@@ -1,0 +1,2810 @@
+[
+  {
+    "number": 1,
+    "title": "Exam 1 — Foundations under pressure",
+    "questions": [
+      {
+        "kind": "mc",
+        "topic": "camera",
+        "stem": "A camera uses the world-to-camera convention Xc = R Xw + t. Which expression gives its optical centre C in world coordinates?",
+        "correct": "C = -R.T @ t",
+        "distractors": [
+          "C = t",
+          "C = -R @ t",
+          "C = R.T @ t"
+        ],
+        "explanation": "At the optical centre Xc = 0. Thus R C + t = 0 and C = -R^(-1)t = -R.T t. The translation column is not generally the camera position.",
+        "source": "HC1b pp.35–45; S1",
+        "id": "E1Q01",
+        "number": 1,
+        "options": [
+          "C = -R @ t",
+          "C = -R.T @ t",
+          "C = R.T @ t",
+          "C = t"
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "camera",
+        "stem": "An image is resized to half its original width and height, with no crop. Use the ideal continuous-coordinate model, with no pixel-centre offset. Which change is correct?",
+        "correct": "Halve fx, fy, skew, cx and cy; keep R and t unchanged.",
+        "distractors": [
+          "Halve R and t; leave K unchanged.",
+          "Halve only fx and fy; leave the principal point unchanged.",
+          "Halve every entry of K, including K[2,2], without renormalizing it."
+        ],
+        "explanation": "Pixel coordinates change, not the camera pose. The first two rows of K scale by 1/2 and its last row stays [0,0,1]. Scaling the entire K only changes homogeneous scale.",
+        "source": "HC1b pp.35–45; S1",
+        "id": "E1Q02",
+        "number": 2,
+        "options": [
+          "Halve fx, fy, skew, cx and cy; keep R and t unchanged.",
+          "Halve only fx and fy; leave the principal point unchanged.",
+          "Halve R and t; leave K unchanged.",
+          "Halve every entry of K, including K[2,2], without renormalizing it."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "camera",
+        "stem": "Under an ideal pinhole model, two distinct visible 3D points have exactly the same image coordinates. What must hold?",
+        "correct": "They lie on the same viewing ray from the optical centre.",
+        "distractors": [
+          "They have the same depth.",
+          "They have the same world X and Y coordinates, regardless of camera pose.",
+          "They have the same physical size."
+        ],
+        "explanation": "Projection retains the direction of a camera-centred ray but loses distance along it. This is a fundamental single-view depth ambiguity.",
+        "source": "HC1a; HC1b pp.24–34",
+        "id": "E1Q03",
+        "number": 3,
+        "options": [
+          "They lie on the same viewing ray from the optical centre.",
+          "They have the same physical size.",
+          "They have the same world X and Y coordinates, regardless of camera pose.",
+          "They have the same depth."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "reflectance",
+        "stem": "Keep illumination, material and surface orientation fixed. For an ideal Lambertian patch, what is independent of viewing direction?",
+        "correct": "Its outgoing radiance, apart from visibility and camera effects.",
+        "distractors": [
+          "Its total projected area in the image.",
+          "Its surface normal in every coordinate frame.",
+          "Its brightness under any change of light direction."
+        ],
+        "explanation": "Lambertian radiance is view-independent. Projected area changes with viewpoint, and brightness still depends on the light–normal angle. Do not confuse radiance with the amount of energy collected from a fixed surface area.",
+        "source": "HC2a pp.12–20",
+        "id": "E1Q04",
+        "number": 4,
+        "options": [
+          "Its outgoing radiance, apart from visibility and camera effects.",
+          "Its total projected area in the image.",
+          "Its brightness under any change of light direction.",
+          "Its surface normal in every coordinate frame."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "photometric",
+        "stem": "Twenty calibrated light vectors all lie in one plane through the origin. In the linear photometric-stereo model i = Lg, which claim is correct?",
+        "correct": "The component of g perpendicular to that plane is unobservable.",
+        "distractors": [
+          "Twenty images guarantee a unique g.",
+          "Normalizing every light vector makes L full rank.",
+          "Only the albedo is ambiguous; the normal is always unique."
+        ],
+        "explanation": "L has rank at most 2. Any vector in its nullspace can be added to g without changing Lg. More dependent observations cannot supply the missing component.",
+        "source": "HC2a pp.34–39; Lab1",
+        "id": "E1Q05",
+        "number": 5,
+        "options": [
+          "Only the albedo is ambiguous; the normal is always unique.",
+          "Twenty images guarantee a unique g.",
+          "The component of g perpendicular to that plane is unobservable.",
+          "Normalizing every light vector makes L full rank."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "photometric",
+        "stem": "A photometric-stereo estimate has g = [0,0,0]. What is the correct interpretation of n = g / ||g||?",
+        "correct": "The normal is undefined; mask or otherwise handle the zero-reflectance/invalid pixel.",
+        "distractors": [
+          "The normal must be [0,0,1].",
+          "The division produces a valid zero unit normal.",
+          "The surface must be infinitely far away."
+        ],
+        "explanation": "A zero vector has no direction. Adding a small denominator can prevent a numerical exception, but does not recover a physically supported normal.",
+        "source": "Lab1; HC2a pp.35–45",
+        "id": "E1Q06",
+        "number": 6,
+        "options": [
+          "The normal must be [0,0,1].",
+          "The surface must be infinitely far away.",
+          "The division produces a valid zero unit normal.",
+          "The normal is undefined; mask or otherwise handle the zero-reflectance/invalid pixel."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "histogram",
+        "stem": "For normalized intensity 0 < r < 1, apply s = r^gamma with 0 < gamma < 1. What happens?",
+        "correct": "Interior intensities increase; 0 and 1 remain fixed.",
+        "distractors": [
+          "Interior intensities decrease; 0 and 1 remain fixed.",
+          "The result is a linear contrast stretch.",
+          "Every output intensity becomes 1."
+        ],
+        "explanation": "For r in (0,1), reducing a positive exponent below 1 makes r^gamma larger than r. Always state the power-law convention; some software uses its reciprocal.",
+        "source": "HC2a pp.59–63; S1",
+        "id": "E1Q07",
+        "number": 7,
+        "options": [
+          "Every output intensity becomes 1.",
+          "The result is a linear contrast stretch.",
+          "Interior intensities increase; 0 and 1 remain fixed.",
+          "Interior intensities decrease; 0 and 1 remain fixed."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "morphology",
+        "stem": "Why does a two-pass connected-component labelling algorithm store equivalences between provisional labels?",
+        "correct": "Different provisional labels can later be found to belong to one connected region.",
+        "distractors": [
+          "It needs to assign a different label to every foreground pixel.",
+          "It estimates the intensity histogram before labelling.",
+          "It changes 4-connectivity into 8-connectivity automatically."
+        ],
+        "explanation": "The first pass can encounter separate branches before their connecting pixels. The second pass resolves recorded label equivalences.",
+        "source": "HC2b pp.7–12",
+        "id": "E1Q08",
+        "number": 8,
+        "options": [
+          "It estimates the intensity histogram before labelling.",
+          "Different provisional labels can later be found to belong to one connected region.",
+          "It needs to assign a different label to every foreground pixel.",
+          "It changes 4-connectivity into 8-connectivity automatically."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "morphology",
+        "stem": "Foreground objects contain tiny isolated foreground specks and small background holes. Which sequence directly targets the two defects, assuming suitable structuring elements?",
+        "correct": "Opening, then closing.",
+        "distractors": [
+          "Closing, then another dilation.",
+          "Dilation, then another dilation.",
+          "Erosion, then another erosion."
+        ],
+        "explanation": "Opening removes small foreground structures. Closing fills small background gaps/holes. Either can alter genuine features, so choose element size and shape with care.",
+        "source": "HC2b pp.13–45; S2",
+        "id": "E1Q09",
+        "number": 9,
+        "options": [
+          "Closing, then another dilation.",
+          "Dilation, then another dilation.",
+          "Opening, then closing.",
+          "Erosion, then another erosion."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "filtering",
+        "stem": "You implement a sliding dot product with an asymmetric 2D kernel K. What change converts this cross-correlation to mathematical convolution?",
+        "correct": "Flip K horizontally and vertically before the sliding dot product.",
+        "distractors": [
+          "Transpose K only.",
+          "Divide K by its sum.",
+          "Negate K without changing its positions."
+        ],
+        "explanation": "Convolution reverses both spatial offsets. Symmetric kernels conceal this distinction; asymmetric derivative or shift kernels do not.",
+        "source": "HC2b pp.78–80; S2",
+        "id": "E1Q10",
+        "number": 10,
+        "options": [
+          "Flip K horizontally and vertically before the sliding dot product.",
+          "Divide K by its sum.",
+          "Negate K without changing its positions.",
+          "Transpose K only."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "filtering",
+        "stem": "Two ideal Gaussian smoothing filters with standard deviations 3 and 4 are applied successively. Ignore sampling and truncation. What is the equivalent standard deviation?",
+        "correct": "5",
+        "distractors": [
+          "7",
+          "12",
+          "25"
+        ],
+        "explanation": "Variances add: sigma^2 = 3^2 + 4^2 = 25. Standard deviations do not add directly.",
+        "source": "HC2b pp.82–87; S2",
+        "id": "E1Q11",
+        "number": 11,
+        "options": [
+          "25",
+          "12",
+          "5",
+          "7"
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "fourier",
+        "stem": "A nonzero Fourier coefficient is a + i b. In NumPy's argument convention, which pair gives its magnitude and phase?",
+        "correct": "sqrt(a*a + b*b), arctan2(b, a)",
+        "distractors": [
+          "a + b, arctan2(a, b)",
+          "sqrt(a*a + b*b), arctan2(a, b)",
+          "a*a + b*b, arctan(b/a) for every a and b"
+        ],
+        "explanation": "Magnitude is distance from the origin. Phase is the quadrant-aware angle measured from the positive real axis; NumPy takes (imaginary, real). See SOURCE_NOTES.md for the slide argument-order issue.",
+        "source": "HC2b pp.97–100; SOURCE_NOTES",
+        "id": "E1Q12",
+        "number": 12,
+        "options": [
+          "a + b, arctan2(a, b)",
+          "sqrt(a*a + b*b), arctan2(b, a)",
+          "a*a + b*b, arctan(b/a) for every a and b",
+          "sqrt(a*a + b*b), arctan2(a, b)"
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "Under valid continuous-domain differentiation and convolution, which operation is equivalent to differentiating a Gaussian-smoothed image?",
+        "correct": "Convolve the image with the corresponding derivative of the Gaussian.",
+        "distractors": [
+          "Convolve the image with the square of the Gaussian.",
+          "Threshold the image and then take a histogram.",
+          "Differentiate the Gaussian's standard deviation instead of a spatial coordinate."
+        ],
+        "explanation": "d(I*G)/dx = I*(dG/dx). Smoothing controls noise before measuring spatial changes.",
+        "source": "HC3a pp.20–54; S2; Lab2",
+        "id": "E1Q13",
+        "number": 13,
+        "options": [
+          "Convolve the image with the corresponding derivative of the Gaussian.",
+          "Threshold the image and then take a histogram.",
+          "Convolve the image with the square of the Gaussian.",
+          "Differentiate the Gaussian's standard deviation instead of a spatial coordinate."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "After Canny non-maximum suppression, a chain of weak pixels connects to a strong pixel; another weak chain is disconnected from all strong pixels. Hysteresis should do what?",
+        "correct": "Keep the connected weak chain and discard the disconnected chain.",
+        "distractors": [
+          "Keep every weak pixel because it exceeds the low threshold.",
+          "Discard every weak pixel because it is below the high threshold.",
+          "Keep whichever chain has the greatest number of pixels, regardless of connection."
+        ],
+        "explanation": "Strong pixels seed edge following. Weak pixels survive only through a qualifying connection to a strong seed, under the declared neighbourhood rule.",
+        "source": "HC3a pp.58–65; S2",
+        "id": "E1Q14",
+        "number": 14,
+        "options": [
+          "Keep every weak pixel because it exceeds the low threshold.",
+          "Discard every weak pixel because it is below the high threshold.",
+          "Keep whichever chain has the greatest number of pixels, regardless of connection.",
+          "Keep the connected weak chain and discard the disconnected chain."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "A local structure tensor has two large eigenvalues. What does this indicate?",
+        "correct": "Strong intensity variation in two independent directions: a good corner-like feature.",
+        "distractors": [
+          "A flat patch.",
+          "A single straight edge with unconstrained tangential motion.",
+          "A guaranteed scale-invariant feature at every resolution."
+        ],
+        "explanation": "Both displacement directions produce a large change. One large and one small eigenvalue instead indicates an edge; two small values indicate a flat patch.",
+        "source": "S3; Lab3 Sections 2–3",
+        "id": "E1Q15",
+        "number": 15,
+        "options": [
+          "A guaranteed scale-invariant feature at every resolution.",
+          "Strong intensity variation in two independent directions: a good corner-like feature.",
+          "A flat patch.",
+          "A single straight edge with unconstrained tangential motion."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "fitting",
+        "stem": "Why is y = mx + b with vertical-residual ordinary least squares unsuitable for an exactly vertical line?",
+        "correct": "A vertical line cannot be represented by a finite m; an orthogonal-distance line model avoids this problem.",
+        "distractors": [
+          "The model becomes valid once both coordinate columns are centred, because centring makes the slope finite.",
+          "Orthogonal-distance fitting handles vertical lines by forcing m = 0 in the same y = mx + b representation.",
+          "It requires equal x and y measurement variances; unequal variances are the reason a vertical line is unrepresentable."
+        ],
+        "explanation": "The slope-intercept model privileges y as the dependent variable. Total least squares uses perpendicular distances and a line representation that admits vertical lines.",
+        "source": "HC3a pp.76–79; S3",
+        "id": "E1Q16",
+        "number": 16,
+        "options": [
+          "It requires equal x and y measurement variances; unequal variances are the reason a vertical line is unrepresentable.",
+          "The model becomes valid once both coordinate columns are centred, because centring makes the slope finite.",
+          "Orthogonal-distance fitting handles vertical lines by forcing m = 0 in the same y = mx + b representation.",
+          "A vertical line cannot be represented by a finite m; an orthogonal-distance line model avoids this problem."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "fitting",
+        "stem": "For fixed desired success probability and model sample size, what happens to the required RANSAC iteration count when the inlier fraction decreases?",
+        "correct": "It increases, often sharply.",
+        "distractors": [
+          "It decreases because more points are rejected.",
+          "It is unchanged because RANSAC is robust.",
+          "RANSAC becomes mathematically impossible as soon as inliers are below 50%."
+        ],
+        "explanation": "The all-inlier sample probability is w^s. A lower w makes such samples rarer. RANSAC can work below 50% inliers, but the required budget can be large.",
+        "source": "HC3a pp.91–109; S3",
+        "id": "E1Q17",
+        "number": 17,
+        "options": [
+          "It decreases because more points are rejected.",
+          "RANSAC becomes mathematically impossible as soon as inliers are below 50%.",
+          "It increases, often sharply.",
+          "It is unchanged because RANSAC is robust."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "flow",
+        "stem": "In Lucas–Kanade, A has rows [Ix, Iy]. Which matrix also appears in corner analysis?",
+        "correct": "A.T @ A: the local second-moment/structure tensor.",
+        "distractors": [
+          "A @ A.T, always a 2 by 2 matrix.",
+          "The intrinsic calibration matrix K.",
+          "The homography's last row."
+        ],
+        "explanation": "A.T A contains sums of Ix^2, Ix Iy and Iy^2. Its eigenvalues determine whether the local flow estimate is well constrained in both directions.",
+        "source": "HC3b p.47; S3; Lab3",
+        "id": "E1Q18",
+        "number": 18,
+        "options": [
+          "A.T @ A: the local second-moment/structure tensor.",
+          "A @ A.T, always a 2 by 2 matrix.",
+          "The intrinsic calibration matrix K.",
+          "The homography's last row."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "flow",
+        "stem": "A Lucas–Kanade window crosses the boundary between two independently moving objects. Which assumption is most directly violated?",
+        "correct": "A single common flow vector for all pixels in the window.",
+        "distractors": [
+          "The camera has a finite focal length.",
+          "The image contains any gradients at all.",
+          "The image has more than one colour channel."
+        ],
+        "explanation": "A larger window adds equations but can mix incompatible motions. Local motion consistency, not simply pixel count, matters.",
+        "source": "HC3b pp.39–47; Lab3",
+        "id": "E1Q19",
+        "number": 19,
+        "options": [
+          "The image contains any gradients at all.",
+          "The image has more than one colour channel.",
+          "The camera has a finite focal length.",
+          "A single common flow vector for all pixels in the window."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "Which property is preserved by every nonsingular affine image transformation, but not by every projective transformation?",
+        "correct": "Parallelism of lines.",
+        "distractors": [
+          "All angles.",
+          "All Euclidean lengths.",
+          "The location of the origin."
+        ],
+        "explanation": "Affine transforms preserve parallelism and ratios along a line, not general angles or lengths. General homographies preserve straight lines but can map parallel lines to intersecting ones.",
+        "source": "HC4a pp.17–22; S4",
+        "id": "E1Q20",
+        "number": 20,
+        "options": [
+          "All Euclidean lengths.",
+          "All angles.",
+          "The location of the origin.",
+          "Parallelism of lines."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "Two views of a static scene are taken by rotating a camera about exactly the same optical centre. The scene is not planar. Which model still relates the ideal undistorted images?",
+        "correct": "One homography, independent of scene depth.",
+        "distractors": [
+          "No global model can exist unless the scene is planar.",
+          "A 2D affine map for every possible rotation angle and calibration, without a projective denominator.",
+          "A unique depth-dependent map recovered by inverting the fundamental matrix."
+        ],
+        "explanation": "Pure rotation makes the image mapping depend on ray direction rather than depth: H = K2 R21 K1^(-1). A planar scene is the other important homography case.",
+        "source": "HC4a pp.33–35; S4",
+        "id": "E1Q21",
+        "number": 21,
+        "options": [
+          "A unique depth-dependent map recovered by inverting the fundamental matrix.",
+          "No global model can exist unless the scene is planar.",
+          "One homography, independent of scene depth.",
+          "A 2D affine map for every possible rotation angle and calibration, without a projective denominator."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "Why impose ||h|| = 1 when solving the homogeneous DLT problem min ||A h||^2 for a homography?",
+        "correct": "Without a scale constraint, h = 0 is a trivial minimizer and does not define a homography.",
+        "distractors": [
+          "Because all nine entries of H must equal 1.",
+          "Because every image point must have unit Euclidean norm.",
+          "Because this fixes lens distortion."
+        ],
+        "explanation": "A homography is defined only up to nonzero scale. The constrained solution is the smallest-eigenvalue eigenvector of A.T A, equivalently the appropriate right singular vector of A.",
+        "source": "HC4a pp.51–55",
+        "id": "E1Q22",
+        "number": 22,
+        "options": [
+          "Because all nine entries of H must equal 1.",
+          "Without a scale constraint, h = 0 is a trivial minimizer and does not define a homography.",
+          "Because every image point must have unit Euclidean norm.",
+          "Because this fixes lens distortion."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "matching",
+        "stem": "A descriptor's nearest and second-nearest match distances are almost equal. Why does Lowe's ratio test tend to reject it?",
+        "correct": "The match is ambiguous even if the nearest absolute distance is small.",
+        "distractors": [
+          "Similar distances establish a reliable nearest match; the ratio test should therefore always keep it.",
+          "The ratio test rejects it only because the nearest absolute distance must exceed a fixed universal cutoff.",
+          "It has already been proven to be a geometric outlier; descriptor distances directly establish reprojection error."
+        ],
+        "explanation": "Repeated or weakly distinctive patterns can have several nearly equally plausible matches. The ratio compares distinctiveness relative to the next alternative.",
+        "source": "HC4a pp.41–44; S4; Lab4",
+        "id": "E1Q23",
+        "number": 23,
+        "options": [
+          "Similar distances establish a reliable nearest match; the ratio test should therefore always keep it.",
+          "The match is ambiguous even if the nearest absolute distance is small.",
+          "The ratio test rejects it only because the nearest absolute distance must exceed a fixed universal cutoff.",
+          "It has already been proven to be a geometric outlier; descriptor distances directly establish reprojection error."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "classification",
+        "stem": "Two images have identical counts of visual words but different arrangements of those words. A plain Bag-of-Visual-Words histogram will do what?",
+        "correct": "Represent them identically, because it discards spatial arrangement.",
+        "distractors": [
+          "Recover their exact layout from the counts.",
+          "Require a different number of histogram bins for each image.",
+          "Use the image labels as its histogram bin values."
+        ],
+        "explanation": "The vocabulary gives fixed-length count vectors. Plain BoVW is orderless; a spatial extension would be needed to retain layout.",
+        "source": "HC4b pp.23–28; S4",
+        "id": "E1Q24",
+        "number": 24,
+        "options": [
+          "Recover their exact layout from the counts.",
+          "Represent them identically, because it discards spatial arrangement.",
+          "Require a different number of histogram bins for each image.",
+          "Use the image labels as its histogram bin values."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "classification",
+        "stem": "You want a clean estimate of generalization for a BoVW classifier. Which protocol is best?",
+        "correct": "Fit the vocabulary on training descriptors; select settings on validation data; evaluate once on untouched test data.",
+        "distractors": [
+          "Fit the vocabulary on all images, including the test set, to make evaluation easier.",
+          "Choose k and vocabulary size using test accuracy, then report that accuracy.",
+          "Choose every setting using training accuracy alone."
+        ],
+        "explanation": "Unsupervised preprocessing can still leak information. The validation set selects hyperparameters; the test set measures the final chosen pipeline.",
+        "source": "HC4b pp.25–28,55–58; Lab5",
+        "id": "E1Q25",
+        "number": 25,
+        "options": [
+          "Choose k and vocabulary size using test accuracy, then report that accuracy.",
+          "Fit the vocabulary on all images, including the test set, to make evaluation easier.",
+          "Choose every setting using training accuracy alone.",
+          "Fit the vocabulary on training descriptors; select settings on validation data; evaluate once on untouched test data."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "metrics",
+        "stem": "A classifier predicts the majority class for every example and achieves 99% accuracy on a 99:1 class split. What can its minority-class recall be?",
+        "correct": "0",
+        "distractors": [
+          "0.99",
+          "1",
+          "It must equal minority-class precision and be positive."
+        ],
+        "explanation": "It finds none of the minority examples: TP = 0 and FN is the minority count. Accuracy alone can hide complete failure on a rare class.",
+        "source": "HC4b pp.80–86",
+        "id": "E1Q26",
+        "number": 26,
+        "options": [
+          "0",
+          "1",
+          "0.99",
+          "It must equal minority-class precision and be positive."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "cnn",
+        "stem": "Ignoring boundaries, a stride-1 convolution with shared weights most directly provides which property?",
+        "correct": "Translation equivariance: shifting the input shifts the feature map.",
+        "distractors": [
+          "Exact translation invariance: the whole feature map never changes after a shift.",
+          "Exact invariance to every rotation and scale change.",
+          "A separate learned kernel for each image location."
+        ],
+        "explanation": "Shared local operations follow translations. Invariance would mean unchanged output; pooling and aggregation can provide limited or additional invariance, not the same property.",
+        "source": "HC5b pp.22–24,64; S5",
+        "id": "E1Q27",
+        "number": 27,
+        "options": [
+          "Exact translation invariance: the whole feature map never changes after a shift.",
+          "A separate learned kernel for each image location.",
+          "Exact invariance to every rotation and scale change.",
+          "Translation equivariance: shifting the input shifts the feature map."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "detection",
+        "stem": "What is the main proposal-generation difference between Fast R-CNN and Faster R-CNN?",
+        "correct": "Faster R-CNN uses a learned Region Proposal Network; Fast R-CNN normally relies on external proposals such as Selective Search.",
+        "distractors": [
+          "Fast R-CNN has an RPN and Faster R-CNN removes it.",
+          "Faster R-CNN runs a separate backbone independently on every raw crop.",
+          "Fast R-CNN predicts pixel masks instead of boxes."
+        ],
+        "explanation": "Fast R-CNN shares a full-image convolutional feature map but retains external proposals. Faster R-CNN also learns proposals through an RPN sharing backbone features.",
+        "source": "HC5b pp.125–133; HC6a pp.18–38",
+        "id": "E1Q28",
+        "number": 28,
+        "options": [
+          "Fast R-CNN predicts pixel masks instead of boxes.",
+          "Fast R-CNN has an RPN and Faster R-CNN removes it.",
+          "Faster R-CNN uses a learned Region Proposal Network; Fast R-CNN normally relies on external proposals such as Selective Search.",
+          "Faster R-CNN runs a separate backbone independently on every raw crop."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "architectures",
+        "stem": "Which statement correctly distinguishes the usual skip operations of ResNet and U-Net?",
+        "correct": "ResNet adds compatible activations; U-Net concatenates encoder and decoder features across matching scales.",
+        "distractors": [
+          "ResNet concatenates encoder/decoder features; U-Net adds an identity tensor to each residual branch.",
+          "Both normally concatenate along the channel axis, so every skip doubles the number of channels.",
+          "Both use elementwise addition with mismatched channel counts; the addition automatically supplies the missing channels."
+        ],
+        "explanation": "Residual addition supports identity-like mappings and gradient paths. U-Net concatenation transfers high-resolution spatial information to the decoder.",
+        "source": "HC6a pp.99–112,122–137",
+        "id": "E1Q29",
+        "number": 29,
+        "options": [
+          "ResNet adds compatible activations; U-Net concatenates encoder and decoder features across matching scales.",
+          "Both use elementwise addition with mismatched channel counts; the addition automatically supplies the missing channels.",
+          "Both normally concatenate along the channel axis, so every skip doubles the number of channels.",
+          "ResNet concatenates encoder/decoder features; U-Net adds an identity tensor to each residual branch."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "stereo",
+        "stem": "Given a homogeneous image point x in image 1 and fundamental matrix F, with F x nonzero, what does F x specify in image 2?",
+        "correct": "An epipolar line on which the corresponding point must lie.",
+        "distractors": [
+          "The unique matching point, including its depth.",
+          "The matching image point after dehomogenizing F x as if it were a homography output.",
+          "A viewing-ray depth that becomes metric once F is normalized to unit Frobenius norm."
+        ],
+        "explanation": "Epipolar geometry reduces correspondence search from 2D to 1D. It does not select a unique point along the line. The nonzero condition excludes the epipole's degenerate zero output.",
+        "source": "HC6b pp.50–65",
+        "id": "E1Q30",
+        "number": 30,
+        "options": [
+          "The unique matching point, including its depth.",
+          "An epipolar line on which the corresponding point must lie.",
+          "A viewing-ray depth that becomes metric once F is normalized to unit Frobenius norm.",
+          "The matching image point after dehomogenizing F x as if it were a homography output."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "num",
+        "topic": "camera",
+        "stem": "Use column vectors and the virtual image plane in front of the camera. The camera centre is C = [1,2,0], Xw = [3,5,4], and Xc = R @ (Xw-C).\n\n```python\nimport numpy as np\nC = np.array([1,2,0])\nXw = np.array([3,5,4])\nR = np.array([[0,-1,0], [1,0,0], [0,0,1]])\nK = np.array([[800,20,320], [0,600,240], [0,0,1]])\n```\n\nProjection is q = K @ Xc, followed by u = q[0]/q[2]. Report u in pixels.",
+        "answer": -270.0,
+        "explanation": "Xw-C = [2,3,4], Xc = [-3,2,4]. q[0] = 800*(-3) + 20*2 + 320*4 = -1080. Divide by 4: u = -270. A negative pixel coordinate can simply be outside the field of view.",
+        "source": "HC1b pp.24–45; S1",
+        "integer": false,
+        "id": "E1Q31",
+        "number": 31,
+        "display_answer": "-270.00"
+      },
+      {
+        "kind": "num",
+        "topic": "photometric",
+        "stem": "For one pixel, use i = Lg, where light strength and camera gain are already absorbed into L. Compute the least-squares estimate, then report albedo rho = ||g||.\n\n```python\nimport numpy as np\nL = np.array([[0,0,1], [.8,0,.6], [-.8,0,.6],\n              [0,.8,.6], [0,-.8,.6]])\ni = np.array([.70,.64,.16,.44,.36])\n```\n\nProvided routine: `g = np.linalg.lstsq(L, i, rcond=None)[0]` minimizes the sum of squared residuals. `np.linalg.norm(g)` returns the Euclidean norm.",
+        "answer": 0.7452154112317649,
+        "explanation": "L.T L = diag(1.28,1.28,2.44) and L.T i = [0.384,0.064,1.66]. Thus g = [0.3,0.05,1.66/2.44]. Its norm is about 0.7452, so submit 0.75. Do not normalize g before taking its magnitude.",
+        "source": "HC2a pp.34–39; Lab1; Coding examples Q1,Q5",
+        "integer": false,
+        "id": "E1Q32",
+        "number": 32,
+        "display_answer": "0.75"
+      },
+      {
+        "kind": "num",
+        "topic": "photometric",
+        "stem": "Use the height-field convention n proportional to [-p,-q,1], where p = dz/dx and q = dz/dy. A plane has constant normal proportional to [2,-1,2] and z(0,0) = 5. Report z(3,4), using unit spatial spacing.",
+        "answer": 4.0,
+        "explanation": "p = -2/2 = -1 and q = -(-1)/2 = 0.5. z(3,4) = 5 + 3*(-1) + 4*0.5 = 4. The declared sign convention is essential.",
+        "source": "HC2a pp.41–43; Lab1; SOURCE_NOTES",
+        "integer": false,
+        "id": "E1Q33",
+        "number": 33,
+        "display_answer": "4.00"
+      },
+      {
+        "kind": "num",
+        "topic": "histogram",
+        "stem": "A 2-bit image has histogram counts [1,3,2,2] for levels [0,1,2,3]. Use this specific equalization rule: T(r) = floor(3 * CDF(r)), with no subtraction of CDF_min. Report T(1) as an exact integer.",
+        "answer": 1,
+        "explanation": "CDF(1) = (1+3)/8 = 0.5; floor(3*0.5) = 1. Other equalization conventions can differ, which is why the mapping is specified.",
+        "source": "HC2a pp.51–63; S1",
+        "integer": true,
+        "id": "E1Q34",
+        "number": 34,
+        "display_answer": "1"
+      },
+      {
+        "kind": "num",
+        "topic": "morphology",
+        "stem": "Close the following 1D binary row with the centred structuring element [1,1,1]. Closing means dilation followed by erosion. At each stage retain exactly 11 entries and treat all out-of-range values as 0. Report the number of foreground entries after closing.\n\n```text\n[0,1,1,0,1,1,0,0,1,0,0]\n```",
+        "answer": 8,
+        "explanation": "Dilation gives [1,1,1,1,1,1,1,1,1,1,0]. Erosion of that fixed-length result gives [0,1,1,1,1,1,1,1,1,0,0], which has 8 foreground entries.",
+        "source": "HC2b pp.13–45; S2",
+        "integer": true,
+        "id": "E1Q35",
+        "number": 35,
+        "display_answer": "8"
+      },
+      {
+        "kind": "num",
+        "topic": "filtering",
+        "stem": "For the 3 by 3 patch I and kernel K below, report the single valid output of mathematical convolution, not cross-correlation. The kernel is flipped on both axes. Report an exact integer.\n\n```text\nI = [[1, 2, 0], [3,-1,4], [2,1,5]]\nK = [[1, 0, 2], [0,-1,0], [3,0,-2]]\n```",
+        "answer": 8,
+        "explanation": "The flipped kernel is [[-2,0,3],[0,-1,0],[2,0,1]]. The dot product is -2 + 1 + 4 + 5 = 8. The unflipped result would be different.",
+        "source": "HC2b pp.78–80; S2; Lab2",
+        "integer": true,
+        "id": "E1Q36",
+        "number": 36,
+        "display_answer": "8"
+      },
+      {
+        "kind": "num",
+        "topic": "fourier",
+        "stem": "Use the unnormalized DFT F[k] = sum(n=0..3) f[n] exp(-2*pi*i*k*n/4). For f = [1,2,3,4], report the magnitude of F[1]. You can use exp(-i*pi/2) = -i and exp(-i*pi) = -1.",
+        "answer": 2.8284271247461903,
+        "explanation": "F[1] = 1 - 2i - 3 + 4i = -2 + 2i. Its magnitude is sqrt(4+4) = sqrt(8), so submit 2.83.",
+        "source": "HC2b pp.95–104",
+        "integer": false,
+        "id": "E1Q37",
+        "number": 37,
+        "display_answer": "2.83"
+      },
+      {
+        "kind": "num",
+        "topic": "features",
+        "stem": "A patch has structure tensor M = [[9,3],[3,9]]. The Harris response is R = det(M) - k * trace(M)^2, with k = 0.04. Report R.",
+        "answer": 59.04,
+        "explanation": "det(M) = 81-9 = 72; trace(M) = 18. R = 72 - 0.04*324 = 59.04. A positive response alone still needs thresholding and spatial non-maximum suppression.",
+        "source": "S3; Lab3",
+        "integer": false,
+        "id": "E1Q38",
+        "number": 38,
+        "display_answer": "59.04"
+      },
+      {
+        "kind": "num",
+        "topic": "flow",
+        "stem": "Use Ix*u + Iy*v = -It and one constant flow in the window. Compute the least-squares flow and report u.\n\n```python\nimport numpy as np\nA = np.array([[1,0], [0,1], [1,1], [2,0]], dtype=float)\nIt = np.array([-2,1,-1,-5], dtype=float)\n```\n\nProvided routine: `np.linalg.lstsq(A, -It, rcond=None)[0]` minimizes squared residuals.",
+        "answer": 2.3636363636363638,
+        "explanation": "A.T A = [[6,1],[1,2]], A.T(-It) = [13,0]. Solve 6u+v=13 and u+2v=0: u=26/11, v=-13/11. Submit 2.36; forgetting the minus sign reverses the estimate.",
+        "source": "HC3b pp.39–47; S3; Lab3",
+        "integer": false,
+        "id": "E1Q39",
+        "number": 39,
+        "display_answer": "2.36"
+      },
+      {
+        "kind": "num",
+        "topic": "fitting",
+        "stem": "A homography RANSAC uses samples of 4 correspondences, each independently an inlier with probability w = 0.6. Report the minimum integer iteration count for success probability at least p = 0.99. Use N = ceil(log(1-p) / log(1-w^4)). Assume all-inlier samples are nondegenerate.",
+        "answer": 34,
+        "explanation": "The all-inlier probability is 0.6^4 = 0.1296. The ratio of logarithms is approximately 33.18; round upwards, not to the nearest integer. N = 34.",
+        "source": "HC3a pp.104–105; HC4a pp.45–48",
+        "integer": true,
+        "id": "E1Q40",
+        "number": 40,
+        "display_answer": "34"
+      },
+      {
+        "kind": "num",
+        "topic": "geometry",
+        "stem": "A homography maps source to target with H = [[2,0,1],[0,1,-2],[0.1,0,1]]. Use column-vector homogeneous coordinates. Report the target x coordinate of source point (5,4).",
+        "answer": 7.333333333333333,
+        "explanation": "H @ [5,4,1] = [11,2,1.5]. Dehomogenize: x' = 11/1.5 = 7.3333, so submit 7.33. The third coordinate is not generally 1.",
+        "source": "HC4a pp.20–22,51; S4",
+        "integer": false,
+        "id": "E1Q41",
+        "number": 41,
+        "display_answer": "7.33"
+      },
+      {
+        "kind": "num",
+        "topic": "geometry",
+        "stem": "Backward warping maps a target pixel to source coordinates (x,y) = (0.25,0.75). Source intensities are I[0,0]=10, I[0,1]=30, I[1,0]=50, I[1,1]=90. Arrays use I[y,x]. Report the bilinear interpolated intensity. The weights are (1-x)(1-y), x(1-y), (1-x)y and xy, respectively.",
+        "answer": 48.75,
+        "explanation": "Weights are 0.1875, 0.0625, 0.5625 and 0.1875. The weighted sum is 1.875 + 1.875 + 28.125 + 16.875 = 48.75. Do not interchange x and y.",
+        "source": "HC4a pp.24–31; Lab4",
+        "integer": false,
+        "id": "E1Q42",
+        "number": 42,
+        "display_answer": "48.75"
+      },
+      {
+        "kind": "num",
+        "topic": "metrics",
+        "stem": "Rows of the following confusion matrix are actual classes A,B,C; columns are predicted classes A,B,C. Report the F1 score for class B as a fraction, not a percentage.\n\n```text\n[[18, 2, 0],\n [ 3,12, 5],\n [ 1, 4,15]]\n```",
+        "answer": 0.631578947368421,
+        "explanation": "TP=12, FP=2+4=6, FN=3+5=8. F1 = 2TP/(2TP+FP+FN) = 24/38 = 0.6315789. Submit 0.63.",
+        "source": "HC4b pp.80–86; S4",
+        "integer": false,
+        "id": "E1Q43",
+        "number": 43,
+        "display_answer": "0.63"
+      },
+      {
+        "kind": "num",
+        "topic": "metrics",
+        "stem": "A retrieval query has 4 relevant database images in total. In its returned ranking, relevant images occur at ranks 1,3,5; the fourth is not returned. Use uninterpolated AP = (sum of precision at each relevant rank) / total relevant images. Report AP as a fraction.",
+        "answer": 0.5666666666666667,
+        "explanation": "AP = (1/1 + 2/3 + 3/5)/4 = 17/30. The missing relevant image contributes zero, so the denominator is 4, not 3. Submit 0.57.",
+        "source": "HC5a pp.19–24,68–78; S4",
+        "integer": false,
+        "id": "E1Q44",
+        "number": 44,
+        "display_answer": "0.57"
+      },
+      {
+        "kind": "num",
+        "topic": "detection",
+        "stem": "Boxes use continuous coordinates [xmin,ymin,xmax,ymax], so width = xmax-xmin, without a +1 correction. Report IoU for A=[0,0,6,4] and B=[2,1,8,5].",
+        "answer": 0.3333333333333333,
+        "explanation": "Each area is 24. The intersection is width 4 times height 3 = 12. Union = 24+24-12 = 36. IoU = 12/36 = 1/3; submit 0.33.",
+        "source": "HC5a p.62; S4",
+        "integer": false,
+        "id": "E1Q45",
+        "number": 45,
+        "display_answer": "0.33"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "A standard 2D convolution takes an H x W x Cin input of 31 x 29 x 3. Kernel height/width = 5 x 3, stride = 2 x 2, padding = 1 x 0 on EACH side, and Cout = 8. No dilation. Report the total number of scalar outputs, excluding the batch dimension. Use out = floor((in + 2*pad - kernel)/stride)+1 per axis.",
+        "answer": 1680,
+        "explanation": "Hout = floor((31+2-5)/2)+1 = 15; Wout = floor((29-3)/2)+1 = 14. Total = 15*14*8 = 1680. Count output positions, not input positions.",
+        "source": "HC5b pp.25–43,66–68; S5",
+        "integer": true,
+        "id": "E1Q46",
+        "number": 46,
+        "display_answer": "1680"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "For the convolution in Q46, report the number of trainable parameters INCLUDING one bias per output channel. It is a dense convolution across all 3 input channels; no groups.",
+        "answer": 368,
+        "explanation": "Each output channel has 5*3*3 = 45 weights and one bias. There are 8 output channels, so 8*(45+1) = 368. Spatial resolution and stride do not change this count.",
+        "source": "HC5b pp.66–73; S5",
+        "integer": true,
+        "id": "E1Q47",
+        "number": 47,
+        "display_answer": "368"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "Flatten a 7 x 7 x 16 feature map and feed it to a fully connected layer with 10 output units. Include one bias per output unit. Report its trainable parameter count.",
+        "answer": 7850,
+        "explanation": "The flattened input has 7*7*16 = 784 values. Count 784*10 weights plus 10 biases = 7850.",
+        "source": "HC5b pp.16–24; S5",
+        "integer": true,
+        "id": "E1Q48",
+        "number": 48,
+        "display_answer": "7850"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "A network applies: a 3 x 3 convolution with stride 1; a 2 x 2 pooling layer with stride 2; a 3 x 3 convolution with stride 1. Report the side length of one final unit's theoretical receptive field in original input pixels. Ignore boundaries. Provided recurrence: r_new = r_old + (kernel-1)*j_old; j_new = j_old*stride; start r=j=1.",
+        "answer": 8,
+        "explanation": "After conv: r=3,j=1. After pool: r=4,j=2. After second conv: r=4+2*2=8,j=2. Pooling changes the spacing used by later layers.",
+        "source": "HC5b pp.80–85; HC6a pp.6–9",
+        "integer": true,
+        "id": "E1Q49",
+        "number": 49,
+        "display_answer": "8"
+      },
+      {
+        "kind": "num",
+        "topic": "stereo",
+        "stem": "For x2.T @ F @ x1 = 0, let F=[[0,0,0],[0,0,-1],[0,1,0]], x1=[12,7,1] and candidate x2=[9,9,1]. Report the perpendicular distance in pixels from x2 to its epipolar line l2=F@x1. Provided formula: distance = abs(a*x+b*y+c)/sqrt(a*a+b*b), for line [a,b,c].",
+        "answer": 2.0,
+        "explanation": "l2=[0,-1,7], so the line is y=7. The candidate has y=9, giving distance | -9+7 | / 1 = 2. This tests the line constraint, not whether the candidate is the true appearance match.",
+        "source": "HC6b pp.50–65",
+        "integer": false,
+        "id": "E1Q50",
+        "number": 50,
+        "display_answer": "2.00"
+      }
+    ]
+  },
+  {
+    "number": 2,
+    "title": "Exam 2 — Implementation and failure diagnosis",
+    "questions": [
+      {
+        "kind": "mc",
+        "topic": "camera",
+        "stem": "R1 and R2 are proper 3D rotation matrices. Which statement is correct?",
+        "correct": "The inverse of R2 @ R1 is R1.T @ R2.T; rotation order generally matters.",
+        "distractors": [
+          "The inverse is always R2.T @ R1.T.",
+          "R1 @ R2 always equals R2 @ R1.",
+          "A rotation matrix has 9 independent degrees of freedom."
+        ],
+        "explanation": "For a product, inverse order reverses. Orthogonality gives R^(-1)=R.T. A proper 3D rotation has 3 degrees of freedom, not 9.",
+        "source": "HC1b pp.41–45; HC4a pp.11–19",
+        "id": "E2Q01",
+        "number": 1,
+        "options": [
+          "The inverse is always R2.T @ R1.T.",
+          "A rotation matrix has 9 independent degrees of freedom.",
+          "The inverse of R2 @ R1 is R1.T @ R2.T; rotation order generally matters.",
+          "R1 @ R2 always equals R2 @ R1."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "camera",
+        "stem": "Crop an image by removing 40 pixels from the left and 20 from the top, with no resize. In the continuous-coordinate model, how does K change?",
+        "correct": "Subtract 40 from cx and 20 from cy; keep focal lengths and skew unchanged.",
+        "distractors": [
+          "Subtract 40 from fx and 20 from fy.",
+          "Keep K unchanged and add [40,20,0] to camera translation.",
+          "Multiply both focal lengths by the crop's remaining image area."
+        ],
+        "explanation": "The new pixel origin changes the principal-point coordinates. Cropping does not change the pose or the pixel scale.",
+        "source": "HC1b pp.35–45; S1",
+        "id": "E2Q02",
+        "number": 2,
+        "options": [
+          "Subtract 40 from fx and 20 from fy.",
+          "Keep K unchanged and add [40,20,0] to camera translation.",
+          "Subtract 40 from cx and 20 from cy; keep focal lengths and skew unchanged.",
+          "Multiply both focal lengths by the crop's remaining image area."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "colour",
+        "stem": "For floating-point RGB image I of shape (H,W,3), what does this code compute?\n\n```python\nout = (I.max(axis=2) + I.min(axis=2)) / 2\n```",
+        "correct": "A lightness-based grayscale image of shape (H,W).",
+        "distractors": [
+          "An RGB image with corrected white balance.",
+          "One scalar containing the midpoint of the global intensity range.",
+          "A hue map obtained by averaging the red and blue channels."
+        ],
+        "explanation": "The reduction is per pixel across channels. It is (max RGB + min RGB)/2, a grayscale lightness definition, not weighted luminance or white balance.",
+        "source": "Lab1; Coding examples Q2",
+        "id": "E2Q03",
+        "number": 3,
+        "options": [
+          "One scalar containing the midpoint of the global intensity range.",
+          "A lightness-based grayscale image of shape (H,W).",
+          "An RGB image with corrected white balance.",
+          "A hue map obtained by averaging the red and blue channels."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "colour",
+        "stem": "Which expression computes per-channel image means that broadcast correctly onto an array of shape (H,W,3)?",
+        "correct": "I.mean(axis=(0,1), keepdims=True)",
+        "distractors": [
+          "I.mean(axis=(0,1,2), keepdims=True)",
+          "I.mean(axis=2, keepdims=True)",
+          "I.mean(axis=0, keepdims=True), which always has shape (1,1,3)"
+        ],
+        "explanation": "Reducing the two spatial axes retains the channel dimension: shape (1,1,3). Reducing every axis instead gives the same scalar for all channels and defeats Grey-World correction.",
+        "source": "Lab1; Coding examples Q3,Q4",
+        "id": "E2Q04",
+        "number": 4,
+        "options": [
+          "I.mean(axis=0, keepdims=True), which always has shape (1,1,3)",
+          "I.mean(axis=(0,1), keepdims=True)",
+          "I.mean(axis=(0,1,2), keepdims=True)",
+          "I.mean(axis=2, keepdims=True)"
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "photometric",
+        "stem": "Suppose the true lighting matrix is Ltrue = 2 * Lused, with no shadows or noise. You solve i = Lused ghat. How do the estimated normal and albedo relate to the true ones?",
+        "correct": "The normal is unchanged; the albedo estimate is doubled.",
+        "distractors": [
+          "Both normal direction and albedo are unchanged.",
+          "The normal reverses and albedo is halved.",
+          "The normal doubles in length after normalization; albedo is unchanged."
+        ],
+        "explanation": "i = 2 Lused gtrue, so ghat = 2 gtrue. Its magnitude doubles but its normalized direction remains the same. Calibrated strengths are needed for absolute albedo.",
+        "source": "HC2a pp.19–20,34–39; Lab1",
+        "id": "E2Q05",
+        "number": 5,
+        "options": [
+          "The normal doubles in length after normalization; albedo is unchanged.",
+          "Both normal direction and albedo are unchanged.",
+          "The normal reverses and albedo is halved.",
+          "The normal is unchanged; the albedo estimate is doubled."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "reflectance",
+        "stem": "For the intrinsic-image model I = A * S, where multiplication is elementwise, which recolouring operation preserves the estimated shading?",
+        "correct": "Change the object's albedo A and multiply the changed A by the original S.",
+        "distractors": [
+          "Change S to the target RGB colour and discard A.",
+          "Divide the target albedo by S.",
+          "Replace every RGB pixel in I by the same target colour, including shadows."
+        ],
+        "explanation": "Albedo represents material colour; shading represents illumination and geometry. Recolour the material layer and reconstruct with the existing shading layer, while respecting the object mask.",
+        "source": "HC2a pp.47–48; Lab1; Coding examples Q6",
+        "id": "E2Q06",
+        "number": 6,
+        "options": [
+          "Divide the target albedo by S.",
+          "Change the object's albedo A and multiply the changed A by the original S.",
+          "Change S to the target RGB colour and discard A.",
+          "Replace every RGB pixel in I by the same target colour, including shadows."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "reflectance",
+        "stem": "A uniformly painted matte object has spatially constant albedo. Why can its image still contain a brightness gradient?",
+        "correct": "Its surface normals and therefore light–normal dot products can vary.",
+        "distractors": [
+          "Lambertian reflection requires all pixels to have the same intensity.",
+          "Constant albedo forces constant depth.",
+          "Its intrinsic albedo must contain every shadow."
+        ],
+        "explanation": "Constant material reflectance does not imply constant shading. Geometry and illumination influence intensity independently of the albedo value.",
+        "source": "HC2a pp.12–23,47",
+        "id": "E2Q07",
+        "number": 7,
+        "options": [
+          "Lambertian reflection requires all pixels to have the same intensity.",
+          "Constant albedo forces constant depth.",
+          "Its surface normals and therefore light–normal dot products can vary.",
+          "Its intrinsic albedo must contain every shadow."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "histogram",
+        "stem": "What information can a joint RGB histogram retain that three separate channel histograms lose?",
+        "correct": "Which red, green and blue values occur together at the same pixels.",
+        "distractors": [
+          "The exact spatial location of each pixel having a particular colour.",
+          "The order of coloured regions across image rows, rather than just their colour counts.",
+          "The scene's illumination-independent albedo distribution, regardless of camera response."
+        ],
+        "explanation": "Marginal distributions lose cross-channel associations. A joint histogram retains colour combinations but still loses spatial arrangement.",
+        "source": "HC2a pp.54–56",
+        "id": "E2Q08",
+        "number": 8,
+        "options": [
+          "Which red, green and blue values occur together at the same pixels.",
+          "The scene's illumination-independent albedo distribution, regardless of camera response.",
+          "The order of coloured regions across image rows, rather than just their colour counts.",
+          "The exact spatial location of each pixel having a particular colour."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "morphology",
+        "stem": "A binary erosion uses a cross-shaped 3 by 3 structuring element with zeros at its corners. How should the zeros be treated?",
+        "correct": "Ignore those positions; require foreground only at active element positions.",
+        "distractors": [
+          "Require the image's corner positions to be zero.",
+          "Include the mask zeros in a logical AND, forcing every output to zero.",
+          "Replace the operation by an average over all nine pixels."
+        ],
+        "explanation": "The structuring element specifies the tested support. Inactive positions impose no requirement. Treating their literal zeros as operands in the final AND is a common implementation error.",
+        "source": "HC2b pp.14–29; S2",
+        "id": "E2Q09",
+        "number": 9,
+        "options": [
+          "Require the image's corner positions to be zero.",
+          "Replace the operation by an average over all nine pixels.",
+          "Include the mask zeros in a logical AND, forcing every output to zero.",
+          "Ignore those positions; require foreground only at active element positions."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "foundations",
+        "stem": "A system labels every pixel by semantic class, including pixels of several touching people, but gives no person-instance IDs. What does its output provide, and can connected-component labelling alone reliably supply the missing instance separation?",
+        "correct": "Semantic segmentation; no, touching people can merge into one connected component.",
+        "distractors": [
+          "Instance segmentation; a semantic class label automatically identifies which individual person owns each pixel.",
+          "Panoptic segmentation; instance IDs are unnecessary as long as all pixels have semantic labels.",
+          "Object detection only; connected-component labels are already separate bounding-box detections."
+        ],
+        "explanation": "Semantic labels distinguish classes, not individual instances. A connected component of the person-class mask can contain multiple touching people, so plain component labelling is not guaranteed instance segmentation.",
+        "source": "HC5a pp.81–89,120–122; HC2b pp.5–12",
+        "id": "E2Q10",
+        "number": 10,
+        "options": [
+          "Semantic segmentation; no, touching people can merge into one connected component.",
+          "Instance segmentation; a semantic class label automatically identifies which individual person owns each pixel.",
+          "Object detection only; connected-component labels are already separate bounding-box detections.",
+          "Panoptic segmentation; instance IDs are unnecessary as long as all pixels have semantic labels."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "filtering",
+        "stem": "Why is a median filter often preferable to averaging for sparse salt-and-pepper noise?",
+        "correct": "It is less affected by extreme isolated values and can preserve edges better.",
+        "distractors": [
+          "It is a linear filter with a fixed kernel of average weights.",
+          "It guarantees removal of every type of noise without information loss.",
+          "It increases the magnitude of all high-frequency components."
+        ],
+        "explanation": "An isolated extreme affects the mean strongly but may not alter the median. The median is nonlinear; its suitability depends on the noise and window.",
+        "source": "HC2b pp.89–91; S2; Lab2",
+        "id": "E2Q11",
+        "number": 11,
+        "options": [
+          "It is a linear filter with a fixed kernel of average weights.",
+          "It increases the magnitude of all high-frequency components.",
+          "It is less affected by extreme isolated values and can preserve edges better.",
+          "It guarantees removal of every type of noise without information loss."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "fourier",
+        "stem": "A Gabor filter is best described as what?",
+        "correct": "A sinusoidal pattern modulated by a Gaussian envelope, selective for local frequency and orientation.",
+        "distractors": [
+          "A Gaussian smoothing filter with no sinusoidal carrier and no orientation selectivity.",
+          "An unwindowed global sinusoid that has no spatial localization.",
+          "A median of oriented derivative responses, making it a nonlinear rank filter."
+        ],
+        "explanation": "The Gaussian localizes the sinusoid. Varying orientation and frequency produces a useful texture-analysis filter bank.",
+        "source": "HC2b pp.106–107; Lab2",
+        "id": "E2Q12",
+        "number": 12,
+        "options": [
+          "A sinusoidal pattern modulated by a Gaussian envelope, selective for local frequency and orientation.",
+          "An unwindowed global sinusoid that has no spatial localization.",
+          "A median of oriented derivative responses, making it a nonlinear rank filter.",
+          "A Gaussian smoothing filter with no sinusoidal carrier and no orientation selectivity."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "fourier",
+        "stem": "You multiply two same-length unpadded DFTs and take the inverse DFT. What operation does this normally implement?",
+        "correct": "Circular convolution, with wrap-around at the signal boundaries.",
+        "distractors": [
+          "Full linear convolution of length N+M-1 regardless of padding.",
+          "Pointwise multiplication of the original spatial samples.",
+          "Cross-correlation with no complex conjugation or reversal."
+        ],
+        "explanation": "DFT signals are periodic. To obtain full linear convolution, pad to at least the combined length minus one in each relevant dimension. Otherwise boundary terms wrap around.",
+        "source": "HC2b pp.101–103; Szeliski §3.4",
+        "id": "E2Q13",
+        "number": 13,
+        "options": [
+          "Pointwise multiplication of the original spatial samples.",
+          "Circular convolution, with wrap-around at the signal boundaries.",
+          "Cross-correlation with no complex conjugation or reversal.",
+          "Full linear convolution of length N+M-1 regardless of padding."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "A kernel measures the x derivative of an image. Which edge orientation usually gives a large response?",
+        "correct": "A vertical edge: intensity changes across x.",
+        "distractors": [
+          "A horizontal edge: intensity changes only across y.",
+          "Only a diagonal edge with exactly 45-degree slope.",
+          "A perfectly constant patch."
+        ],
+        "explanation": "Derivative direction is perpendicular to the edge's tangent. The sign depends on the stated kernel orientation and whether the implementation uses convolution or correlation.",
+        "source": "HC2b pp.74–80; HC3a; Lab2",
+        "id": "E2Q14",
+        "number": 14,
+        "options": [
+          "Only a diagonal edge with exactly 45-degree slope.",
+          "A horizontal edge: intensity changes only across y.",
+          "A vertical edge: intensity changes across x.",
+          "A perfectly constant patch."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "Compared with a small Gaussian sigma, what is a likely effect of increasing sigma in Canny?",
+        "correct": "Suppress finer detail and noise, while potentially merging edges and reducing localization precision.",
+        "distractors": [
+          "Guarantee detection of every weak edge with perfect localization.",
+          "Remove the need for non-maximum suppression.",
+          "Make the operation exactly scale invariant."
+        ],
+        "explanation": "Smoothing changes the analysis scale. Larger scales emphasize broader structure but can remove or shift fine structures.",
+        "source": "HC3a pp.20–66",
+        "id": "E2Q15",
+        "number": 15,
+        "options": [
+          "Suppress finer detail and noise, while potentially merging edges and reducing localization precision.",
+          "Remove the need for non-maximum suppression.",
+          "Make the operation exactly scale invariant.",
+          "Guarantee detection of every weak edge with perfect localization."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "For a structure tensor at a pixel, which implementation follows the usual order of operations?",
+        "correct": "Compute Ix*Ix, Ix*Iy and Iy*Iy first, then aggregate or smooth those products over the neighbourhood.",
+        "distractors": [
+          "Smooth Ix and Iy to one mean each, then use only the outer product of those two means.",
+          "Aggregate only Ix and Iy and use their signed means as the diagonal entries, setting the off-diagonal entries to zero.",
+          "Use Ixx and Iyy as the diagonal entries and Ixy off diagonal, because the structure tensor is the image Hessian."
+        ],
+        "explanation": "The tensor aggregates the local outer products of gradient vectors. The outer product of the mean gradient is generally different and can cancel gradients of opposite sign. The image Hessian is a different second-derivative matrix.",
+        "source": "S3; Lab3",
+        "id": "E2Q16",
+        "number": 16,
+        "options": [
+          "Compute Ix*Ix, Ix*Iy and Iy*Iy first, then aggregate or smooth those products over the neighbourhood.",
+          "Use Ixx and Iyy as the diagonal entries and Ixy off diagonal, because the structure tensor is the image Hessian.",
+          "Smooth Ix and Iy to one mean each, then use only the outer product of those two means.",
+          "Aggregate only Ix and Iy and use their signed means as the diagonal entries, setting the off-diagonal entries to zero."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "Shi–Tomasi's corner score for structure-tensor eigenvalues lambda1 and lambda2 is which expression?",
+        "correct": "min(lambda1, lambda2)",
+        "distractors": [
+          "max(lambda1, lambda2)",
+          "lambda1 - lambda2",
+          "lambda1 + lambda2, regardless of their relative sizes"
+        ],
+        "explanation": "Both directions must be constrained. The minimum eigenvalue prevents a strong straight edge from scoring highly just because one direction has a large gradient.",
+        "source": "Lab3 Section 2; S3",
+        "id": "E2Q17",
+        "number": 17,
+        "options": [
+          "max(lambda1, lambda2)",
+          "lambda1 + lambda2, regardless of their relative sizes",
+          "min(lambda1, lambda2)",
+          "lambda1 - lambda2"
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "flow",
+        "stem": "A Lucas–Kanade window contains 100 nonzero image-gradient vectors, all parallel. Is its two-component flow uniquely observable from those equations?",
+        "correct": "No; the design matrix has rank 1 and tangential motion remains ambiguous.",
+        "distractors": [
+          "Yes, because there are more equations than unknowns.",
+          "Yes, because every gradient is nonzero.",
+          "No, because least squares works only for exactly two pixels."
+        ],
+        "explanation": "Number of equations does not guarantee independent constraints. Parallel gradients constrain only the normal component of flow: the aperture problem.",
+        "source": "HC3b pp.39–47; S3; Lab3",
+        "id": "E2Q18",
+        "number": 18,
+        "options": [
+          "No; the design matrix has rank 1 and tangential motion remains ambiguous.",
+          "Yes, because there are more equations than unknowns.",
+          "No, because least squares works only for exactly two pixels.",
+          "Yes, because every gradient is nonzero."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "flow",
+        "stem": "Move a flow estimate from a half-resolution pyramid level to full resolution. After spatially resizing the flow arrays, what else is required?",
+        "correct": "Multiply displacement components by 2, then warp and refine at the finer level.",
+        "distractors": [
+          "Keep the vector magnitudes unchanged because the arrays were resized.",
+          "Divide both displacement components by 2.",
+          "Set every displacement to zero before the finer solve."
+        ],
+        "explanation": "A coarse pixel spans two finer pixels. Vector units must scale with the grid, not just the array's dimensions.",
+        "source": "HC3b pp.48–54; Lab3",
+        "id": "E2Q19",
+        "number": 19,
+        "options": [
+          "Keep the vector magnitudes unchanged because the arrays were resized.",
+          "Divide both displacement components by 2.",
+          "Multiply displacement components by 2, then warp and refine at the finer level.",
+          "Set every displacement to zero before the finer solve."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "tracking",
+        "stem": "A fixed image template is tracked with SSD. The target's shape and position remain the same but all intensities gain a constant positive offset. Which claim is correct?",
+        "correct": "SSD can increase even for the true match; a mean-normalized comparison can handle an additive offset better.",
+        "distractors": [
+          "SSD is exactly invariant to every additive intensity change.",
+          "Only the target's geometric rotation can change SSD.",
+          "Unnormalized correlation always removes additive and multiplicative brightness changes."
+        ],
+        "explanation": "SSD compares raw values. Subtracting patch means before comparison removes a constant offset; zero-mean normalized correlation can additionally address positive gain when variance is nonzero.",
+        "source": "HC3b pp.75–87; HC6b p.103; Szeliski §9.1",
+        "id": "E2Q20",
+        "number": 20,
+        "options": [
+          "SSD can increase even for the true match; a mean-normalized comparison can handle an additive offset better.",
+          "Unnormalized correlation always removes additive and multiplicative brightness changes.",
+          "Only the target's geometric rotation can change SSD.",
+          "SSD is exactly invariant to every additive intensity change."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "clustering",
+        "stem": "Which statement about mean-shift clustering is correct?",
+        "correct": "It seeks density modes; kernel bandwidth influences how many modes and clusters are found.",
+        "distractors": [
+          "It always requires the desired number of clusters K as its central input.",
+          "It minimizes the same fixed-K objective as k-means using identical updates.",
+          "Its result cannot depend on the bandwidth."
+        ],
+        "explanation": "Mean shift repeatedly moves to a local kernel-weighted mean. It does not need a preset K, but bandwidth and mode-merging rules strongly influence the result.",
+        "source": "HC3b pp.110–122",
+        "id": "E2Q21",
+        "number": 21,
+        "options": [
+          "It always requires the desired number of clusters K as its central input.",
+          "It minimizes the same fixed-K objective as k-means using identical updates.",
+          "Its result cannot depend on the bandwidth.",
+          "It seeks density modes; kernel bandwidth influences how many modes and clusters are found."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "matching",
+        "stem": "Retrieve images of the same planar building facade using a query in which part of the facade is occluded by a tree. Assuming enough distinctive features remain visible, which local-keypoint approach is appropriate?",
+        "correct": "Match visible local descriptors and verify a consistent homography; the occluded parts need not match.",
+        "distractors": [
+          "Reject every database image unless every query descriptor has a correct facade match, including descriptors on the tree.",
+          "Rank only by each database image's total keypoint count; descriptor appearance and geometric consistency are unnecessary.",
+          "Accept every nearest descriptor match as geometrically correct, because SIFT's scale robustness guarantees the same scene point."
+        ],
+        "explanation": "Local descriptors allow the visible part of an instance to support retrieval despite partial occlusion. Ambiguity rejection and geometric verification reduce false matches. The explicitly planar facade permits a homography between ideal undistorted views; not every arbitrary nonplanar scene does.",
+        "source": "HC5a pp.14–24; HC4a pp.33–48; S4; Szeliski §7.1.4",
+        "id": "E2Q22",
+        "number": 22,
+        "options": [
+          "Reject every database image unless every query descriptor has a correct facade match, including descriptors on the tree.",
+          "Accept every nearest descriptor match as geometrically correct, because SIFT's scale robustness guarantees the same scene point.",
+          "Rank only by each database image's total keypoint count; descriptor appearance and geometric consistency are unnecessary.",
+          "Match visible local descriptors and verify a consistent homography; the occluded parts need not match."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "What is the generic minimum data requirement for an unconstrained 2D affine transformation?",
+        "correct": "Three point pairs whose source points are noncollinear.",
+        "distractors": [
+          "One point pair because affine transforms have two parameters.",
+          "Two point pairs because an affine transformation is only rotation plus translation.",
+          "Four collinear point pairs always uniquely determine it."
+        ],
+        "explanation": "There are 6 affine parameters and two scalar equations per pair. Three noncollinear source points make the affine design matrix full rank.",
+        "source": "HC4a pp.17–22,50; S4; Lab4",
+        "id": "E2Q23",
+        "number": 23,
+        "options": [
+          "Two point pairs because an affine transformation is only rotation plus translation.",
+          "Four collinear point pairs always uniquely determine it.",
+          "One point pair because affine transforms have two parameters.",
+          "Three point pairs whose source points are noncollinear."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "Which statement accurately describes backward image warping?",
+        "correct": "For each destination pixel, inverse-map its coordinate and sample/interpolate the source; out-of-domain samples still need a boundary rule.",
+        "distractors": [
+          "It guarantees valid source data for every destination pixel, even outside source coverage.",
+          "It forward-maps each source pixel without interpolation.",
+          "It always avoids aliasing during downsampling, even without a low-pass filter."
+        ],
+        "explanation": "Backward warping avoids discretization holes within covered regions, but does not create unseen content or automatically prevent sampling artifacts.",
+        "source": "HC4a pp.24–31; Lab4",
+        "id": "E2Q24",
+        "number": 24,
+        "options": [
+          "It guarantees valid source data for every destination pixel, even outside source coverage.",
+          "It forward-maps each source pixel without interpolation.",
+          "It always avoids aliasing during downsampling, even without a low-pass filter.",
+          "For each destination pixel, inverse-map its coordinate and sample/interpolate the source; out-of-domain samples still need a boundary rule."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "classification",
+        "stem": "What does the SVM kernel trick allow?",
+        "correct": "Evaluate inner products in a transformed feature space without explicitly constructing all transformed features.",
+        "distractors": [
+          "Change the distance metric only after fitting a linear SVM, without changing any training computation.",
+          "Automatically eliminate every mislabeled training example, making soft-margin penalties unnecessary.",
+          "Make every nonlinear decision boundary linear in the original coordinates."
+        ],
+        "explanation": "The classifier can be linear in the implicit feature space while nonlinear in the original space. A valid kernel computes the required feature-space inner products.",
+        "source": "HC4b pp.69–78",
+        "id": "E2Q25",
+        "number": 25,
+        "options": [
+          "Evaluate inner products in a transformed feature space without explicitly constructing all transformed features.",
+          "Make every nonlinear decision boundary linear in the original coordinates.",
+          "Change the distance metric only after fitting a linear SVM, without changing any training computation.",
+          "Automatically eliminate every mislabeled training example, making soft-margin penalties unnecessary."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "metrics",
+        "stem": "At a fixed detection IoU threshold, two same-class detections both overlap the same ground-truth object sufficiently. In score-ordered, one-to-one matching, how are they counted?",
+        "correct": "The first can be a TP; the second is a duplicate FP unless it can validly match another unmatched object.",
+        "distractors": [
+          "Both are TPs because their IoUs are high, even though they claim the same object.",
+          "The first is a TP and the second is ignored automatically in AP, so duplicate boxes cannot reduce precision.",
+          "Both are TPs but each receives half a recall increment, making this identical to a single detection."
+        ],
+        "explanation": "Each ground-truth object can be claimed once. Duplicate detections inflate precision errors even when both boxes localize the same object well.",
+        "source": "HC5a pp.68–78; S4",
+        "id": "E2Q26",
+        "number": 26,
+        "options": [
+          "Both are TPs but each receives half a recall increment, making this identical to a single detection.",
+          "The first can be a TP; the second is a duplicate FP unless it can validly match another unmatched object.",
+          "The first is a TP and the second is ignored automatically in AP, so duplicate boxes cannot reduce precision.",
+          "Both are TPs because their IoUs are high, even though they claim the same object."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "detection",
+        "stem": "Three same-class boxes have descending scores A>B>C. IoU(A,B)>threshold, IoU(B,C)>threshold, but IoU(A,C)<threshold. What does greedy hard NMS keep?",
+        "correct": "A and C.",
+        "distractors": [
+          "A only, because overlap is transitively inherited through B.",
+          "B and C.",
+          "All three, because A and C do not overlap strongly."
+        ],
+        "explanation": "Keep A and suppress B. The suppressed B does not itself suppress C; C is compared with retained boxes and survives its low overlap with A.",
+        "source": "HC5a pp.63–67",
+        "id": "E2Q27",
+        "number": 27,
+        "options": [
+          "A only, because overlap is transitively inherited through B.",
+          "A and C.",
+          "B and C.",
+          "All three, because A and C do not overlap strongly."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "optimization",
+        "stem": "Why is identical constant initialization of all interchangeable hidden units problematic?",
+        "correct": "Symmetric units can receive identical activations and gradients, so they fail to learn distinct features.",
+        "distractors": [
+          "Every nonzero constant necessarily causes exploding gradients on the first step.",
+          "Random initialization guarantees no overfitting.",
+          "Biases must always be random for any network to learn at all."
+        ],
+        "explanation": "Random weight initialization breaks symmetry. Zero biases are often acceptable with randomized weights. Initializing all weights to zero can introduce further dead-gradient problems, especially with ReLU.",
+        "source": "S5; Lab5 assignment Tasks 5 and 8",
+        "id": "E2Q28",
+        "number": 28,
+        "options": [
+          "Random initialization guarantees no overfitting.",
+          "Every nonzero constant necessarily causes exploding gradients on the first step.",
+          "Biases must always be random for any network to learn at all.",
+          "Symmetric units can receive identical activations and gradients, so they fail to learn distinct features."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "optimization",
+        "stem": "Which statement about Adam and learning rate is correct?",
+        "correct": "Adam uses gradient-moment estimates to adapt parameter updates, but still has a base learning-rate hyperparameter.",
+        "distractors": [
+          "Adam eliminates base learning-rate tuning because its moment estimates guarantee stable convergence for any chosen step size.",
+          "Adam uses only a running mean of gradients, so it is exactly SGD with momentum and has no second-moment adaptation.",
+          "Increasing Adam's base learning rate cannot destabilize training because all adaptive updates are independent of that rate."
+        ],
+        "explanation": "Adaptation does not remove the need to tune the base step size or other settings. Performance depends on task, initialization, data and optimization settings.",
+        "source": "Lab5 assignment Tasks 3–5; S5",
+        "id": "E2Q29",
+        "number": 29,
+        "options": [
+          "Adam eliminates base learning-rate tuning because its moment estimates guarantee stable convergence for any chosen step size.",
+          "Adam uses gradient-moment estimates to adapt parameter updates, but still has a base learning-rate hyperparameter.",
+          "Adam uses only a running mean of gradients, so it is exactly SGD with momentum and has no second-moment adaptation.",
+          "Increasing Adam's base learning rate cannot destabilize training because all adaptive updates are independent of that rate."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "stereo",
+        "stem": "A camera only rotates about its optical centre while viewing a static scene. Why is this unsuitable as the sole initialization for ordinary depth triangulation?",
+        "correct": "There is no translation baseline and no depth-dependent parallax.",
+        "distractors": [
+          "A pure rotation makes all otherwise visible feature correspondences invalid.",
+          "Higher image resolution creates a metric translation baseline even when the optical centre stays fixed.",
+          "The pure-rotation homography is invertible, so its inverse already provides each point's unique metric depth."
+        ],
+        "explanation": "Rays can be aligned by rotation, but points at different distances on the same ray are still indistinguishable. SfM initialization normally needs adequate non-panoramic views and parallax.",
+        "source": "HC4a p.34; HC6b pp.114–124",
+        "id": "E2Q30",
+        "number": 30,
+        "options": [
+          "The pure-rotation homography is invertible, so its inverse already provides each point's unique metric depth.",
+          "There is no translation baseline and no depth-dependent parallax.",
+          "Higher image resolution creates a metric translation baseline even when the optical centre stays fixed.",
+          "A pure rotation makes all otherwise visible feature correspondences invalid."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "num",
+        "topic": "camera",
+        "stem": "A world-to-camera extrinsic transform is Xc=R@Xw+t, with R=[[0,0,1],[0,1,0],[-1,0,0]] and t=[-3,2,1] metres. Report the Euclidean distance of the camera centre from the world origin. Use C=-R.T@t.",
+        "answer": 3.7416573867739413,
+        "explanation": "R.T t = [-1,2,-3], so C=[1,-2,3]. Distance = sqrt(1+4+9)=sqrt(14). Submit 3.74 metres. Rotation preserves length, so ||t|| gives the same distance, but t is still not the world-frame centre C.",
+        "source": "HC1b pp.35–45; S1",
+        "integer": false,
+        "id": "E2Q31",
+        "number": 31,
+        "display_answer": "3.74"
+      },
+      {
+        "kind": "num",
+        "topic": "colour",
+        "stem": "An RGB image has per-channel means [80,40,20]. A pixel has RGB value [100,30,10]. Grey-World correction uses target=(80+40+20)/3, then corrected = pixel/channel_means*target. Ignore clipping and quantization. Report the corrected green value.",
+        "answer": 35.0,
+        "explanation": "target = 140/3. The green value is (30/40)*(140/3)=35. Means come from the full image, not this one pixel.",
+        "source": "Lab1; Coding examples Q3,Q4",
+        "integer": false,
+        "id": "E2Q32",
+        "number": 32,
+        "display_answer": "35.00"
+      },
+      {
+        "kind": "num",
+        "topic": "photometric",
+        "stem": "Weighted photometric stereo minimizes sum_j (w[j]*(L[j]@g-i[j]))^2. The last light vector's magnitude also encodes its strength. Report g[2].\n\n```python\nimport numpy as np\nL = np.array([[1,0,0],[0,1,0],[0,0,1],[1,1,1]], dtype=float)\ni = np.array([.2,.3,.6,1.2])\nw = np.array([1,1,1,2], dtype=float)\n```\n\nProvided routine: `np.linalg.lstsq(L*w[:,None], i*w, rcond=None)[0]` minimizes the stated weighted residuals.",
+        "answer": 0.6307692307692307,
+        "explanation": "The fourth row has residual weight squared 4. Relative to [.2,.3,.6], all three components gain the same delta. Solve delta=4*(.1-3*delta), giving delta=.4/13. g[2]=.6+.4/13=.6307692; submit 0.63.",
+        "source": "Lab1; HC2a pp.34–39",
+        "integer": false,
+        "id": "E2Q33",
+        "number": 33,
+        "display_answer": "0.63"
+      },
+      {
+        "kind": "num",
+        "topic": "reflectance",
+        "stem": "Use the simplified Phong model I = Ia + kd*max(n dot l,0) + ks*max(v dot r,0)^s. Let Ia=0.1, kd=0.6, n dot l=0.5, ks=0.8, v dot r=0.5, and s=4. Report I.",
+        "answer": 0.45,
+        "explanation": "Diffuse = .6*.5=.3; specular = .8*(.5^4)=.05. I=.1+.3+.05=.45. The specular exponent acts on the dot product, not on the entire intensity.",
+        "source": "HC2a p.33",
+        "integer": false,
+        "id": "E2Q34",
+        "number": 34,
+        "display_answer": "0.45"
+      },
+      {
+        "kind": "num",
+        "topic": "histogram",
+        "stem": "Linearly stretch intensities from input range [50,150] to [0,255]. Report the output for input intensity 70. No clipping is needed for this value.",
+        "answer": 51.0,
+        "explanation": "The fractional position is (70-50)/(150-50)=.2. Output=.2*255=51.",
+        "source": "HC2a pp.59–60; S1",
+        "integer": false,
+        "id": "E2Q35",
+        "number": 35,
+        "display_answer": "51.00"
+      },
+      {
+        "kind": "num",
+        "topic": "morphology",
+        "stem": "For the binary image below, compute the number of foreground components under 4-connectivity and under 8-connectivity. Report count4-count8 as one exact integer. Background is not counted.\n\n```text\n1 0 1 0 0\n0 1 0 0 1\n0 0 1 0 1\n0 0 0 1 0\n1 0 0 0 1\n```",
+        "answer": 6,
+        "explanation": "There are 8 four-connected foreground components. Under 8-connectivity, the diagonal chain, the top (0,2) pixel and the right-hand pair are linked into one component; the bottom-left pixel is the other. Thus 8-2=6.",
+        "source": "HC2b pp.7–12; S2",
+        "integer": true,
+        "id": "E2Q36",
+        "number": 36,
+        "display_answer": "6"
+      },
+      {
+        "kind": "num",
+        "topic": "filtering",
+        "stem": "Report the centre output of a 3 by 3 median filter on this patch. Use all nine entries and report an exact integer.\n\n```text\n[[0, 7,8],\n [8,255,9],\n [10,11,0]]\n```",
+        "answer": 8,
+        "explanation": "Sorted values: [0,0,7,8,8,9,10,11,255]. The fifth value is 8. The impulse 255 does not dominate the median.",
+        "source": "HC2b pp.89–91; S2; Lab2",
+        "integer": true,
+        "id": "E2Q37",
+        "number": 37,
+        "display_answer": "8"
+      },
+      {
+        "kind": "num",
+        "topic": "features",
+        "stem": "Construct a magnitude-weighted UNSIGNED HoG histogram from Gx=[3,-3,0,2] and Gy=[4,-4,5,0]. Use angles theta=degrees(atan2(Gy,Gx)) modulo 180. Use nine HARD bins [0,20),[20,40),...,[160,180), numbered 0..8; no interpolation and no histogram normalization. Report the value of bin 2, which covers [40,60) degrees.\n\nProvided functions: `np.arctan2(y,x)` gives quadrant-aware angles in radians; `np.degrees(angle)` converts radians to degrees. Magnitude is `np.sqrt(Gx*Gx+Gy*Gy)`.",
+        "answer": 10.0,
+        "explanation": "Magnitudes are [5,5,5,2]. The first two unsigned angles are both about 53.13 degrees; reversing a gradient by 180 degrees preserves unsigned orientation. Both vote into bin 2, so its value is 5+5=10. The other angles are 90 and 0 degrees and go to other bins.",
+        "source": "S3 Exercise 2; HC3a gradients",
+        "integer": false,
+        "id": "E2Q38",
+        "number": 38,
+        "display_answer": "10.00"
+      },
+      {
+        "kind": "num",
+        "topic": "fourier",
+        "stem": "A complex Fourier coefficient is F=-3-4i. Report its principal phase in degrees in the range (-180,180]. Provided function: `np.degrees(np.arctan2(F.imag, F.real))` uses quadrant-aware atan2(y,x).",
+        "answer": -126.86989764584402,
+        "explanation": "The point is in the third quadrant. Its principal angle is -180 + atan(4/3) = -126.8699 degrees; submit -126.87. atan(4/3) alone gives the wrong quadrant.",
+        "source": "HC2b pp.97–100; SOURCE_NOTES",
+        "integer": false,
+        "id": "E2Q39",
+        "number": 39,
+        "display_answer": "-126.87"
+      },
+      {
+        "kind": "num",
+        "topic": "flow",
+        "stem": "In Lucas–Kanade, solve A@[u,v] = -It by least squares and report v.\n\n```python\nimport numpy as np\nA = np.array([[2,1],[1,-1],[0,2],[3,0]], dtype=float)\nIt = np.array([-5,-1,-3,-6], dtype=float)\n```\n\nProvided routine: `np.linalg.lstsq(A, -It, rcond=None)[0]` returns [u,v].",
+        "answer": 1.3373493975903614,
+        "explanation": "A.T A=[[14,1],[1,6]], A.T(-It)=[29,10]. The determinant is 83; v=(-29+140)/83=111/83. Submit 1.34.",
+        "source": "HC3b pp.39–47; S3; Lab3",
+        "integer": false,
+        "id": "E2Q40",
+        "number": 40,
+        "display_answer": "1.34"
+      },
+      {
+        "kind": "num",
+        "topic": "tracking",
+        "stem": "Report the zero-based index returned by this SSD matching code. NumPy's argmin returns the FIRST minimum in a tie.\n\n```python\nimport numpy as np\nT = np.array([[1,2],[3,4]])\nP = np.array([[[2,3],[4,5]],\n              [[1,1],[3,5]],\n              [[2,2],[2,4]]])\ncosts = ((P-T)**2).sum(axis=(1,2))\nanswer = int(np.argmin(costs))\n```",
+        "answer": 1,
+        "explanation": "The three costs are [4,2,2]. The first minimum occurs at index 1, not index 2. Broadcasting subtracts T independently from each candidate patch.",
+        "source": "HC3b pp.75–87; Lab0",
+        "integer": true,
+        "id": "E2Q41",
+        "number": 41,
+        "display_answer": "1"
+      },
+      {
+        "kind": "num",
+        "topic": "geometry",
+        "stem": "Fit a 2D affine transform by least squares. Source rows are [[0,0],[1,0],[0,1],[1,1]]; target rows are [[2,-1],[4,-1],[3,2],[5,3]]. Build A with rows [x,y,1] and solve A@P=targets. Report the predicted target y coordinate for source (2,3).\n\nProvided routine: `P=np.linalg.lstsq(A, targets, rcond=None)[0]`; prediction is `np.array([2,3,1])@P`.",
+        "answer": 10.25,
+        "explanation": "The target-y least-squares coefficients are [.5,3.5,-1.25]. Predicted y=.5*2+3.5*3-1.25=10.25. The x and y output coordinates use separate columns of P.",
+        "source": "HC4a pp.17–22,50; Lab4",
+        "integer": false,
+        "id": "E2Q42",
+        "number": 42,
+        "display_answer": "10.25"
+      },
+      {
+        "kind": "num",
+        "topic": "matching",
+        "stem": "Rows contain [nearest_distance, second_nearest_distance] from descriptor matching. Keep a match iff d1/d2 < 0.75 (strict inequality). Report the count kept.\n\n```text\n[[.30,.50], [.40,.50], [.60,1.00], [.20,.21], [.10,.40]]\n```",
+        "answer": 3,
+        "explanation": "Ratios are [.6,.8,.6,20/21,.25]. Rows 0,2,4 pass, giving 3 matches. These are descriptor candidates, not guaranteed geometric inliers.",
+        "source": "HC4a pp.43–48; S4; Lab4",
+        "integer": true,
+        "id": "E2Q43",
+        "number": 43,
+        "display_answer": "3"
+      },
+      {
+        "kind": "num",
+        "topic": "clustering",
+        "stem": "Run ONE assignment/update iteration of 1D k-means with initial centres [0,10] and data [0,2,3,9,11]. Use squared Euclidean distance. Report the updated smaller centre.",
+        "answer": 1.6666666666666667,
+        "explanation": "The first centre gets [0,2,3] and updates to 5/3. The other gets [9,11] and updates to 10. Submit 1.67. Do not average the initial centre itself into its assigned data.",
+        "source": "HC5a pp.91–118",
+        "integer": false,
+        "id": "E2Q44",
+        "number": 44,
+        "display_answer": "1.67"
+      },
+      {
+        "kind": "num",
+        "topic": "metrics",
+        "stem": "Rows are actual classes; columns are predicted classes. Report MACRO recall as a fraction for this matrix.\n\n```text\n[[30,10,0],\n [ 5,10,5],\n [ 0, 2,8]]\n```",
+        "answer": 0.6833333333333332,
+        "explanation": "Class recalls are 30/40=.75, 10/20=.5, 8/10=.8. Macro recall=(.75+.5+.8)/3=.6833333. Submit .68; averaging classes differs from weighting by class frequency.",
+        "source": "HC4b pp.80–86; S4",
+        "integer": false,
+        "id": "E2Q45",
+        "number": 45,
+        "display_answer": "0.68"
+      },
+      {
+        "kind": "num",
+        "topic": "detection",
+        "stem": "Greedy hard NMS processes one class in score order A,B,C,D (all scores distinct). Exact pairwise IoUs are below; fractions mean ordinary division. Suppress a lower-scoring box only when its IoU with a KEPT box is strictly greater than 0.5. Report the number kept.\n\n```text\n      A    B    C    D\nA     1   3/5  1/3  1/7\nB    3/5   1   3/5  1/3\nC    1/3  3/5   1   3/5\nD    1/7  1/3  3/5   1\n```",
+        "answer": 2,
+        "explanation": "Keep A and suppress B because 3/5>.5. C survives its comparison with A (1/3), so keep C and suppress D (3/5). Retained boxes are A,C; B's overlap with C is irrelevant after B is suppressed. The table can arise from rectangles [0,0,4,2], [1,0,5,2], [2,0,6,2], [3,0,7,2] in continuous corner format.",
+        "source": "HC5a pp.63–67",
+        "integer": true,
+        "id": "E2Q46",
+        "number": 46,
+        "display_answer": "2"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "A CNN layer uses a valid stride-1 CROSS-CORRELATION, no bias, I=[[1,3,5],[2,-1,4]] and W=[[1,0],[-1,2]]. Its two output positions receive upstream loss gradients [2,-1]. Report dLoss/dW[1,1], with zero-based indices. The derivative sums upstream_gradient * the corresponding input value over BOTH output positions.",
+        "answer": -6.0,
+        "explanation": "W[1,1] multiplies I[1,1]=-1 in the first patch and I[1,2]=4 in the second. Gradient=2*(-1)+(-1)*4=-6. Shared weights accumulate contributions across output positions.",
+        "source": "S5 Exercise 3; HC5b pp.24–33",
+        "integer": false,
+        "id": "E2Q47",
+        "number": 47,
+        "display_answer": "-6.00"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "A final feature map has shape 9 x 9 x 8. Global average pooling replaces each channel by its spatial mean. A fully connected 5-class head then uses one bias per class. Report the head's trainable parameter count; exclude the backbone.",
+        "answer": 45,
+        "explanation": "Global pooling produces 8 features. The head has 8*5 weights plus 5 biases = 45. The parameter-free pooling removes spatial dimensions before the linear layer.",
+        "source": "HC5b pp.64–78; HC6a network architectures; Lab5",
+        "integer": true,
+        "id": "E2Q48",
+        "number": 48,
+        "display_answer": "45"
+      },
+      {
+        "kind": "num",
+        "topic": "detection",
+        "stem": "Use ORIGINAL YOLO v1, whose output shape is S x S x (5*B+C): B boxes with 5 values each, and ONE shared C-class probability vector per cell. Let S=7, B=2 and C=4. Report the total number of scalar outputs.",
+        "answer": 686,
+        "explanation": "Each cell has 2*5+4=14 outputs. There are 7*7=49 cells, giving 49*14=686. Do not use B*(5+C), which is a different per-anchor convention.",
+        "source": "HC6a pp.66–72",
+        "integer": true,
+        "id": "E2Q49",
+        "number": 49,
+        "display_answer": "686"
+      },
+      {
+        "kind": "num",
+        "topic": "stereo",
+        "stem": "An ideal rectified stereo pair has focal length f=1200 pixels, baseline B=0.12 metres, and matching horizontal coordinates uL=414, uR=390. Both principal points are equal. Use disparity d=uL-uR and depth Z=f*B/d. Report Z in metres.",
+        "answer": 6.0,
+        "explanation": "d=24 pixels. Z=1200*.12/24=6 metres. Use focal length in pixels with pixel disparity; the baseline sets metric units.",
+        "source": "HC6b pp.79–90; Szeliski §12.1",
+        "integer": false,
+        "id": "E2Q50",
+        "number": 50,
+        "display_answer": "6.00"
+      }
+    ]
+  },
+  {
+    "number": 3,
+    "title": "Exam 3 — Synthesis and transfer",
+    "questions": [
+      {
+        "kind": "mc",
+        "topic": "camera",
+        "stem": "A unit normal n_c is expressed in the camera frame. The camera uses Xc=R@Xw+t. Which expression converts the normal to the world frame?",
+        "correct": "n_w = R.T @ n_c; translation does not act on a direction vector.",
+        "distractors": [
+          "n_w = R.T @ (n_c-t)",
+          "n_w = R @ n_c+t",
+          "n_w = K @ n_c, followed by perspective division"
+        ],
+        "explanation": "Normals between rigid coordinate frames transform by rotation only. R maps world directions to camera directions; its transpose maps back. A general non-rigid affine transform would require a different normal rule, which is not asked here.",
+        "source": "HC1b pp.35–45; HC2a surface normals; prerequisite linear algebra",
+        "id": "E3Q01",
+        "number": 1,
+        "options": [
+          "n_w = R.T @ (n_c-t)",
+          "n_w = K @ n_c, followed by perspective division",
+          "n_w = R.T @ n_c; translation does not act on a direction vector.",
+          "n_w = R @ n_c+t"
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "filtering",
+        "stem": "You resize an image to one quarter of each spatial dimension by keeping every fourth pixel. Why should a suitable low-pass filter normally be applied BEFORE subsampling?",
+        "correct": "High spatial frequencies can otherwise alias into false lower-frequency patterns.",
+        "distractors": [
+          "It guarantees exact recovery of every original sample, even when the image has frequencies above the coarse-grid limit.",
+          "Keeping every fourth pixel is itself an ideal low-pass filter, so preprocessing cannot influence aliasing.",
+          "Low-pass filtering after subsampling removes aliasing just as reliably as filtering before subsampling."
+        ],
+        "explanation": "Subsampling reduces the representable frequency range. Filtering first suppresses frequencies that the coarse grid cannot represent; smoothing after aliasing does not undo it.",
+        "source": "HC2b pp.93–105; HC5b pp.38–39; Szeliski §3.4",
+        "id": "E3Q02",
+        "number": 2,
+        "options": [
+          "Keeping every fourth pixel is itself an ideal low-pass filter, so preprocessing cannot influence aliasing.",
+          "It guarantees exact recovery of every original sample, even when the image has frequencies above the coarse-grid limit.",
+          "High spatial frequencies can otherwise alias into false lower-frequency patterns.",
+          "Low-pass filtering after subsampling removes aliasing just as reliably as filtering before subsampling."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "reflectance",
+        "stem": "A single image is modelled as I=A*S. Without further constraints, can it uniquely determine both albedo and shading?",
+        "correct": "No; multiple albedo/shading combinations can produce the same image.",
+        "distractors": [
+          "Yes, because one RGB pixel always supplies all geometry and material parameters.",
+          "Yes, if the image has a high enough resolution, regardless of assumptions.",
+          "No, but dividing every pixel by 255 always resolves the ambiguity."
+        ],
+        "explanation": "For positive scale c, A'=cA and S'=S/c preserve I, and further spatial ambiguities exist. Priors or extra observations are required.",
+        "source": "HC2a pp.4–6,21–23,47–48; Lab1",
+        "id": "E3Q03",
+        "number": 3,
+        "options": [
+          "No, but dividing every pixel by 255 always resolves the ambiguity.",
+          "No; multiple albedo/shading combinations can produce the same image.",
+          "Yes, because one RGB pixel always supplies all geometry and material parameters.",
+          "Yes, if the image has a high enough resolution, regardless of assumptions."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "photometric",
+        "stem": "Why can directly fitting the linear photometric-stereo model to strongly gamma-compressed pixel values be wrong?",
+        "correct": "The model assumes a linear relation between measured intensity and radiance; the response must be linearized or modelled.",
+        "distractors": [
+          "No correction is needed: any common gamma exponent preserves the linear equations exactly under a change of albedo alone.",
+          "Gamma can always be absorbed into one constant camera gain, independent of intensity and light direction.",
+          "Normalizing the fitted g removes all gamma effects, so only albedo can be affected by a nonlinear response."
+        ],
+        "explanation": "If recorded value is a nonlinear function of radiance, the original linear dot-product equations no longer describe the observations. Camera-response calibration or suitable raw data is needed.",
+        "source": "HC2a pp.19–20,61–62; Lab1",
+        "id": "E3Q04",
+        "number": 4,
+        "options": [
+          "Normalizing the fitted g removes all gamma effects, so only albedo can be affected by a nonlinear response.",
+          "The model assumes a linear relation between measured intensity and radiance; the response must be linearized or modelled.",
+          "Gamma can always be absorbed into one constant camera gain, independent of intensity and light direction.",
+          "No correction is needed: any common gamma exponent preserves the linear equations exactly under a change of albedo alone."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "colour",
+        "stem": "What determines a sensor channel's response to an illuminated coloured surface?",
+        "correct": "The interaction of source spectrum, surface spectral reflectance and that channel's spectral sensitivity.",
+        "distractors": [
+          "Only the surface's colour name, independent of light and sensor.",
+          "Only the camera's extrinsic translation.",
+          "Only the maximum channel value in a different pixel."
+        ],
+        "explanation": "A channel integrates wavelength-dependent contributions. Material colour alone does not fix measured RGB; illumination and sensor response matter.",
+        "source": "HC1b pp.67–71,80–86; Lab1",
+        "id": "E3Q05",
+        "number": 5,
+        "options": [
+          "The interaction of source spectrum, surface spectral reflectance and that channel's spectral sensitivity.",
+          "Only the surface's colour name, independent of light and sensor.",
+          "Only the maximum channel value in a different pixel.",
+          "Only the camera's extrinsic translation."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "photometric",
+        "stem": "An integrable normal-derived gradient field is reconstructed on a connected image domain with known x/y spacing and at least one nonzero slope. Which ambiguity remains without an anchor or boundary height?",
+        "correct": "An additive constant in height.",
+        "distractors": [
+          "An independent additive height constant for every pixel, even while all neighbouring derivatives stay fixed.",
+          "An arbitrary multiplicative height scale, even though p and q and the x/y spacing are fixed.",
+          "No height ambiguity remains, because unit-normal normalization already fixes the absolute reference height."
+        ],
+        "explanation": "Derivatives determine relative height, not the reference height. Fixing a height such as z(0,0)=0 removes this additive ambiguity on a connected region.",
+        "source": "HC2a pp.41–43; Lab1; Forsyth–Ponce §2.2",
+        "id": "E3Q06",
+        "number": 6,
+        "options": [
+          "No height ambiguity remains, because unit-normal normalization already fixes the absolute reference height.",
+          "An additive constant in height.",
+          "An arbitrary multiplicative height scale, even though p and q and the x/y spacing are fixed.",
+          "An independent additive height constant for every pixel, even while all neighbouring derivatives stay fixed."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "filtering",
+        "stem": "Apply a normalized averaging kernel to a constant positive image with zero padding. What is correct?",
+        "correct": "Interior outputs remain constant, but outputs near boundaries can be darker.",
+        "distractors": [
+          "Every output must be identical, including boundaries, for any padding rule.",
+          "All outputs become zero because averaging removes the DC component.",
+          "Only corners become brighter because there are fewer neighbours."
+        ],
+        "explanation": "Interior samples see a full constant patch and weights sum to 1. At a zero-padded boundary some weighted values are 0. Padding is part of the filter's actual behaviour.",
+        "source": "HC2b pp.47–87; Lab2",
+        "id": "E3Q07",
+        "number": 7,
+        "options": [
+          "All outputs become zero because averaging removes the DC component.",
+          "Every output must be identical, including boundaries, for any padding rule.",
+          "Only corners become brighter because there are fewer neighbours.",
+          "Interior outputs remain constant, but outputs near boundaries can be darker."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "morphology",
+        "stem": "A closing operation uses a small structuring element. Which statement is safest?",
+        "correct": "It can fill sufficiently small gaps/holes relative to the element's shape, but need not fill a large cavity.",
+        "distractors": [
+          "One closing always fills every hole in every binary object.",
+          "Closing means erosion followed by dilation.",
+          "Closing removes every isolated foreground component without changing holes."
+        ],
+        "explanation": "Closing is scale- and shape-dependent. It is dilation followed by erosion, not general topological hole filling.",
+        "source": "HC2b pp.39–45; S2",
+        "id": "E3Q08",
+        "number": 8,
+        "options": [
+          "It can fill sufficiently small gaps/holes relative to the element's shape, but need not fill a large cavity.",
+          "Closing removes every isolated foreground component without changing holes.",
+          "Closing means erosion followed by dilation.",
+          "One closing always fills every hole in every binary object."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "morphology",
+        "stem": "Erode an all-ones finite image using a centred 3 by 3 all-ones element with outside-image values defined as zero. What happens?",
+        "correct": "Its outermost pixel border is removed.",
+        "distractors": [
+          "It remains all ones because every stored pixel is one.",
+          "Its foreground expands by one pixel outside the image.",
+          "Every interior pixel becomes zero while the border stays one."
+        ],
+        "explanation": "For a border pixel, part of the tested support lies outside the image and encounters 0. Interior pixels whose entire support is inside survive.",
+        "source": "HC2b pp.27–38; S2",
+        "id": "E3Q09",
+        "number": 9,
+        "options": [
+          "Its foreground expands by one pixel outside the image.",
+          "It remains all ones because every stored pixel is one.",
+          "Its outermost pixel border is removed.",
+          "Every interior pixel becomes zero while the border stays one."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "fourier",
+        "stem": "Circularly translate a discrete image by an integer offset. How does the DFT transform under the standard shift theorem?",
+        "correct": "Each coefficient is multiplied by a frequency-dependent phase factor of unit magnitude; its magnitude is unchanged.",
+        "distractors": [
+          "Only magnitude changes; phase is fixed.",
+          "Both magnitude and phase must stay unchanged because the image content is the same.",
+          "The spectrum is only reordered by fftshift; individual frequency coefficients never change."
+        ],
+        "explanation": "The translated spectrum is the original spectrum times a unit-magnitude complex exponential. This is exact for a circular shift; cropping/zero-filled shifts can also change magnitude through boundaries. A particular coefficient can have an unchanged phase when its factor is 1.",
+        "source": "HC2b pp.97–104; Szeliski §3.4",
+        "id": "E3Q10",
+        "number": 10,
+        "options": [
+          "Only magnitude changes; phase is fixed.",
+          "The spectrum is only reordered by fftshift; individual frequency coefficients never change.",
+          "Both magnitude and phase must stay unchanged because the image content is the same.",
+          "Each coefficient is multiplied by a frequency-dependent phase factor of unit magnitude; its magnitude is unchanged."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "fourier",
+        "stem": "For a real-valued image, what relationship holds between opposite-frequency DFT coefficients?",
+        "correct": "They are complex conjugates, with indices interpreted modulo the image size.",
+        "distractors": [
+          "They are always identical in both real and imaginary components, so their phases must also be identical.",
+          "Their imaginary components must all be zero, because the original image contains only real values.",
+          "They are always negatives of each other, so the spectrum is antisymmetric at every opposite-frequency pair."
+        ],
+        "explanation": "Real-valued signals have Hermitian symmetry F[-k]=conj(F[k]). Thus magnitudes are symmetric and phases have opposite signs modulo a full turn, where defined.",
+        "source": "HC2b pp.99–104; Szeliski §3.4",
+        "id": "E3Q11",
+        "number": 11,
+        "options": [
+          "Their imaginary components must all be zero, because the original image contains only real values.",
+          "They are complex conjugates, with indices interpreted modulo the image size.",
+          "They are always identical in both real and imaginary components, so their phases must also be identical.",
+          "They are always negatives of each other, so the spectrum is antisymmetric at every opposite-frequency pair."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "features",
+        "stem": "A detected intensity edge does not necessarily mark a depth discontinuity. Why?",
+        "correct": "Reflectance or illumination changes can also cause an intensity edge.",
+        "distractors": [
+          "Canny hysteresis guarantees that only physical depth boundaries survive its high threshold.",
+          "Increasing Gaussian sigma makes intensity edges uniquely attributable to changes in depth.",
+          "A material boundary cannot affect intensity, so every strong edge must be a depth discontinuity."
+        ],
+        "explanation": "Image derivatives measure appearance changes. Material boundaries, shadows, highlights and orientation changes can create edges without a depth break.",
+        "source": "HC3a; S3 introduction; HC2a",
+        "id": "E3Q12",
+        "number": 12,
+        "options": [
+          "Canny hysteresis guarantees that only physical depth boundaries survive its high threshold.",
+          "A material boundary cannot affect intensity, so every strong edge must be a depth discontinuity.",
+          "Increasing Gaussian sigma makes intensity edges uniquely attributable to changes in depth.",
+          "Reflectance or illumination changes can also cause an intensity edge."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "matching",
+        "stem": "Why does SIFT search across a Gaussian scale space and use Difference-of-Gaussians extrema?",
+        "correct": "To locate distinctive structures at their characteristic scales; DoG approximates a scale-normalized LoG response.",
+        "distractors": [
+          "To guarantee invariance to arbitrary projective deformation of every patch.",
+          "To recover absolute object size in metres from one image.",
+          "To force all keypoints to have identical pixel scale."
+        ],
+        "explanation": "Scale selection allows corresponding structures to be detected after resizing. DoG is an efficient approximation, not a guarantee of unlimited viewpoint invariance.",
+        "source": "HC4a pp.36–42; S4; Szeliski §7.1",
+        "id": "E3Q13",
+        "number": 13,
+        "options": [
+          "To locate distinctive structures at their characteristic scales; DoG approximates a scale-normalized LoG response.",
+          "To recover absolute object size in metres from one image.",
+          "To guarantee invariance to arbitrary projective deformation of every patch.",
+          "To force all keypoints to have identical pixel scale."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "matching",
+        "stem": "For positive affine brightness changes I'=aI+b with a>0, why can a normalized gradient-based SIFT descriptor be relatively robust?",
+        "correct": "Gradients remove the constant offset b, and descriptor normalization reduces the common gain a.",
+        "distractors": [
+          "The descriptor stores the original unnormalized RGB values exactly.",
+          "SIFT estimates and removes every spatially varying shadow without assumptions.",
+          "Dividing pixel coordinates by the focal length removes b."
+        ],
+        "explanation": "The derivative of aI+b is a times the derivative of I. Orientation and normalized magnitudes are relatively stable, provided clipping, quantization and nonlinear response do not disrupt the assumption.",
+        "source": "HC4a pp.41–44; Szeliski §7.1.2 pp.434–436",
+        "id": "E3Q14",
+        "number": 14,
+        "options": [
+          "Dividing pixel coordinates by the focal length removes b.",
+          "Gradients remove the constant offset b, and descriptor normalization reduces the common gain a.",
+          "The descriptor stores the original unnormalized RGB values exactly.",
+          "SIFT estimates and removes every spatially varying shadow without assumptions."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "fitting",
+        "stem": "An affine RANSAC sample contains three correct correspondences, but the three source points are collinear. Why should the sample be rejected?",
+        "correct": "It is geometrically degenerate and does not uniquely constrain a general 2D affine transform.",
+        "distractors": [
+          "Three pairs supply six scalar equations, so the transform is necessarily unique despite collinearity.",
+          "Repeated least-squares refitting of the same three pairs automatically restores the missing rank.",
+          "An all-inlier sample is always sufficient; degeneracy can occur only when at least one correspondence is wrong."
+        ],
+        "explanation": "All-inlier probability alone is not enough. A minimal sample must also have the geometry required to determine the model. For affine transforms, the [x,y,1] design rows must have rank 3.",
+        "source": "HC4a pp.17–22,45–55; Lab4",
+        "id": "E3Q15",
+        "number": 15,
+        "options": [
+          "Three pairs supply six scalar equations, so the transform is necessarily unique despite collinearity.",
+          "It is geometrically degenerate and does not uniquely constrain a general 2D affine transform.",
+          "An all-inlier sample is always sufficient; degeneracy can occur only when at least one correspondence is wrong.",
+          "Repeated least-squares refitting of the same three pairs automatically restores the missing rank."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "fitting",
+        "stem": "Increasing the RANSAC inlier threshold gives a model many more counted inliers. Why is this not automatically evidence of a better geometric model?",
+        "correct": "The larger threshold can admit poor matches and outliers as inliers.",
+        "distractors": [
+          "A threshold has no influence on consensus size.",
+          "A larger threshold always improves localization accuracy.",
+          "Every counted inlier has exactly zero residual by definition."
+        ],
+        "explanation": "A threshold controls what residual is accepted. Compare fit quality using meaningful units and tolerances, rather than maximizing a count under arbitrarily relaxed criteria.",
+        "source": "HC4a pp.46–48; HC3a pp.99–109",
+        "id": "E3Q16",
+        "number": 16,
+        "options": [
+          "A larger threshold always improves localization accuracy.",
+          "A threshold has no influence on consensus size.",
+          "The larger threshold can admit poor matches and outliers as inliers.",
+          "Every counted inlier has exactly zero residual by definition."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "flow",
+        "stem": "A stationary scene undergoes a moving cast shadow. A brightness-constancy flow method reports motion in the shadow region. Which interpretation is correct?",
+        "correct": "The appearance-constancy assumption for a physical surface point is violated; apparent image motion need not equal physical surface motion.",
+        "distractors": [
+          "Every measured optical flow vector necessarily equals a 3D object's velocity.",
+          "The reported vector must be a sign error, because a static scene guarantees zero estimated flow regardless of illumination.",
+          "Increasing the window size always establishes that reported image motion corresponds to physical surface motion."
+        ],
+        "explanation": "Optical flow describes apparent image change and relies on assumptions. Lighting changes can mimic motion even with stationary geometry. A moving shadow pattern may itself have a consistent image displacement; that is not the underlying surface's displacement.",
+        "source": "HC3b pp.8–47,57–58; Lab3",
+        "id": "E3Q17",
+        "number": 17,
+        "options": [
+          "The appearance-constancy assumption for a physical surface point is violated; apparent image motion need not equal physical surface motion.",
+          "Increasing the window size always establishes that reported image motion corresponds to physical surface motion.",
+          "The reported vector must be a sign error, because a static scene guarantees zero estimated flow regardless of illumination.",
+          "Every measured optical flow vector necessarily equals a 3D object's velocity."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "flow",
+        "stem": "Why can a coarse-to-fine flow method still fail on a tiny fast-moving object?",
+        "correct": "The object can disappear or become indistinct at coarse levels, so its motion is not initialized correctly.",
+        "distractors": [
+          "Pyramids make every flow observable regardless of texture or visibility.",
+          "Small objects always have zero displacement at full resolution.",
+          "The coarse-level flow already gives exact depth in metres."
+        ],
+        "explanation": "Pyramids reduce displacement but also reduce detail. Coarse estimation can miss thin or small structures, and later refinement may remain in the wrong solution basin.",
+        "source": "HC3b pp.52–58",
+        "id": "E3Q18",
+        "number": 18,
+        "options": [
+          "Small objects always have zero displacement at full resolution.",
+          "The coarse-level flow already gives exact depth in metres.",
+          "Pyramids make every flow observable regardless of texture or visibility.",
+          "The object can disappear or become indistinct at coarse levels, so its motion is not initialized correctly."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "tracking",
+        "stem": "An online tracker updates its appearance model from its own predicted box. What is a major risk during occlusion?",
+        "correct": "Incorrect predictions can contaminate the model and cause tracking drift.",
+        "distractors": [
+          "The model can never change because the initial template is fixed by definition.",
+          "Occlusion automatically provides perfect new positive labels.",
+          "Any online update guarantees improved test accuracy."
+        ],
+        "explanation": "Self-labelled updates can learn the occluder or background. Controlled updates and re-detection can help, but no method is universally immune.",
+        "source": "HC3b pp.89–106; Lab3",
+        "id": "E3Q19",
+        "number": 19,
+        "options": [
+          "Any online update guarantees improved test accuracy.",
+          "Incorrect predictions can contaminate the model and cause tracking drift.",
+          "Occlusion automatically provides perfect new positive labels.",
+          "The model can never change because the initial template is fixed by definition."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "A camera translates while observing a scene with nearby and distant objects. One fitted panorama homography aligns the distant background but not the foreground. What is the main cause?",
+        "correct": "Depth-dependent parallax; one global homography need not align the nonplanar scene.",
+        "distractors": [
+          "The blend ramp is too narrow; widening it guarantees correction of every geometric mismatch.",
+          "H has the wrong homogeneous scale; multiplying all its entries by a different nonzero scalar corrects foreground without moving background.",
+          "The foreground and background require opposite matrix multiplication orders, even when the transform direction is fixed."
+        ],
+        "explanation": "Translation makes image displacement depend on depth. Blending can hide seams but cannot generally correct incompatible geometric alignments or double images.",
+        "source": "HC4a pp.33–35,60–64; S4; Lab4",
+        "id": "E3Q20",
+        "number": 20,
+        "options": [
+          "Depth-dependent parallax; one global homography need not align the nonplanar scene.",
+          "The foreground and background require opposite matrix multiplication orders, even when the transform direction is fixed.",
+          "The blend ramp is too narrow; widening it guarantees correction of every geometric mismatch.",
+          "H has the wrong homogeneous scale; multiplying all its entries by a different nonzero scalar corrects foreground without moving background."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "geometry",
+        "stem": "H maps source image coordinates to a reference image. A translation T then moves reference coordinates into a larger panorama canvas. With column vectors, which matrix maps source directly to the canvas?",
+        "correct": "T @ H",
+        "distractors": [
+          "H @ T",
+          "H + T",
+          "H.T @ T, regardless of the coordinate convention"
+        ],
+        "explanation": "Matrix composition applies the rightmost transformation first: source -> H -> reference -> T -> canvas. Transform direction and multiplication order must be explicit.",
+        "source": "HC4a pp.19,24–35; Lab4",
+        "id": "E3Q21",
+        "number": 21,
+        "options": [
+          "T @ H",
+          "H @ T",
+          "H + T",
+          "H.T @ T, regardless of the coordinate convention"
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "classification",
+        "stem": "Which classifier and prediction does this code implement for binary class labels? Squared distances preserve Euclidean neighbour order. Provided routine: `np.argsort(d2)` returns indices sorted by increasing d2.\n\n```python\nimport numpy as np\nX = np.array([[0,0], [0,1], [1,0], [3,3]], dtype=float)\ny = np.array([1,0,0,1])\nquery = np.array([.1,.1])\nd2 = ((X-query)**2).sum(axis=1)\nnearest = np.argsort(d2)[:3]\nprediction = int(y[nearest].sum() > 1)\n```",
+        "correct": "Unweighted 3-nearest-neighbour majority voting predicts class 0, although the closest example has class 1.",
+        "distractors": [
+          "1-nearest-neighbour classification predicts class 1; the two other selected labels never contribute.",
+          "Unweighted 3-nearest-neighbour voting predicts class 1 because the closest example's label outweighs both others.",
+          "K-means predicts class 0 after moving three learned centres; the array y is used only as an initialization seed."
+        ],
+        "explanation": "Squared distances are [.02,.82,.82,16.82]. The three nearest labels are [1,0,0], in an irrelevant tie order for the two zero labels. Their sum is 1, so the comparison is false and prediction=0. k-NN uses labelled examples; it does not update cluster centres. With k=1 the prediction would instead be 1.",
+        "source": "HC4b pp.37–53; Lab0",
+        "id": "E3Q22",
+        "number": 22,
+        "options": [
+          "K-means predicts class 0 after moving three learned centres; the array y is used only as an initialization seed.",
+          "Unweighted 3-nearest-neighbour voting predicts class 1 because the closest example's label outweighs both others.",
+          "Unweighted 3-nearest-neighbour majority voting predicts class 0, although the closest example has class 1.",
+          "1-nearest-neighbour classification predicts class 1; the two other selected labels never contribute."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "clustering",
+        "stem": "For pixel clustering, why might features [R,G,B,alpha*x,alpha*y] give different segments from [R,G,B]?",
+        "correct": "Spatial terms encourage location coherence, and alpha sets their relative importance against colour differences.",
+        "distractors": [
+          "Adding x,y guarantees the true semantic labels without supervision.",
+          "Feature scaling cannot affect Euclidean distances.",
+          "K-means always returns connected regions even with colour-only features."
+        ],
+        "explanation": "K-means uses the metric in the supplied feature space. Scaling positions changes distances and can trade colour similarity against spatial compactness; it does not guarantee semantics or connectivity.",
+        "source": "HC5a pp.91–118",
+        "id": "E3Q23",
+        "number": 23,
+        "options": [
+          "K-means always returns connected regions even with colour-only features.",
+          "Adding x,y guarantees the true semantic labels without supervision.",
+          "Spatial terms encourage location coherence, and alpha sets their relative importance against colour differences.",
+          "Feature scaling cannot affect Euclidean distances."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "classification",
+        "stem": "A training set contains label noise and is not linearly separable. Why use a soft-margin rather than a hard-margin linear SVM?",
+        "correct": "It permits margin violations while balancing fit against regularization.",
+        "distractors": [
+          "It removes every mislabeled point with certainty.",
+          "It guarantees infinite margin for nonseparable data.",
+          "It ignores the weight norm entirely and only memorizes pixels."
+        ],
+        "explanation": "A hard-margin separator is infeasible for nonseparable labels. Soft margin penalizes violations and controls model complexity; it does not know which labels are wrong.",
+        "source": "HC4b pp.69–78",
+        "id": "E3Q24",
+        "number": 24,
+        "options": [
+          "It removes every mislabeled point with certainty.",
+          "It guarantees infinite margin for nonseparable data.",
+          "It permits margin violations while balancing fit against regularization.",
+          "It ignores the weight norm entirely and only memorizes pixels."
+        ],
+        "answer": "C",
+        "display_answer": "C"
+      },
+      {
+        "kind": "mc",
+        "topic": "metrics",
+        "stem": "A CNN outputs softmax class scores that sum to one. Which conclusion is NOT guaranteed merely by applying softmax?",
+        "correct": "The probabilities are well calibrated to actual correctness frequencies.",
+        "distractors": [
+          "Each output is nonnegative.",
+          "The outputs sum to one, up to numerical precision.",
+          "Increasing one logit relative to the others increases its softmax probability."
+        ],
+        "explanation": "Softmax produces a normalized score distribution, but calibration is a separate empirical property. A high score alone is not proof that its stated frequency matches reality.",
+        "source": "HC5a p.5; HC5b p.78; prerequisite probability",
+        "id": "E3Q25",
+        "number": 25,
+        "options": [
+          "Increasing one logit relative to the others increases its softmax probability.",
+          "Each output is nonnegative.",
+          "The outputs sum to one, up to numerical precision.",
+          "The probabilities are well calibrated to actual correctness frequencies."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "optimization",
+        "stem": "Consider this training sequence from the kind of loop taught in Lab5. What is the purpose of the first line? No executable PyTorch code is required.\n\n```python\noptimizer.zero_grad()\nloss.backward()\noptimizer.step()\n```",
+        "correct": "Prevent unintended accumulation of earlier batches' gradients before this batch's update.",
+        "distractors": [
+          "Reset learned model parameters to zero, ensuring that each batch starts from the same initialized network.",
+          "Disable gradient recording for this batch while retaining earlier batches' stored gradients.",
+          "Normalize every stored gradient to unit norm, so the learning rate becomes irrelevant to the next update."
+        ],
+        "explanation": "PyTorch gradient buffers accumulate unless cleared. Clearing gradients does not reset parameter values or disable gradient recording. Deliberate gradient accumulation is possible, but would need a different specified training schedule.",
+        "source": "Lab5 tutorial and training code",
+        "id": "E3Q26",
+        "number": 26,
+        "options": [
+          "Disable gradient recording for this batch while retaining earlier batches' stored gradients.",
+          "Reset learned model parameters to zero, ensuring that each batch starts from the same initialized network.",
+          "Normalize every stored gradient to unit norm, so the learning rate becomes irrelevant to the next update.",
+          "Prevent unintended accumulation of earlier batches' gradients before this batch's update."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "architectures",
+        "stem": "A residual branch changes feature shape from H x W x C to H/2 x W/2 x 2C. What is required for an additive shortcut?",
+        "correct": "A compatible shortcut, such as a stride-2 projection, so the tensors have matching shapes.",
+        "distractors": [
+          "Add the mismatched tensors with no mapping; addition always changes the channel count automatically.",
+          "Concatenate them and call the result an identity addition.",
+          "Remove all nonlinearities from the entire network."
+        ],
+        "explanation": "Elementwise residual addition requires compatible dimensions. Identity shortcuts work only when the required shape matches; otherwise use an appropriate projection/downsampling path.",
+        "source": "HC6a pp.99–111",
+        "id": "E3Q27",
+        "number": 27,
+        "options": [
+          "A compatible shortcut, such as a stride-2 projection, so the tensors have matching shapes.",
+          "Remove all nonlinearities from the entire network.",
+          "Add the mismatched tensors with no mapping; addition always changes the channel count automatically.",
+          "Concatenate them and call the result an identity addition."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "detection",
+        "stem": "Multiply both a predicted box and its ground-truth box coordinates by the same positive scale. Which property is correct?",
+        "correct": "IoU is unchanged, while an unnormalized squared coordinate-error loss generally scales by the square of that factor.",
+        "distractors": [
+          "IoU doubles whenever object area doubles.",
+          "Both losses must be identical for every pair of boxes.",
+          "Coordinate error becomes scale invariant just by summing its four components."
+        ],
+        "explanation": "Intersection and union areas both scale by the square factor, so their ratio stays fixed. Squared coordinate errors also scale by the square factor, without cancellation.",
+        "source": "S5 Exercise 4; YOLOv4 §2.2",
+        "id": "E3Q28",
+        "number": 28,
+        "options": [
+          "Both losses must be identical for every pair of boxes.",
+          "IoU doubles whenever object area doubles.",
+          "Coordinate error becomes scale invariant just by summing its four components.",
+          "IoU is unchanged, while an unnormalized squared coordinate-error loss generally scales by the square of that factor."
+        ],
+        "answer": "D",
+        "display_answer": "D"
+      },
+      {
+        "kind": "mc",
+        "topic": "stereo",
+        "stem": "For an ideal rectified stereo pair with parallel optical axes and a horizontal baseline, why are epipolar lines parallel?",
+        "correct": "The epipoles are at infinity in the horizontal baseline direction.",
+        "distractors": [
+          "Every scene point has the same depth.",
+          "Both cameras have exactly the same optical centre.",
+          "The fundamental matrix maps every point to the image's principal point."
+        ],
+        "explanation": "The other camera centre projects to a point at infinity when the baseline is parallel to the image plane. Corresponding points lie on horizontal scanlines after rectification.",
+        "source": "HC6b pp.50–90",
+        "id": "E3Q29",
+        "number": 29,
+        "options": [
+          "The epipoles are at infinity in the horizontal baseline direction.",
+          "The fundamental matrix maps every point to the image's principal point.",
+          "Both cameras have exactly the same optical centre.",
+          "Every scene point has the same depth."
+        ],
+        "answer": "A",
+        "display_answer": "A"
+      },
+      {
+        "kind": "mc",
+        "topic": "stereo",
+        "stem": "Which description of a standard multi-view reconstruction pipeline is correct?",
+        "correct": "SfM estimates camera poses and sparse structure; bundle adjustment refines poses and points jointly; MVS can densify using estimated cameras.",
+        "distractors": [
+          "MVS always estimates metric scale from arbitrary uncalibrated image content alone.",
+          "Bundle adjustment modifies only colour histograms and never camera parameters.",
+          "SfM requires only one camera image with no priors or known geometry."
+        ],
+        "explanation": "SfM recovers geometry from correspondences and motion. Ordinary monocular reconstruction retains a global scale ambiguity without a metric reference. MVS and bundle adjustment have different roles.",
+        "source": "HC6b pp.108–149",
+        "id": "E3Q30",
+        "number": 30,
+        "options": [
+          "Bundle adjustment modifies only colour histograms and never camera parameters.",
+          "SfM estimates camera poses and sparse structure; bundle adjustment refines poses and points jointly; MVS can densify using estimated cameras.",
+          "SfM requires only one camera image with no priors or known geometry.",
+          "MVS always estimates metric scale from arbitrary uncalibrated image content alone."
+        ],
+        "answer": "B",
+        "display_answer": "B"
+      },
+      {
+        "kind": "num",
+        "topic": "camera",
+        "stem": "An original camera has fx=800, fy=600, cx=320, cy=240 and zero skew. Crop away 40 pixels from the left and 20 from the top; then halve both spatial dimensions. Use continuous coordinates with no half-pixel offsets. A camera-frame point is [0.5,1,2]. Report its final image v coordinate, using the virtual image plane in front of the camera.",
+        "answer": 260.0,
+        "explanation": "After crop and resize: fy'=300 and cy'=(240-20)/2=110. v'=300*(1/2)+110=260. Extrinsics do not change.",
+        "source": "HC1b pp.24–45; S1",
+        "integer": false,
+        "id": "E3Q31",
+        "number": 31,
+        "display_answer": "260.00"
+      },
+      {
+        "kind": "num",
+        "topic": "colour",
+        "stem": "For the RGB image below, compute normalized RGB PER PIXEL, then report the spatial mean of its normalized red channel. For black pixels, define all normalized channels as zero.\n\n```python\nimport numpy as np\nI = np.array([[[6,1,3], [2,6,2]],\n              [[0,0,0], [1,1,2]]], dtype=float)\ns = I.sum(axis=2, keepdims=True)\nsafe = np.where(s == 0, 1, s)\nnormalized = I / safe\nanswer = normalized[:, :, 0].mean()\n```\n\nProvided function: `np.where(condition, a, b)` selects a where the condition is true and b elsewhere. Black pixels are included in the spatial mean.",
+        "answer": 0.2625,
+        "explanation": "The per-pixel sums are [[10,10],[0,4]], with the zero denominator replaced by 1. Normalized red values are [[.6,.2],[0,.25]]. Their mean is 1.05/4=.2625; submit .26. Normalizing a spatially averaged RGB vector would be a different calculation.",
+        "source": "Lab1 Section 1; Lab0 array axes",
+        "integer": false,
+        "id": "E3Q32",
+        "number": 32,
+        "display_answer": "0.26"
+      },
+      {
+        "kind": "num",
+        "topic": "photometric",
+        "stem": "Let estimated height gradients be p(x,y)=dz/dx=y and q(x,y)=dz/dy=2x. Start with z(0,0)=0. Integrate continuously to (2,3) along path A: x first then y; and path B: y first then x. Report the absolute difference between the two resulting heights.",
+        "answer": 6.0,
+        "explanation": "Path A: p=0 along y=0, then q=4 along x=2, giving z_A=12. Path B: q=0 along x=0, then p=3 along y=3, giving z_B=6. Difference=6. The field is not integrable because dp/dy=1 differs from dq/dx=2.",
+        "source": "HC2a pp.41–43; Lab1",
+        "integer": false,
+        "id": "E3Q33",
+        "number": 33,
+        "display_answer": "6.00"
+      },
+      {
+        "kind": "num",
+        "topic": "reflectance",
+        "stem": "Use calibrated Lambertian intensity I=rho*max(n dot l,0), with unit vectors n=[2/3,-1/3,2/3] and l=[0,0.6,0.8], rho=0.75, and unit light strength/gain. Report I.",
+        "answer": 0.25,
+        "explanation": "n dot l = (-1/3)*.6+(2/3)*.8=1/3. It is positive, so I=.75/3=.25.",
+        "source": "HC2a pp.12–20; S1; Lab1",
+        "integer": false,
+        "id": "E3Q34",
+        "number": 34,
+        "display_answer": "0.25"
+      },
+      {
+        "kind": "num",
+        "topic": "morphology",
+        "stem": "A 9 by 9 binary image is zero except for a 3 by 3 all-ones block at rows 3..5 and columns 3..5 (inclusive, zero-based), and a single foreground pixel at (0,0). Apply opening with a centred 3 by 3 all-ones element, zero outside the image, retaining the same shape after each stage. Report the final foreground-pixel count.",
+        "answer": 9,
+        "explanation": "Erosion leaves only the central pixel (4,4); the isolated corner pixel disappears. Dilation restores the central 3 by 3 block, giving 9 pixels. It does not restore the isolated noise.",
+        "source": "HC2b pp.39–42; S2",
+        "integer": true,
+        "id": "E3Q35",
+        "number": 35,
+        "display_answer": "9"
+      },
+      {
+        "kind": "num",
+        "topic": "filtering",
+        "stem": "Use the median of three entries: `med(v)=sorted(v)[1]`. Let a=[0,0,10] and b=[0,10,0], with elementwise addition. Report med(a+b)-med(a)-med(b) as an exact integer.",
+        "answer": 10,
+        "explanation": "a+b=[0,10,10], whose median is 10. Both original medians are 0. The difference is 10, a concrete failure of additivity proving that median filtering is nonlinear.",
+        "source": "HC2b pp.47,89–91; Lab2",
+        "integer": true,
+        "id": "E3Q36",
+        "number": 36,
+        "display_answer": "10"
+      },
+      {
+        "kind": "num",
+        "topic": "fourier",
+        "stem": "For f=[1,0,2,0] and h=[0,1,0,1], use 4-point CIRCULAR convolution c[k]=sum(n=0..3) f[n]*h[(k-n) modulo 4]. Report c[3] as an exact integer. This is the result of multiplying their unpadded 4-point DFTs and applying the inverse DFT.",
+        "answer": 3,
+        "explanation": "c[3]=1*h[3]+0*h[2]+2*h[1]+0*h[0]=1+2=3. Wrap-around is part of the defined operation.",
+        "source": "HC2b pp.101–103; Szeliski §3.4",
+        "integer": true,
+        "id": "E3Q37",
+        "number": 37,
+        "display_answer": "3"
+      },
+      {
+        "kind": "num",
+        "topic": "features",
+        "stem": "The grid below contains gradient magnitudes AFTER non-maximum suppression. Use 8-neighbour Canny hysteresis: strong means >=9; weak means >=4 and <9; lower values are rejected. Retain every weak pixel connected through weak/strong pixels to a strong pixel. Report the retained pixel count.\n\n```text\n10 6 0 0 5 5 0\n 0 6 0 0 0 5 0\n 0 6 6 0 0 0 0\n```",
+        "answer": 5,
+        "explanation": "The left group has one strong 10 and four connected weak 6s, so all 5 survive. The three 5s on the right have no connection to a strong seed and are discarded.",
+        "source": "HC3a pp.58–65; S2",
+        "integer": true,
+        "id": "E3Q38",
+        "number": 38,
+        "display_answer": "5"
+      },
+      {
+        "kind": "num",
+        "topic": "features",
+        "stem": "Use equal weights for a four-pixel window with Ix=[1,0,1,2] and Iy=[0,2,1,0]. Construct M=[[sum(Ix^2),sum(Ix*Iy)],[sum(Ix*Iy),sum(Iy^2)]]. Report the Shi–Tomasi score, the smaller eigenvalue. Provided formula for symmetric [[a,b],[b,d]]: lambda_min=(a+d-sqrt((a-d)^2+4*b*b))/2.",
+        "answer": 4.381966011250105,
+        "explanation": "M=[[6,1],[1,5]]. lambda_min=(11-sqrt(5))/2=4.381966. Submit 4.38. The score tests the least constrained direction.",
+        "source": "S3; Lab3 Sections 2–3",
+        "integer": false,
+        "id": "E3Q39",
+        "number": 39,
+        "display_answer": "4.38"
+      },
+      {
+        "kind": "num",
+        "topic": "flow",
+        "stem": "A flow at one-eighth spatial resolution is [u,v]=[1.75,-0.5] in COARSE pixels. Upsample to full resolution with the correct vector-unit scaling, then add a full-resolution residual flow [0.25,0.75]. Report the Euclidean magnitude of the resulting full-resolution vector.",
+        "answer": 14.615915982243466,
+        "explanation": "Scale coarse displacement by 8: [14,-4]. Add the residual: [14.25,-3.25]. Magnitude=sqrt(14.25^2+3.25^2)=about 14.62 pixels. Resizing the array alone is not enough.",
+        "source": "HC3b pp.48–54; Lab3",
+        "integer": false,
+        "id": "E3Q40",
+        "number": 40,
+        "display_answer": "14.62"
+      },
+      {
+        "kind": "num",
+        "topic": "fitting",
+        "stem": "An affine RANSAC uses minimal samples of 3 point pairs and independently sampled inlier fraction w=0.4. Assume all-inlier samples are nondegenerate. Use N=ceil(log(1-p)/log(1-w^3)). Report the minimum integer N for p=0.999.",
+        "answer": 105,
+        "explanation": "w^3=.064. log(.001)/log(.936)=104.4417. Ceiling gives 105. A homography would require a different sample size and a larger budget.",
+        "source": "HC3a pp.104–105; Lab4",
+        "integer": true,
+        "id": "E3Q41",
+        "number": 41,
+        "display_answer": "105"
+      },
+      {
+        "kind": "num",
+        "topic": "geometry",
+        "stem": "A nonsingular homography maps these four source points to targets:\n\n```text\n(0,0) -> (1,2)\n(1,0) -> (3,2)\n(0,1) -> (1,4)\n(1,1) -> (3,3)\n```\n\nUse H=[[a,b,c],[d,e,f],[g,h,1]], so x'=(a*x+b*y+c)/(g*x+h*y+1), y'=(d*x+e*y+f)/(g*x+h*y+1). Rearrange the eight scalar equations into a linear system. You may use the provided least-squares routine `np.linalg.lstsq(A, rhs, rcond=None)[0]` to solve a full-rank system. Report the target x coordinate for source (0.5,0.5).",
+        "answer": 2.3333333333333335,
+        "explanation": "The first pair gives c=1,f=2. The next pairs imply a=3g+2,d=2g,b=h,e=4h+2. The last pair gives h=0,g=1. Thus H=[[5,0,1],[2,2,2],[1,0,1]]. At (.5,.5), x'=3.5/1.5=7/3; submit 2.33. Averaging target corner positions would not implement a projective map.",
+        "source": "HC4a pp.47–55; S4",
+        "integer": false,
+        "id": "E3Q42",
+        "number": 42,
+        "display_answer": "2.33"
+      },
+      {
+        "kind": "num",
+        "topic": "matching",
+        "stem": "A matcher returns SQUARED Euclidean distances [D1,D2], nearest first. Apply Lowe's test to the ordinary distances: sqrt(D1)/sqrt(D2)<0.7. For the rows below, report the largest ordinary nearest distance among accepted matches.\n\n```text\n[[4,9], [9,16], [1,4], [25,36], [.25,1]]\n```",
+        "answer": 2.0,
+        "explanation": "Ordinary ratios are [2/3,3/4,1/2,5/6,1/2]. Accepted nearest distances are [2,1,.5], whose maximum is 2. Comparing D1/D2 directly with .7 would use the wrong threshold.",
+        "source": "HC4a pp.43–44; S4; Lab4",
+        "integer": false,
+        "id": "E3Q43",
+        "number": 43,
+        "display_answer": "2.00"
+      },
+      {
+        "kind": "num",
+        "topic": "classification",
+        "stem": "A 1D visual vocabulary has centres [0,4,8]. Quantize descriptors [1,3,5,7,8,9] to their nearest centre using Euclidean distance. Build counts, then L1-normalize by the number of descriptors. Report the normalized bin value for centre 8.",
+        "answer": 0.5,
+        "explanation": "Assignments produce counts [1,2,3]. After normalization by 6, the final bin is 3/6=.5. The fixed vocabulary gives the same histogram length for every image.",
+        "source": "HC4b pp.23–28; S4",
+        "integer": false,
+        "id": "E3Q44",
+        "number": 44,
+        "display_answer": "0.50"
+      },
+      {
+        "kind": "num",
+        "topic": "metrics",
+        "stem": "A binary classifier predicts positive iff score>=0.6. True labels are [1,0,1,0,1,0] and scores are [.9,.8,.7,.6,.5,.4], in the same order. Report F1 for the positive class as a fraction.",
+        "answer": 0.5714285714285714,
+        "explanation": "The first four predictions are positive. TP=2, FP=2, FN=1. F1=4/(4+2+1)=4/7=.5714286; submit .57. The score exactly at .6 is positive because the rule is inclusive.",
+        "source": "HC4b pp.80–86; S4",
+        "integer": false,
+        "id": "E3Q45",
+        "number": 45,
+        "display_answer": "0.57"
+      },
+      {
+        "kind": "num",
+        "topic": "metrics",
+        "stem": "One class has 4 ground-truth objects. After score-ordered, one-to-one matching, ranked detections are [FP,TP,FP,TP,TP]. Use ALL-POINTS INTERPOLATED AP: sum each positive recall increment times the maximum precision at that recall or any later recall. Precision beyond maximum achieved recall is zero. Report AP as a fraction. This is NOT 11-point AP or raw uninterpolated AP.",
+        "answer": 0.45,
+        "explanation": "Cumulative precisions are [0,1/2,1/3,2/4,3/5], recalls [0,1/4,1/4,2/4,3/4]. The future-maximum precision at each TP is .6. Three increments of .25 contribute .25*.6 each, so AP=.45. The missing final quarter of recall contributes zero; raw uninterpolated AP would instead be .40.",
+        "source": "HC5a pp.68–78; S4",
+        "integer": false,
+        "id": "E3Q46",
+        "number": 46,
+        "display_answer": "0.45"
+      },
+      {
+        "kind": "num",
+        "topic": "architectures",
+        "stem": "A residual block has an identity shortcut and this dense bottleneck branch: 1 x 1 convolution 64->16 channels; 3 x 3 convolution 16->16; 1 x 1 convolution 16->64. Include one bias per output channel in EACH convolution. There is no normalization layer or trainable shortcut. Report total trainable parameters.",
+        "answer": 4448,
+        "explanation": "Counts are (64+1)*16=1040, (3*3*16+1)*16=2320, and (16+1)*64=1088. Total=4448. The identity shortcut has no parameters.",
+        "source": "HC5b pp.70–73; HC6a pp.107–111; S5",
+        "integer": true,
+        "id": "E3Q47",
+        "number": 47,
+        "display_answer": "4448"
+      },
+      {
+        "kind": "num",
+        "topic": "cnn",
+        "stem": "A standard 3D convolution processes a video tensor with 2 input channels and uses 5 output channels. Each filter has temporal x height x width size 3 x 3 x 3. Include one bias per output channel. No groups. Report the trainable parameter count; the video length and spatial image size do not enter this count.",
+        "answer": 275,
+        "explanation": "Each filter has 3*3*3*2=54 weights. Five filters and five biases give (54+1)*5=275. Do not count frames as independent input channels for this 3D convolution.",
+        "source": "S5 Exercise 5",
+        "integer": true,
+        "id": "E3Q48",
+        "number": 48,
+        "display_answer": "275"
+      },
+      {
+        "kind": "num",
+        "topic": "detection",
+        "stem": "Use the ORIGINAL YOLO v1 confidence convention: box_confidence=Pr(object)*IoU(predicted_box,GT); class_specific_score=Pr(class|object)*box_confidence. Given Pr(object)=0.75, IoU=0.6 and Pr(class|object)=0.8, report the class-specific score.",
+        "answer": 0.36,
+        "explanation": "Box confidence=.75*.6=.45. Class-specific score=.8*.45=.36. The convention is explicitly given because different YOLO versions use different outputs and targets.",
+        "source": "HC6a pp.66–72; SOURCE_NOTES",
+        "integer": false,
+        "id": "E3Q49",
+        "number": 49,
+        "display_answer": "0.36"
+      },
+      {
+        "kind": "num",
+        "topic": "stereo",
+        "stem": "For rectified stereo, Z=f*B/d. Let f=900 pixels, B=0.2 metres, d=12 pixels, and small disparity-error magnitude delta_d=0.25 pixel. Use FIRST-ORDER error propagation |delta_Z| approximately (f*B/d^2)*|delta_d|. Report the estimated depth-error magnitude in metres, not the exact finite-difference error.",
+        "answer": 0.3125,
+        "explanation": "Sensitivity magnitude is 180/144=1.25 metres per pixel. Multiply by .25: .3125 metres, so submit .31. Depth becomes increasingly sensitive to disparity errors at small disparity/large depth.",
+        "source": "HC6b pp.84–90; Szeliski §12.1; prerequisite calculus",
+        "integer": false,
+        "id": "E3Q50",
+        "number": 50,
+        "display_answer": "0.31"
+      }
+    ]
+  }
+]
