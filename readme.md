@@ -1,0 +1,1 @@
+Coursework and slides for the Computer Vision 1 course at the University of Amsterdam, in the MSc AI programme.
