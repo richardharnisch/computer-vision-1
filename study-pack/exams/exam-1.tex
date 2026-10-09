@@ -1,0 +1,553 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=20mm,headheight=15pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{fvextra}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{3em}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\raggedright
+\DefineVerbatimEnvironment{Code}{Verbatim}{fontsize=\small,
+  breaklines=true,breakanywhere=true,breaksymbolleft={},breaksymbolright={},
+  frame=single,framesep=5pt}
+\setlist[enumerate]{leftmargin=7mm,itemsep=3pt,topsep=5pt,parsep=0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Computer Vision 1}
+\fancyhead[R]{\small Exam 1 · Questions}
+\fancyfoot[C]{\small \thepage}
+\hypersetup{pdftitle={Exam 1 — Foundations under pressure},pdfsubject={CV1 practice material}}
+\begin{document}
+{\LARGE\bfseries Exam 1 — Foundations under pressure}\par
+{\large Questions only}\par\bigskip
+\textbf{Name:} \rule{70mm}{0.4pt}\hfill \textbf{Date:} \rule{30mm}{0.4pt}
+\section*{Conditions}
+\begin{itemize}[leftmargin=5mm,itemsep=5pt]
+\item 50 questions: 30 single-answer multiple choice and 20 numerical. Each is worth 1 raw practice point.
+\item Suggested training limit: \textbf{150 minutes}. This is not a claim about the actual exam duration or question count.
+\item Use up to three double-sided A4 sheets,\allowbreak{} prepared by you,\allowbreak{} and a local Jupyter notebook. No internet,\allowbreak{} AI assistance or answer key during the attempt.
+\item Use Python/\allowbreak{}NumPy for computation; SciPy is also allowed. You do not need executable OpenCV or PyTorch. Specialized routines are provided when needed.
+\item For multiple choice,\allowbreak{} select exactly one of A–D. Attempt every question.
+\item Unless an exact integer is requested,\allowbreak{} round the final numerical answer to \textbf{two decimal places}. Keep full precision in intermediate steps. Use fractions rather than percentages unless specified.
+\item Numerical practice grading uses the syllabus rule: within ±0.01 of the unrounded reference,\allowbreak{} inclusive. Counts require the exact integer; no partial credit.
+\item Conventions stated in a question override defaults. Arrays use [row,\allowbreak{}column] =\allowbreak{} [y,\allowbreak{}x]; geometric vectors are columns; image-plane projection is virtual/\allowbreak{}front-facing; foreground is 1.
+\item This is original,\allowbreak{} challenging training material based on the supplied course files,\allowbreak{} not a lecturer-issued mock or a prediction of the exam.
+\end{itemize}
+Solutions are in a separate PDF. Do not open them until you finish.
+\clearpage\section*{Part A — Single-answer multiple choice}
+\begin{minipage}{\linewidth}
+\textbf{Q01 — Multiple choice}\par\smallskip
+A camera uses the world-to-camera convention Xc =\allowbreak{} R Xw + t. Which expression gives its optical centre C in world coordinates?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item C =\allowbreak{} -R @ t
+\item C =\allowbreak{} -R.T @ t
+\item C =\allowbreak{} R.T @ t
+\item C =\allowbreak{} t
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q02 — Multiple choice}\par\smallskip
+An image is resized to half its original width and height,\allowbreak{} with no crop. Use the ideal continuous-coordinate model,\allowbreak{} with no pixel-centre offset. Which change is correct?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Halve fx,\allowbreak{} fy,\allowbreak{} skew,\allowbreak{} cx and cy; keep R and t unchanged.
+\item Halve only fx and fy; leave the principal point unchanged.
+\item Halve R and t; leave K unchanged.
+\item Halve every entry of K,\allowbreak{} including K[2,\allowbreak{}2],\allowbreak{} without renormalizing it.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q03 — Multiple choice}\par\smallskip
+Under an ideal pinhole model,\allowbreak{} two distinct visible 3D points have exactly the same image coordinates. What must hold?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item They lie on the same viewing ray from the optical centre.
+\item They have the same physical size.
+\item They have the same world X and Y coordinates,\allowbreak{} regardless of camera pose.
+\item They have the same depth.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q04 — Multiple choice}\par\smallskip
+Keep illumination,\allowbreak{} material and surface orientation fixed. For an ideal Lambertian patch,\allowbreak{} what is independent of viewing direction?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Its outgoing radiance,\allowbreak{} apart from visibility and camera effects.
+\item Its total projected area in the image.
+\item Its brightness under any change of light direction.
+\item Its surface normal in every coordinate frame.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q05 — Multiple choice}\par\smallskip
+Twenty calibrated light vectors all lie in one plane through the origin. In the linear photometric-stereo model i =\allowbreak{} Lg,\allowbreak{} which claim is correct?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Only the albedo is ambiguous; the normal is always unique.
+\item Twenty images guarantee a unique g.
+\item The component of g perpendicular to that plane is unobservable.
+\item Normalizing every light vector makes L full rank.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q06 — Multiple choice}\par\smallskip
+A photometric-stereo estimate has g =\allowbreak{} [0,\allowbreak{}0,\allowbreak{}0]. What is the correct interpretation of n =\allowbreak{} g /\allowbreak{} |\allowbreak{}|\allowbreak{}g|\allowbreak{}|\allowbreak{}?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item The normal must be [0,\allowbreak{}0,\allowbreak{}1].
+\item The surface must be infinitely far away.
+\item The division produces a valid zero unit normal.
+\item The normal is undefined; mask or otherwise handle the zero-reflectance/\allowbreak{}invalid pixel.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q07 — Multiple choice}\par\smallskip
+For normalized intensity 0 < r < 1,\allowbreak{} apply s =\allowbreak{} r\textasciicircum{}gamma with 0 < gamma < 1. What happens?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Every output intensity becomes 1.
+\item The result is a linear contrast stretch.
+\item Interior intensities increase; 0 and 1 remain fixed.
+\item Interior intensities decrease; 0 and 1 remain fixed.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q08 — Multiple choice}\par\smallskip
+Why does a two-pass connected-component labelling algorithm store equivalences between provisional labels?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item It estimates the intensity histogram before labelling.
+\item Different provisional labels can later be found to belong to one connected region.
+\item It needs to assign a different label to every foreground pixel.
+\item It changes 4-connectivity into 8-connectivity automatically.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q09 — Multiple choice}\par\smallskip
+Foreground objects contain tiny isolated foreground specks and small background holes. Which sequence directly targets the two defects,\allowbreak{} assuming suitable structuring elements?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Closing,\allowbreak{} then another dilation.
+\item Dilation,\allowbreak{} then another dilation.
+\item Opening,\allowbreak{} then closing.
+\item Erosion,\allowbreak{} then another erosion.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q10 — Multiple choice}\par\smallskip
+You implement a sliding dot product with an asymmetric 2D kernel K. What change converts this cross-correlation to mathematical convolution?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Flip K horizontally and vertically before the sliding dot product.
+\item Divide K by its sum.
+\item Negate K without changing its positions.
+\item Transpose K only.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q11 — Multiple choice}\par\smallskip
+Two ideal Gaussian smoothing filters with standard deviations 3 and 4 are applied successively. Ignore sampling and truncation. What is the equivalent standard deviation?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item 25
+\item 12
+\item 5
+\item 7
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q12 — Multiple choice}\par\smallskip
+A nonzero Fourier coefficient is a + i b. In NumPy's argument convention,\allowbreak{} which pair gives its magnitude and phase?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item a + b,\allowbreak{} arctan2(a,\allowbreak{} b)
+\item sqrt(a*\allowbreak{}a + b*\allowbreak{}b),\allowbreak{} arctan2(b,\allowbreak{} a)
+\item a*\allowbreak{}a + b*\allowbreak{}b,\allowbreak{} arctan(b/\allowbreak{}a) for every a and b
+\item sqrt(a*\allowbreak{}a + b*\allowbreak{}b),\allowbreak{} arctan2(a,\allowbreak{} b)
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q13 — Multiple choice}\par\smallskip
+Under valid continuous-domain differentiation and convolution,\allowbreak{} which operation is equivalent to differentiating a Gaussian-smoothed image?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Convolve the image with the corresponding derivative of the Gaussian.
+\item Threshold the image and then take a histogram.
+\item Convolve the image with the square of the Gaussian.
+\item Differentiate the Gaussian's standard deviation instead of a spatial coordinate.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q14 — Multiple choice}\par\smallskip
+After Canny non-maximum suppression,\allowbreak{} a chain of weak pixels connects to a strong pixel; another weak chain is disconnected from all strong pixels. Hysteresis should do what?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Keep every weak pixel because it exceeds the low threshold.
+\item Discard every weak pixel because it is below the high threshold.
+\item Keep whichever chain has the greatest number of pixels,\allowbreak{} regardless of connection.
+\item Keep the connected weak chain and discard the disconnected chain.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q15 — Multiple choice}\par\smallskip
+A local structure tensor has two large eigenvalues. What does this indicate?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item A guaranteed scale-invariant feature at every resolution.
+\item Strong intensity variation in two independent directions: a good corner-like feature.
+\item A flat patch.
+\item A single straight edge with unconstrained tangential motion.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q16 — Multiple choice}\par\smallskip
+Why is y =\allowbreak{} mx + b with vertical-residual ordinary least squares unsuitable for an exactly vertical line?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item It requires equal x and y measurement variances; unequal variances are the reason a vertical line is unrepresentable.
+\item The model becomes valid once both coordinate columns are centred,\allowbreak{} because centring makes the slope finite.
+\item Orthogonal-distance fitting handles vertical lines by forcing m =\allowbreak{} 0 in the same y =\allowbreak{} mx + b representation.
+\item A vertical line cannot be represented by a finite m; an orthogonal-distance line model avoids this problem.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q17 — Multiple choice}\par\smallskip
+For fixed desired success probability and model sample size,\allowbreak{} what happens to the required RANSAC iteration count when the inlier fraction decreases?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item It decreases because more points are rejected.
+\item RANSAC becomes mathematically impossible as soon as inliers are below 50\%.
+\item It increases,\allowbreak{} often sharply.
+\item It is unchanged because RANSAC is robust.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q18 — Multiple choice}\par\smallskip
+In Lucas–Kanade,\allowbreak{} A has rows [Ix,\allowbreak{} Iy]. Which matrix also appears in corner analysis?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item A.T @ A: the local second-moment/\allowbreak{}structure tensor.
+\item A @ A.T,\allowbreak{} always a 2 by 2 matrix.
+\item The intrinsic calibration matrix K.
+\item The homography's last row.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q19 — Multiple choice}\par\smallskip
+A Lucas–Kanade window crosses the boundary between two independently moving objects. Which assumption is most directly violated?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item The image contains any gradients at all.
+\item The image has more than one colour channel.
+\item The camera has a finite focal length.
+\item A single common flow vector for all pixels in the window.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q20 — Multiple choice}\par\smallskip
+Which property is preserved by every nonsingular affine image transformation,\allowbreak{} but not by every projective transformation?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item All Euclidean lengths.
+\item All angles.
+\item The location of the origin.
+\item Parallelism of lines.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q21 — Multiple choice}\par\smallskip
+Two views of a static scene are taken by rotating a camera about exactly the same optical centre. The scene is not planar. Which model still relates the ideal undistorted images?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item A unique depth-dependent map recovered by inverting the fundamental matrix.
+\item No global model can exist unless the scene is planar.
+\item One homography,\allowbreak{} independent of scene depth.
+\item A 2D affine map for every possible rotation angle and calibration,\allowbreak{} without a projective denominator.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q22 — Multiple choice}\par\smallskip
+Why impose |\allowbreak{}|\allowbreak{}h|\allowbreak{}|\allowbreak{} =\allowbreak{} 1 when solving the homogeneous DLT problem min |\allowbreak{}|\allowbreak{}A h|\allowbreak{}|\allowbreak{}\textasciicircum{}2 for a homography?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Because all nine entries of H must equal 1.
+\item Without a scale constraint,\allowbreak{} h =\allowbreak{} 0 is a trivial minimizer and does not define a homography.
+\item Because every image point must have unit Euclidean norm.
+\item Because this fixes lens distortion.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q23 — Multiple choice}\par\smallskip
+A descriptor's nearest and second-nearest match distances are almost equal. Why does Lowe's ratio test tend to reject it?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Similar distances establish a reliable nearest match; the ratio test should therefore always keep it.
+\item The match is ambiguous even if the nearest absolute distance is small.
+\item The ratio test rejects it only because the nearest absolute distance must exceed a fixed universal cutoff.
+\item It has already been proven to be a geometric outlier; descriptor distances directly establish reprojection error.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q24 — Multiple choice}\par\smallskip
+Two images have identical counts of visual words but different arrangements of those words. A plain Bag-of-Visual-Words histogram will do what?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Recover their exact layout from the counts.
+\item Represent them identically,\allowbreak{} because it discards spatial arrangement.
+\item Require a different number of histogram bins for each image.
+\item Use the image labels as its histogram bin values.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q25 — Multiple choice}\par\smallskip
+You want a clean estimate of generalization for a BoVW classifier. Which protocol is best?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Choose k and vocabulary size using test accuracy,\allowbreak{} then report that accuracy.
+\item Fit the vocabulary on all images,\allowbreak{} including the test set,\allowbreak{} to make evaluation easier.
+\item Choose every setting using training accuracy alone.
+\item Fit the vocabulary on training descriptors; select settings on validation data; evaluate once on untouched test data.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q26 — Multiple choice}\par\smallskip
+A classifier predicts the majority class for every example and achieves 99\% accuracy on a 99:1 class split. What can its minority-class recall be?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item 0
+\item 1
+\item 0.99
+\item It must equal minority-class precision and be positive.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q27 — Multiple choice}\par\smallskip
+Ignoring boundaries,\allowbreak{} a stride-1 convolution with shared weights most directly provides which property?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Exact translation invariance: the whole feature map never changes after a shift.
+\item A separate learned kernel for each image location.
+\item Exact invariance to every rotation and scale change.
+\item Translation equivariance: shifting the input shifts the feature map.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q28 — Multiple choice}\par\smallskip
+What is the main proposal-generation difference between Fast R-CNN and Faster R-CNN?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Fast R-CNN predicts pixel masks instead of boxes.
+\item Fast R-CNN has an RPN and Faster R-CNN removes it.
+\item Faster R-CNN uses a learned Region Proposal Network; Fast R-CNN normally relies on external proposals such as Selective Search.
+\item Faster R-CNN runs a separate backbone independently on every raw crop.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q29 — Multiple choice}\par\smallskip
+Which statement correctly distinguishes the usual skip operations of ResNet and U-Net?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item ResNet adds compatible activations; U-Net concatenates encoder and decoder features across matching scales.
+\item Both use elementwise addition with mismatched channel counts; the addition automatically supplies the missing channels.
+\item Both normally concatenate along the channel axis,\allowbreak{} so every skip doubles the number of channels.
+\item ResNet concatenates encoder/\allowbreak{}decoder features; U-Net adds an identity tensor to each residual branch.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q30 — Multiple choice}\par\smallskip
+Given a homogeneous image point x in image 1 and fundamental matrix F,\allowbreak{} with F x nonzero,\allowbreak{} what does F x specify in image 2?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item The unique matching point,\allowbreak{} including its depth.
+\item An epipolar line on which the corresponding point must lie.
+\item A viewing-ray depth that becomes metric once F is normalized to unit Frobenius norm.
+\item The matching image point after dehomogenizing F x as if it were a homography output.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\clearpage\section*{Part B — Numerical values}
+\begin{minipage}{\linewidth}
+\textbf{Q31 — Numerical}\par\smallskip
+Use column vectors and the virtual image plane in front of the camera. The camera centre is C =\allowbreak{} [1,\allowbreak{}2,\allowbreak{}0],\allowbreak{} Xw =\allowbreak{} [3,\allowbreak{}5,\allowbreak{}4],\allowbreak{} and Xc =\allowbreak{} R @ (Xw-C).
+
+
+\begin{Code}
+import numpy as np
+C = np.array([1,2,0])
+Xw = np.array([3,5,4])
+R = np.array([[0,-1,0], [1,0,0], [0,0,1]])
+K = np.array([[800,20,320], [0,600,240], [0,0,1]])
+\end{Code}
+
+
+Projection is q =\allowbreak{} K @ Xc,\allowbreak{} followed by u =\allowbreak{} q[0]/\allowbreak{}q[2]. Report u in pixels.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q32 — Numerical}\par\smallskip
+For one pixel,\allowbreak{} use i =\allowbreak{} Lg,\allowbreak{} where light strength and camera gain are already absorbed into L. Compute the least-squares estimate,\allowbreak{} then report albedo rho =\allowbreak{} |\allowbreak{}|\allowbreak{}g|\allowbreak{}|\allowbreak{}.
+
+
+\begin{Code}
+import numpy as np
+L = np.array([[0,0,1], [.8,0,.6], [-.8,0,.6],
+              [0,.8,.6], [0,-.8,.6]])
+i = np.array([.70,.64,.16,.44,.36])
+\end{Code}
+
+
+Provided routine: \texttt{g =\allowbreak{} np.linalg.lstsq(L,\allowbreak{} i,\allowbreak{} rcond=\allowbreak{}None)[0]} minimizes the sum of squared residuals. \texttt{np.linalg.norm(g)} returns the Euclidean norm.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q33 — Numerical}\par\smallskip
+Use the height-field convention n proportional to [-p,\allowbreak{}-q,\allowbreak{}1],\allowbreak{} where p =\allowbreak{} dz/\allowbreak{}dx and q =\allowbreak{} dz/\allowbreak{}dy. A plane has constant normal proportional to [2,\allowbreak{}-1,\allowbreak{}2] and z(0,\allowbreak{}0) =\allowbreak{} 5. Report z(3,\allowbreak{}4),\allowbreak{} using unit spatial spacing.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q34 — Numerical}\par\smallskip
+A 2-bit image has histogram counts [1,\allowbreak{}3,\allowbreak{}2,\allowbreak{}2] for levels [0,\allowbreak{}1,\allowbreak{}2,\allowbreak{}3]. Use this specific equalization rule: T(r) =\allowbreak{} floor(3 *\allowbreak{} CDF(r)),\allowbreak{} with no subtraction of CDF\_\allowbreak{}min. Report T(1) as an exact integer.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q35 — Numerical}\par\smallskip
+Close the following 1D binary row with the centred structuring element [1,\allowbreak{}1,\allowbreak{}1]. Closing means dilation followed by erosion. At each stage retain exactly 11 entries and treat all out-of-range values as 0. Report the number of foreground entries after closing.
+
+
+\begin{Code}
+[0,1,1,0,1,1,0,0,1,0,0]
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q36 — Numerical}\par\smallskip
+For the 3 by 3 patch I and kernel K below,\allowbreak{} report the single valid output of mathematical convolution,\allowbreak{} not cross-correlation. The kernel is flipped on both axes. Report an exact integer.
+
+
+\begin{Code}
+I = [[1, 2, 0], [3,-1,4], [2,1,5]]
+K = [[1, 0, 2], [0,-1,0], [3,0,-2]]
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q37 — Numerical}\par\smallskip
+Use the unnormalized DFT F[k] =\allowbreak{} sum(n=\allowbreak{}0..3) f[n] exp(-2*\allowbreak{}pi*\allowbreak{}i*\allowbreak{}k*\allowbreak{}n/\allowbreak{}4). For f =\allowbreak{} [1,\allowbreak{}2,\allowbreak{}3,\allowbreak{}4],\allowbreak{} report the magnitude of F[1]. You can use exp(-i*\allowbreak{}pi/\allowbreak{}2) =\allowbreak{} -i and exp(-i*\allowbreak{}pi) =\allowbreak{} -1.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q38 — Numerical}\par\smallskip
+A patch has structure tensor M =\allowbreak{} [[9,\allowbreak{}3],\allowbreak{}[3,\allowbreak{}9]]. The Harris response is R =\allowbreak{} det(M) - k *\allowbreak{} trace(M)\textasciicircum{}2,\allowbreak{} with k =\allowbreak{} 0.04. Report R.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q39 — Numerical}\par\smallskip
+Use Ix*\allowbreak{}u + Iy*\allowbreak{}v =\allowbreak{} -It and one constant flow in the window. Compute the least-squares flow and report u.
+
+
+\begin{Code}
+import numpy as np
+A = np.array([[1,0], [0,1], [1,1], [2,0]], dtype=float)
+It = np.array([-2,1,-1,-5], dtype=float)
+\end{Code}
+
+
+Provided routine: \texttt{np.linalg.lstsq(A,\allowbreak{} -It,\allowbreak{} rcond=\allowbreak{}None)[0]} minimizes squared residuals.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q40 — Numerical}\par\smallskip
+A homography RANSAC uses samples of 4 correspondences,\allowbreak{} each independently an inlier with probability w =\allowbreak{} 0.6. Report the minimum integer iteration count for success probability at least p =\allowbreak{} 0.99. Use N =\allowbreak{} ceil(log(1-p) /\allowbreak{} log(1-w\textasciicircum{}4)). Assume all-inlier samples are nondegenerate.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q41 — Numerical}\par\smallskip
+A homography maps source to target with H =\allowbreak{} [[2,\allowbreak{}0,\allowbreak{}1],\allowbreak{}[0,\allowbreak{}1,\allowbreak{}-2],\allowbreak{}[0.1,\allowbreak{}0,\allowbreak{}1]]. Use column-vector homogeneous coordinates. Report the target x coordinate of source point (5,\allowbreak{}4).
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q42 — Numerical}\par\smallskip
+Backward warping maps a target pixel to source coordinates (x,\allowbreak{}y) =\allowbreak{} (0.25,\allowbreak{}0.75). Source intensities are I[0,\allowbreak{}0]=\allowbreak{}10,\allowbreak{} I[0,\allowbreak{}1]=\allowbreak{}30,\allowbreak{} I[1,\allowbreak{}0]=\allowbreak{}50,\allowbreak{} I[1,\allowbreak{}1]=\allowbreak{}90. Arrays use I[y,\allowbreak{}x]. Report the bilinear interpolated intensity. The weights are (1-x)(1-y),\allowbreak{} x(1-y),\allowbreak{} (1-x)y and xy,\allowbreak{} respectively.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q43 — Numerical}\par\smallskip
+Rows of the following confusion matrix are actual classes A,\allowbreak{}B,\allowbreak{}C; columns are predicted classes A,\allowbreak{}B,\allowbreak{}C. Report the F1 score for class B as a fraction,\allowbreak{} not a percentage.
+
+
+\begin{Code}
+[[18, 2, 0],
+ [ 3,12, 5],
+ [ 1, 4,15]]
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q44 — Numerical}\par\smallskip
+A retrieval query has 4 relevant database images in total. In its returned ranking,\allowbreak{} relevant images occur at ranks 1,\allowbreak{}3,\allowbreak{}5; the fourth is not returned. Use uninterpolated AP =\allowbreak{} (sum of precision at each relevant rank) /\allowbreak{} total relevant images. Report AP as a fraction.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q45 — Numerical}\par\smallskip
+Boxes use continuous coordinates [xmin,\allowbreak{}ymin,\allowbreak{}xmax,\allowbreak{}ymax],\allowbreak{} so width =\allowbreak{} xmax-xmin,\allowbreak{} without a +1 correction. Report IoU for A=\allowbreak{}[0,\allowbreak{}0,\allowbreak{}6,\allowbreak{}4] and B=\allowbreak{}[2,\allowbreak{}1,\allowbreak{}8,\allowbreak{}5].
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q46 — Numerical}\par\smallskip
+A standard 2D convolution takes an H x W x Cin input of 31 x 29 x 3. Kernel height/\allowbreak{}width =\allowbreak{} 5 x 3,\allowbreak{} stride =\allowbreak{} 2 x 2,\allowbreak{} padding =\allowbreak{} 1 x 0 on EACH side,\allowbreak{} and Cout =\allowbreak{} 8. No dilation. Report the total number of scalar outputs,\allowbreak{} excluding the batch dimension. Use out =\allowbreak{} floor((in + 2*\allowbreak{}pad - kernel)/\allowbreak{}stride)+1 per axis.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q47 — Numerical}\par\smallskip
+For the convolution in Q46,\allowbreak{} report the number of trainable parameters INCLUDING one bias per output channel. It is a dense convolution across all 3 input channels; no groups.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q48 — Numerical}\par\smallskip
+Flatten a 7 x 7 x 16 feature map and feed it to a fully connected layer with 10 output units. Include one bias per output unit. Report its trainable parameter count.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q49 — Numerical}\par\smallskip
+A network applies: a 3 x 3 convolution with stride 1; a 2 x 2 pooling layer with stride 2; a 3 x 3 convolution with stride 1. Report the side length of one final unit's theoretical receptive field in original input pixels. Ignore boundaries. Provided recurrence: r\_\allowbreak{}new =\allowbreak{} r\_\allowbreak{}old + (kernel-1)*\allowbreak{}j\_\allowbreak{}old; j\_\allowbreak{}new =\allowbreak{} j\_\allowbreak{}old*\allowbreak{}stride; start r=\allowbreak{}j=\allowbreak{}1.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q50 — Numerical}\par\smallskip
+For x2.T @ F @ x1 =\allowbreak{} 0,\allowbreak{} let F=\allowbreak{}[[0,\allowbreak{}0,\allowbreak{}0],\allowbreak{}[0,\allowbreak{}0,\allowbreak{}-1],\allowbreak{}[0,\allowbreak{}1,\allowbreak{}0]],\allowbreak{} x1=\allowbreak{}[12,\allowbreak{}7,\allowbreak{}1] and candidate x2=\allowbreak{}[9,\allowbreak{}9,\allowbreak{}1]. Report the perpendicular distance in pixels from x2 to its epipolar line l2=\allowbreak{}F@x1. Provided formula: distance =\allowbreak{} abs(a*\allowbreak{}x+b*\allowbreak{}y+c)/\allowbreak{}sqrt(a*\allowbreak{}a+b*\allowbreak{}b),\allowbreak{} for line [a,\allowbreak{}b,\allowbreak{}c].
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+
+\end{document}

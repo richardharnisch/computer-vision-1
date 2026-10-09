@@ -1,0 +1,584 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=20mm,headheight=15pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{fvextra}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{3em}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\raggedright
+\DefineVerbatimEnvironment{Code}{Verbatim}{fontsize=\small,
+  breaklines=true,breakanywhere=true,breaksymbolleft={},breaksymbolright={},
+  frame=single,framesep=5pt}
+\setlist[enumerate]{leftmargin=7mm,itemsep=3pt,topsep=5pt,parsep=0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Computer Vision 1}
+\fancyhead[R]{\small Exam 2 · Questions}
+\fancyfoot[C]{\small \thepage}
+\hypersetup{pdftitle={Exam 2 — Implementation and failure diagnosis},pdfsubject={CV1 practice material}}
+\begin{document}
+{\LARGE\bfseries Exam 2 — Implementation and failure diagnosis}\par
+{\large Questions only}\par\bigskip
+\textbf{Name:} \rule{70mm}{0.4pt}\hfill \textbf{Date:} \rule{30mm}{0.4pt}
+\section*{Conditions}
+\begin{itemize}[leftmargin=5mm,itemsep=5pt]
+\item 50 questions: 30 single-answer multiple choice and 20 numerical. Each is worth 1 raw practice point.
+\item Suggested training limit: \textbf{150 minutes}. This is not a claim about the actual exam duration or question count.
+\item Use up to three double-sided A4 sheets,\allowbreak{} prepared by you,\allowbreak{} and a local Jupyter notebook. No internet,\allowbreak{} AI assistance or answer key during the attempt.
+\item Use Python/\allowbreak{}NumPy for computation; SciPy is also allowed. You do not need executable OpenCV or PyTorch. Specialized routines are provided when needed.
+\item For multiple choice,\allowbreak{} select exactly one of A–D. Attempt every question.
+\item Unless an exact integer is requested,\allowbreak{} round the final numerical answer to \textbf{two decimal places}. Keep full precision in intermediate steps. Use fractions rather than percentages unless specified.
+\item Numerical practice grading uses the syllabus rule: within ±0.01 of the unrounded reference,\allowbreak{} inclusive. Counts require the exact integer; no partial credit.
+\item Conventions stated in a question override defaults. Arrays use [row,\allowbreak{}column] =\allowbreak{} [y,\allowbreak{}x]; geometric vectors are columns; image-plane projection is virtual/\allowbreak{}front-facing; foreground is 1.
+\item This is original,\allowbreak{} challenging training material based on the supplied course files,\allowbreak{} not a lecturer-issued mock or a prediction of the exam.
+\end{itemize}
+Solutions are in a separate PDF. Do not open them until you finish.
+\clearpage\section*{Part A — Single-answer multiple choice}
+\begin{minipage}{\linewidth}
+\textbf{Q01 — Multiple choice}\par\smallskip
+R1 and R2 are proper 3D rotation matrices. Which statement is correct?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item The inverse is always R2.T @ R1.T.
+\item A rotation matrix has 9 independent degrees of freedom.
+\item The inverse of R2 @ R1 is R1.T @ R2.T; rotation order generally matters.
+\item R1 @ R2 always equals R2 @ R1.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q02 — Multiple choice}\par\smallskip
+Crop an image by removing 40 pixels from the left and 20 from the top,\allowbreak{} with no resize. In the continuous-coordinate model,\allowbreak{} how does K change?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Subtract 40 from fx and 20 from fy.
+\item Keep K unchanged and add [40,\allowbreak{}20,\allowbreak{}0] to camera translation.
+\item Subtract 40 from cx and 20 from cy; keep focal lengths and skew unchanged.
+\item Multiply both focal lengths by the crop's remaining image area.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q03 — Multiple choice}\par\smallskip
+For floating-point RGB image I of shape (H,\allowbreak{}W,\allowbreak{}3),\allowbreak{} what does this code compute?
+
+
+\begin{Code}
+out = (I.max(axis=2) + I.min(axis=2)) / 2
+\end{Code}
+
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item One scalar containing the midpoint of the global intensity range.
+\item A lightness-based grayscale image of shape (H,\allowbreak{}W).
+\item An RGB image with corrected white balance.
+\item A hue map obtained by averaging the red and blue channels.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q04 — Multiple choice}\par\smallskip
+Which expression computes per-channel image means that broadcast correctly onto an array of shape (H,\allowbreak{}W,\allowbreak{}3)?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item I.mean(axis=\allowbreak{}0,\allowbreak{} keepdims=\allowbreak{}True),\allowbreak{} which always has shape (1,\allowbreak{}1,\allowbreak{}3)
+\item I.mean(axis=\allowbreak{}(0,\allowbreak{}1),\allowbreak{} keepdims=\allowbreak{}True)
+\item I.mean(axis=\allowbreak{}(0,\allowbreak{}1,\allowbreak{}2),\allowbreak{} keepdims=\allowbreak{}True)
+\item I.mean(axis=\allowbreak{}2,\allowbreak{} keepdims=\allowbreak{}True)
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q05 — Multiple choice}\par\smallskip
+Suppose the true lighting matrix is Ltrue =\allowbreak{} 2 *\allowbreak{} Lused,\allowbreak{} with no shadows or noise. You solve i =\allowbreak{} Lused ghat. How do the estimated normal and albedo relate to the true ones?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item The normal doubles in length after normalization; albedo is unchanged.
+\item Both normal direction and albedo are unchanged.
+\item The normal reverses and albedo is halved.
+\item The normal is unchanged; the albedo estimate is doubled.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q06 — Multiple choice}\par\smallskip
+For the intrinsic-image model I =\allowbreak{} A *\allowbreak{} S,\allowbreak{} where multiplication is elementwise,\allowbreak{} which recolouring operation preserves the estimated shading?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Divide the target albedo by S.
+\item Change the object's albedo A and multiply the changed A by the original S.
+\item Change S to the target RGB colour and discard A.
+\item Replace every RGB pixel in I by the same target colour,\allowbreak{} including shadows.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q07 — Multiple choice}\par\smallskip
+A uniformly painted matte object has spatially constant albedo. Why can its image still contain a brightness gradient?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Lambertian reflection requires all pixels to have the same intensity.
+\item Constant albedo forces constant depth.
+\item Its surface normals and therefore light–normal dot products can vary.
+\item Its intrinsic albedo must contain every shadow.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q08 — Multiple choice}\par\smallskip
+What information can a joint RGB histogram retain that three separate channel histograms lose?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Which red,\allowbreak{} green and blue values occur together at the same pixels.
+\item The scene's illumination-independent albedo distribution,\allowbreak{} regardless of camera response.
+\item The order of coloured regions across image rows,\allowbreak{} rather than just their colour counts.
+\item The exact spatial location of each pixel having a particular colour.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q09 — Multiple choice}\par\smallskip
+A binary erosion uses a cross-shaped 3 by 3 structuring element with zeros at its corners. How should the zeros be treated?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Require the image's corner positions to be zero.
+\item Replace the operation by an average over all nine pixels.
+\item Include the mask zeros in a logical AND,\allowbreak{} forcing every output to zero.
+\item Ignore those positions; require foreground only at active element positions.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q10 — Multiple choice}\par\smallskip
+A system labels every pixel by semantic class,\allowbreak{} including pixels of several touching people,\allowbreak{} but gives no person-instance IDs. What does its output provide,\allowbreak{} and can connected-component labelling alone reliably supply the missing instance separation?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Semantic segmentation; no,\allowbreak{} touching people can merge into one connected component.
+\item Instance segmentation; a semantic class label automatically identifies which individual person owns each pixel.
+\item Object detection only; connected-component labels are already separate bounding-box detections.
+\item Panoptic segmentation; instance IDs are unnecessary as long as all pixels have semantic labels.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q11 — Multiple choice}\par\smallskip
+Why is a median filter often preferable to averaging for sparse salt-and-pepper noise?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item It is a linear filter with a fixed kernel of average weights.
+\item It increases the magnitude of all high-frequency components.
+\item It is less affected by extreme isolated values and can preserve edges better.
+\item It guarantees removal of every type of noise without information loss.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q12 — Multiple choice}\par\smallskip
+A Gabor filter is best described as what?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item A sinusoidal pattern modulated by a Gaussian envelope,\allowbreak{} selective for local frequency and orientation.
+\item An unwindowed global sinusoid that has no spatial localization.
+\item A median of oriented derivative responses,\allowbreak{} making it a nonlinear rank filter.
+\item A Gaussian smoothing filter with no sinusoidal carrier and no orientation selectivity.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q13 — Multiple choice}\par\smallskip
+You multiply two same-length unpadded DFTs and take the inverse DFT. What operation does this normally implement?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Pointwise multiplication of the original spatial samples.
+\item Circular convolution,\allowbreak{} with wrap-around at the signal boundaries.
+\item Cross-correlation with no complex conjugation or reversal.
+\item Full linear convolution of length N+M-1 regardless of padding.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q14 — Multiple choice}\par\smallskip
+A kernel measures the x derivative of an image. Which edge orientation usually gives a large response?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Only a diagonal edge with exactly 45-degree slope.
+\item A horizontal edge: intensity changes only across y.
+\item A vertical edge: intensity changes across x.
+\item A perfectly constant patch.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q15 — Multiple choice}\par\smallskip
+Compared with a small Gaussian sigma,\allowbreak{} what is a likely effect of increasing sigma in Canny?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Suppress finer detail and noise,\allowbreak{} while potentially merging edges and reducing localization precision.
+\item Remove the need for non-maximum suppression.
+\item Make the operation exactly scale invariant.
+\item Guarantee detection of every weak edge with perfect localization.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q16 — Multiple choice}\par\smallskip
+For a structure tensor at a pixel,\allowbreak{} which implementation follows the usual order of operations?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Compute Ix*\allowbreak{}Ix,\allowbreak{} Ix*\allowbreak{}Iy and Iy*\allowbreak{}Iy first,\allowbreak{} then aggregate or smooth those products over the neighbourhood.
+\item Use Ixx and Iyy as the diagonal entries and Ixy off diagonal,\allowbreak{} because the structure tensor is the image Hessian.
+\item Smooth Ix and Iy to one mean each,\allowbreak{} then use only the outer product of those two means.
+\item Aggregate only Ix and Iy and use their signed means as the diagonal entries,\allowbreak{} setting the off-diagonal entries to zero.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q17 — Multiple choice}\par\smallskip
+Shi–Tomasi's corner score for structure-tensor eigenvalues lambda1 and lambda2 is which expression?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item max(lambda1,\allowbreak{} lambda2)
+\item lambda1 + lambda2,\allowbreak{} regardless of their relative sizes
+\item min(lambda1,\allowbreak{} lambda2)
+\item lambda1 - lambda2
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q18 — Multiple choice}\par\smallskip
+A Lucas–Kanade window contains 100 nonzero image-gradient vectors,\allowbreak{} all parallel. Is its two-component flow uniquely observable from those equations?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item No; the design matrix has rank 1 and tangential motion remains ambiguous.
+\item Yes,\allowbreak{} because there are more equations than unknowns.
+\item No,\allowbreak{} because least squares works only for exactly two pixels.
+\item Yes,\allowbreak{} because every gradient is nonzero.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q19 — Multiple choice}\par\smallskip
+Move a flow estimate from a half-resolution pyramid level to full resolution. After spatially resizing the flow arrays,\allowbreak{} what else is required?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Keep the vector magnitudes unchanged because the arrays were resized.
+\item Divide both displacement components by 2.
+\item Multiply displacement components by 2,\allowbreak{} then warp and refine at the finer level.
+\item Set every displacement to zero before the finer solve.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q20 — Multiple choice}\par\smallskip
+A fixed image template is tracked with SSD. The target's shape and position remain the same but all intensities gain a constant positive offset. Which claim is correct?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item SSD can increase even for the true match; a mean-normalized comparison can handle an additive offset better.
+\item Unnormalized correlation always removes additive and multiplicative brightness changes.
+\item Only the target's geometric rotation can change SSD.
+\item SSD is exactly invariant to every additive intensity change.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q21 — Multiple choice}\par\smallskip
+Which statement about mean-shift clustering is correct?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item It always requires the desired number of clusters K as its central input.
+\item It minimizes the same fixed-K objective as k-means using identical updates.
+\item Its result cannot depend on the bandwidth.
+\item It seeks density modes; kernel bandwidth influences how many modes and clusters are found.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q22 — Multiple choice}\par\smallskip
+Retrieve images of the same planar building facade using a query in which part of the facade is occluded by a tree. Assuming enough distinctive features remain visible,\allowbreak{} which local-keypoint approach is appropriate?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Reject every database image unless every query descriptor has a correct facade match,\allowbreak{} including descriptors on the tree.
+\item Accept every nearest descriptor match as geometrically correct,\allowbreak{} because SIFT's scale robustness guarantees the same scene point.
+\item Rank only by each database image's total keypoint count; descriptor appearance and geometric consistency are unnecessary.
+\item Match visible local descriptors and verify a consistent homography; the occluded parts need not match.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q23 — Multiple choice}\par\smallskip
+What is the generic minimum data requirement for an unconstrained 2D affine transformation?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Two point pairs because an affine transformation is only rotation plus translation.
+\item Four collinear point pairs always uniquely determine it.
+\item One point pair because affine transforms have two parameters.
+\item Three point pairs whose source points are noncollinear.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q24 — Multiple choice}\par\smallskip
+Which statement accurately describes backward image warping?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item It guarantees valid source data for every destination pixel,\allowbreak{} even outside source coverage.
+\item It forward-maps each source pixel without interpolation.
+\item It always avoids aliasing during downsampling,\allowbreak{} even without a low-pass filter.
+\item For each destination pixel,\allowbreak{} inverse-map its coordinate and sample/\allowbreak{}interpolate the source; out-of-domain samples still need a boundary rule.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q25 — Multiple choice}\par\smallskip
+What does the SVM kernel trick allow?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Evaluate inner products in a transformed feature space without explicitly constructing all transformed features.
+\item Make every nonlinear decision boundary linear in the original coordinates.
+\item Change the distance metric only after fitting a linear SVM,\allowbreak{} without changing any training computation.
+\item Automatically eliminate every mislabeled training example,\allowbreak{} making soft-margin penalties unnecessary.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q26 — Multiple choice}\par\smallskip
+At a fixed detection IoU threshold,\allowbreak{} two same-class detections both overlap the same ground-truth object sufficiently. In score-ordered,\allowbreak{} one-to-one matching,\allowbreak{} how are they counted?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Both are TPs but each receives half a recall increment,\allowbreak{} making this identical to a single detection.
+\item The first can be a TP; the second is a duplicate FP unless it can validly match another unmatched object.
+\item The first is a TP and the second is ignored automatically in AP,\allowbreak{} so duplicate boxes cannot reduce precision.
+\item Both are TPs because their IoUs are high,\allowbreak{} even though they claim the same object.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q27 — Multiple choice}\par\smallskip
+Three same-class boxes have descending scores A>B>C. IoU(A,\allowbreak{}B)>threshold,\allowbreak{} IoU(B,\allowbreak{}C)>threshold,\allowbreak{} but IoU(A,\allowbreak{}C)<threshold. What does greedy hard NMS keep?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item A only,\allowbreak{} because overlap is transitively inherited through B.
+\item A and C.
+\item B and C.
+\item All three,\allowbreak{} because A and C do not overlap strongly.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q28 — Multiple choice}\par\smallskip
+Why is identical constant initialization of all interchangeable hidden units problematic?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Random initialization guarantees no overfitting.
+\item Every nonzero constant necessarily causes exploding gradients on the first step.
+\item Biases must always be random for any network to learn at all.
+\item Symmetric units can receive identical activations and gradients,\allowbreak{} so they fail to learn distinct features.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q29 — Multiple choice}\par\smallskip
+Which statement about Adam and learning rate is correct?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item Adam eliminates base learning-rate tuning because its moment estimates guarantee stable convergence for any chosen step size.
+\item Adam uses gradient-moment estimates to adapt parameter updates,\allowbreak{} but still has a base learning-rate hyperparameter.
+\item Adam uses only a running mean of gradients,\allowbreak{} so it is exactly SGD with momentum and has no second-moment adaptation.
+\item Increasing Adam's base learning rate cannot destabilize training because all adaptive updates are independent of that rate.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q30 — Multiple choice}\par\smallskip
+A camera only rotates about its optical centre while viewing a static scene. Why is this unsuitable as the sole initialization for ordinary depth triangulation?
+\begin{enumerate}[label=\textbf{\Alph*.}]
+\item The pure-rotation homography is invertible,\allowbreak{} so its inverse already provides each point's unique metric depth.
+\item There is no translation baseline and no depth-dependent parallax.
+\item Higher image resolution creates a metric translation baseline even when the optical centre stays fixed.
+\item A pure rotation makes all otherwise visible feature correspondences invalid.
+\end{enumerate}
+\end{minipage}
+\par\vspace{12pt}
+\clearpage\section*{Part B — Numerical values}
+\begin{minipage}{\linewidth}
+\textbf{Q31 — Numerical}\par\smallskip
+A world-to-camera extrinsic transform is Xc=\allowbreak{}R@Xw+t,\allowbreak{} with R=\allowbreak{}[[0,\allowbreak{}0,\allowbreak{}1],\allowbreak{}[0,\allowbreak{}1,\allowbreak{}0],\allowbreak{}[-1,\allowbreak{}0,\allowbreak{}0]] and t=\allowbreak{}[-3,\allowbreak{}2,\allowbreak{}1] metres. Report the Euclidean distance of the camera centre from the world origin. Use C=\allowbreak{}-R.T@t.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q32 — Numerical}\par\smallskip
+An RGB image has per-channel means [80,\allowbreak{}40,\allowbreak{}20]. A pixel has RGB value [100,\allowbreak{}30,\allowbreak{}10]. Grey-World correction uses target=\allowbreak{}(80+40+20)/\allowbreak{}3,\allowbreak{} then corrected =\allowbreak{} pixel/\allowbreak{}channel\_\allowbreak{}means*\allowbreak{}target. Ignore clipping and quantization. Report the corrected green value.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q33 — Numerical}\par\smallskip
+Weighted photometric stereo minimizes sum\_\allowbreak{}j (w[j]*\allowbreak{}(L[j]@g-i[j]))\textasciicircum{}2. The last light vector's magnitude also encodes its strength. Report g[2].
+
+
+\begin{Code}
+import numpy as np
+L = np.array([[1,0,0],[0,1,0],[0,0,1],[1,1,1]], dtype=float)
+i = np.array([.2,.3,.6,1.2])
+w = np.array([1,1,1,2], dtype=float)
+\end{Code}
+
+
+Provided routine: \texttt{np.linalg.lstsq(L*\allowbreak{}w[:,\allowbreak{}None],\allowbreak{} i*\allowbreak{}w,\allowbreak{} rcond=\allowbreak{}None)[0]} minimizes the stated weighted residuals.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q34 — Numerical}\par\smallskip
+Use the simplified Phong model I =\allowbreak{} Ia + kd*\allowbreak{}max(n dot l,\allowbreak{}0) + ks*\allowbreak{}max(v dot r,\allowbreak{}0)\textasciicircum{}s. Let Ia=\allowbreak{}0.1,\allowbreak{} kd=\allowbreak{}0.6,\allowbreak{} n dot l=\allowbreak{}0.5,\allowbreak{} ks=\allowbreak{}0.8,\allowbreak{} v dot r=\allowbreak{}0.5,\allowbreak{} and s=\allowbreak{}4. Report I.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q35 — Numerical}\par\smallskip
+Linearly stretch intensities from input range [50,\allowbreak{}150] to [0,\allowbreak{}255]. Report the output for input intensity 70. No clipping is needed for this value.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q36 — Numerical}\par\smallskip
+For the binary image below,\allowbreak{} compute the number of foreground components under 4-connectivity and under 8-connectivity. Report count4-count8 as one exact integer. Background is not counted.
+
+
+\begin{Code}
+1 0 1 0 0
+0 1 0 0 1
+0 0 1 0 1
+0 0 0 1 0
+1 0 0 0 1
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q37 — Numerical}\par\smallskip
+Report the centre output of a 3 by 3 median filter on this patch. Use all nine entries and report an exact integer.
+
+
+\begin{Code}
+[[0, 7,8],
+ [8,255,9],
+ [10,11,0]]
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q38 — Numerical}\par\smallskip
+Construct a magnitude-weighted UNSIGNED HoG histogram from Gx=\allowbreak{}[3,\allowbreak{}-3,\allowbreak{}0,\allowbreak{}2] and Gy=\allowbreak{}[4,\allowbreak{}-4,\allowbreak{}5,\allowbreak{}0]. Use angles theta=\allowbreak{}degrees(atan2(Gy,\allowbreak{}Gx)) modulo 180. Use nine HARD bins [0,\allowbreak{}20),\allowbreak{}[20,\allowbreak{}40),\allowbreak{}...,\allowbreak{}[160,\allowbreak{}180),\allowbreak{} numbered 0..8; no interpolation and no histogram normalization. Report the value of bin 2,\allowbreak{} which covers [40,\allowbreak{}60) degrees.
+
+Provided functions: \texttt{np.arctan2(y,\allowbreak{}x)} gives quadrant-aware angles in radians; \texttt{np.degrees(angle)} converts radians to degrees. Magnitude is \texttt{np.sqrt(Gx*\allowbreak{}Gx+Gy*\allowbreak{}Gy)}.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q39 — Numerical}\par\smallskip
+A complex Fourier coefficient is F=\allowbreak{}-3-4i. Report its principal phase in degrees in the range (-180,\allowbreak{}180]. Provided function: \texttt{np.degrees(np.arctan2(F.imag,\allowbreak{} F.real))} uses quadrant-aware atan2(y,\allowbreak{}x).
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q40 — Numerical}\par\smallskip
+In Lucas–Kanade,\allowbreak{} solve A@[u,\allowbreak{}v] =\allowbreak{} -It by least squares and report v.
+
+
+\begin{Code}
+import numpy as np
+A = np.array([[2,1],[1,-1],[0,2],[3,0]], dtype=float)
+It = np.array([-5,-1,-3,-6], dtype=float)
+\end{Code}
+
+
+Provided routine: \texttt{np.linalg.lstsq(A,\allowbreak{} -It,\allowbreak{} rcond=\allowbreak{}None)[0]} returns [u,\allowbreak{}v].
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q41 — Numerical}\par\smallskip
+Report the zero-based index returned by this SSD matching code. NumPy's argmin returns the FIRST minimum in a tie.
+
+
+\begin{Code}
+import numpy as np
+T = np.array([[1,2],[3,4]])
+P = np.array([[[2,3],[4,5]],
+              [[1,1],[3,5]],
+              [[2,2],[2,4]]])
+costs = ((P-T)**2).sum(axis=(1,2))
+answer = int(np.argmin(costs))
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q42 — Numerical}\par\smallskip
+Fit a 2D affine transform by least squares. Source rows are [[0,\allowbreak{}0],\allowbreak{}[1,\allowbreak{}0],\allowbreak{}[0,\allowbreak{}1],\allowbreak{}[1,\allowbreak{}1]]; target rows are [[2,\allowbreak{}-1],\allowbreak{}[4,\allowbreak{}-1],\allowbreak{}[3,\allowbreak{}2],\allowbreak{}[5,\allowbreak{}3]]. Build A with rows [x,\allowbreak{}y,\allowbreak{}1] and solve A@P=\allowbreak{}targets. Report the predicted target y coordinate for source (2,\allowbreak{}3).
+
+Provided routine: \texttt{P=\allowbreak{}np.linalg.lstsq(A,\allowbreak{} targets,\allowbreak{} rcond=\allowbreak{}None)[0]}; prediction is \texttt{np.array([2,\allowbreak{}3,\allowbreak{}1])@P}.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q43 — Numerical}\par\smallskip
+Rows contain [nearest\_\allowbreak{}distance,\allowbreak{} second\_\allowbreak{}nearest\_\allowbreak{}distance] from descriptor matching. Keep a match iff d1/\allowbreak{}d2 < 0.75 (strict inequality). Report the count kept.
+
+
+\begin{Code}
+[[.30,.50], [.40,.50], [.60,1.00], [.20,.21], [.10,.40]]
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q44 — Numerical}\par\smallskip
+Run ONE assignment/\allowbreak{}update iteration of 1D k-means with initial centres [0,\allowbreak{}10] and data [0,\allowbreak{}2,\allowbreak{}3,\allowbreak{}9,\allowbreak{}11]. Use squared Euclidean distance. Report the updated smaller centre.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q45 — Numerical}\par\smallskip
+Rows are actual classes; columns are predicted classes. Report MACRO recall as a fraction for this matrix.
+
+
+\begin{Code}
+[[30,10,0],
+ [ 5,10,5],
+ [ 0, 2,8]]
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q46 — Numerical}\par\smallskip
+Greedy hard NMS processes one class in score order A,\allowbreak{}B,\allowbreak{}C,\allowbreak{}D (all scores distinct). Exact pairwise IoUs are below; fractions mean ordinary division. Suppress a lower-scoring box only when its IoU with a KEPT box is strictly greater than 0.5. Report the number kept.
+
+
+\begin{Code}
+      A    B    C    D
+A     1   3/5  1/3  1/7
+B    3/5   1   3/5  1/3
+C    1/3  3/5   1   3/5
+D    1/7  1/3  3/5   1
+\end{Code}
+
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q47 — Numerical}\par\smallskip
+A CNN layer uses a valid stride-1 CROSS-CORRELATION,\allowbreak{} no bias,\allowbreak{} I=\allowbreak{}[[1,\allowbreak{}3,\allowbreak{}5],\allowbreak{}[2,\allowbreak{}-1,\allowbreak{}4]] and W=\allowbreak{}[[1,\allowbreak{}0],\allowbreak{}[-1,\allowbreak{}2]]. Its two output positions receive upstream loss gradients [2,\allowbreak{}-1]. Report dLoss/\allowbreak{}dW[1,\allowbreak{}1],\allowbreak{} with zero-based indices. The derivative sums upstream\_\allowbreak{}gradient *\allowbreak{} the corresponding input value over BOTH output positions.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q48 — Numerical}\par\smallskip
+A final feature map has shape 9 x 9 x 8. Global average pooling replaces each channel by its spatial mean. A fully connected 5-class head then uses one bias per class. Report the head's trainable parameter count; exclude the backbone.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q49 — Numerical}\par\smallskip
+Use ORIGINAL YOLO v1,\allowbreak{} whose output shape is S x S x (5*\allowbreak{}B+C): B boxes with 5 values each,\allowbreak{} and ONE shared C-class probability vector per cell. Let S=\allowbreak{}7,\allowbreak{} B=\allowbreak{}2 and C=\allowbreak{}4. Report the total number of scalar outputs.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q50 — Numerical}\par\smallskip
+An ideal rectified stereo pair has focal length f=\allowbreak{}1200 pixels,\allowbreak{} baseline B=\allowbreak{}0.12 metres,\allowbreak{} and matching horizontal coordinates uL=\allowbreak{}414,\allowbreak{} uR=\allowbreak{}390. Both principal points are equal. Use disparity d=\allowbreak{}uL-uR and depth Z=\allowbreak{}f*\allowbreak{}B/\allowbreak{}d. Report Z in metres.
+\par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
+\end{minipage}
+\par\vspace{12pt}
+
+\end{document}

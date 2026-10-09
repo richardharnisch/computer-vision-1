@@ -4,6 +4,16 @@
 
 ## Start here
 
+**PDF versions (compiled with LaTeX):**
+
+| Exam | Questions | Separate solutions |
+|---|---|---|
+| 1 | [PDF](pdf/exam-1.pdf) | [Solutions PDF](pdf/exam-1-solutions.pdf) |
+| 2 | [PDF](pdf/exam-2.pdf) | [Solutions PDF](pdf/exam-2-solutions.pdf) |
+| 3 | [PDF](pdf/exam-3.pdf) | [Solutions PDF](pdf/exam-3-solutions.pdf) |
+
+Standalone LaTeX sources are in `study-pack/latex/`. To regenerate the PDFs, run `uv run --no-project study-pack/tools/build_pdfs.py` with XeLaTeX and `latexmk` installed. The PDF build checks extracted text against the question and solution content and rejects missing glyphs or overflowing boxes.
+
 | Practice exam | Focus | Questions |
 |---|---|---:|
 | [Exam 1](exams/exam-1.md) | Foundations under pressure | 50 |

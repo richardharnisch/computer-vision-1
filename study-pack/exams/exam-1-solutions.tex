@@ -1,0 +1,464 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=20mm,headheight=15pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{fvextra}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{3em}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\raggedright
+\DefineVerbatimEnvironment{Code}{Verbatim}{fontsize=\small,
+  breaklines=true,breakanywhere=true,breaksymbolleft={},breaksymbolright={},
+  frame=single,framesep=5pt}
+\setlist[enumerate]{leftmargin=7mm,itemsep=3pt,topsep=5pt,parsep=0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Computer Vision 1}
+\fancyhead[R]{\small Exam 1 · Solutions}
+\fancyfoot[C]{\small \thepage}
+\hypersetup{pdftitle={Exam 1 — Solutions},pdfsubject={CV1 practice material}}
+\begin{document}
+{\LARGE\bfseries Exam 1 — Solutions}\par
+{\large Foundations under pressure}\par\bigskip
+Answer key and worked explanations. Source aliases and convention warnings are listed in \texttt{COVERAGE.md} and \texttt{SOURCE\_NOTES.md} in the study pack.
+\section*{Quick key}
+\begin{longtable}{@{}r l@{\hspace{25mm}}r l@{}}
+\toprule Question & Answer & Question & Answer \\ \midrule
+01 & B & 26 & A \\
+02 & A & 27 & D \\
+03 & A & 28 & C \\
+04 & A & 29 & A \\
+05 & C & 30 & B \\
+06 & D & 31 & -270.00 \\
+07 & C & 32 & 0.75 \\
+08 & B & 33 & 4.00 \\
+09 & C & 34 & 1 \\
+10 & A & 35 & 8 \\
+11 & C & 36 & 8 \\
+12 & B & 37 & 2.83 \\
+13 & A & 38 & 59.04 \\
+14 & D & 39 & 2.36 \\
+15 & B & 40 & 34 \\
+16 & D & 41 & 7.33 \\
+17 & C & 42 & 48.75 \\
+18 & A & 43 & 0.63 \\
+19 & D & 44 & 0.57 \\
+20 & D & 45 & 0.33 \\
+21 & C & 46 & 1680 \\
+22 & B & 47 & 368 \\
+23 & B & 48 & 7850 \\
+24 & B & 49 & 8 \\
+25 & D & 50 & 2.00 \\
+\bottomrule\end{longtable}
+\clearpage\section*{Worked solutions}
+\begin{minipage}{\linewidth}
+\textbf{Q01 — B}\par\smallskip
+\textbf{B. C =\allowbreak{} -R.T @ t}\par
+At the optical centre Xc =\allowbreak{} 0. Thus R C + t =\allowbreak{} 0 and C =\allowbreak{} -R\textasciicircum{}(-1)t =\allowbreak{} -R.T t. The translation column is not generally the camera position.\par
+{\small\itshape Topic: camera. Sources: HC1b pp.35–45; S1.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q02 — A}\par\smallskip
+\textbf{A. Halve fx,\allowbreak{} fy,\allowbreak{} skew,\allowbreak{} cx and cy; keep R and t unchanged.}\par
+Pixel coordinates change,\allowbreak{} not the camera pose. The first two rows of K scale by 1/\allowbreak{}2 and its last row stays [0,\allowbreak{}0,\allowbreak{}1]. Scaling the entire K only changes homogeneous scale.\par
+{\small\itshape Topic: camera. Sources: HC1b pp.35–45; S1.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q03 — A}\par\smallskip
+\textbf{A. They lie on the same viewing ray from the optical centre.}\par
+Projection retains the direction of a camera-centred ray but loses distance along it. This is a fundamental single-view depth ambiguity.\par
+{\small\itshape Topic: camera. Sources: HC1a; HC1b pp.24–34.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q04 — A}\par\smallskip
+\textbf{A. Its outgoing radiance,\allowbreak{} apart from visibility and camera effects.}\par
+Lambertian radiance is view-independent. Projected area changes with viewpoint,\allowbreak{} and brightness still depends on the light–normal angle. Do not confuse radiance with the amount of energy collected from a fixed surface area.\par
+{\small\itshape Topic: reflectance. Sources: HC2a pp.12–20.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q05 — C}\par\smallskip
+\textbf{C. The component of g perpendicular to that plane is unobservable.}\par
+L has rank at most 2. Any vector in its nullspace can be added to g without changing Lg. More dependent observations cannot supply the missing component.\par
+{\small\itshape Topic: photometric. Sources: HC2a pp.34–39; Lab1.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q06 — D}\par\smallskip
+\textbf{D. The normal is undefined; mask or otherwise handle the zero-reflectance/\allowbreak{}invalid pixel.}\par
+A zero vector has no direction. Adding a small denominator can prevent a numerical exception,\allowbreak{} but does not recover a physically supported normal.\par
+{\small\itshape Topic: photometric. Sources: Lab1; HC2a pp.35–45.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q07 — C}\par\smallskip
+\textbf{C. Interior intensities increase; 0 and 1 remain fixed.}\par
+For r in (0,\allowbreak{}1),\allowbreak{} reducing a positive exponent below 1 makes r\textasciicircum{}gamma larger than r. Always state the power-law convention; some software uses its reciprocal.\par
+{\small\itshape Topic: histogram. Sources: HC2a pp.59–63; S1.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q08 — B}\par\smallskip
+\textbf{B. Different provisional labels can later be found to belong to one connected region.}\par
+The first pass can encounter separate branches before their connecting pixels. The second pass resolves recorded label equivalences.\par
+{\small\itshape Topic: morphology. Sources: HC2b pp.7–12.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q09 — C}\par\smallskip
+\textbf{C. Opening,\allowbreak{} then closing.}\par
+Opening removes small foreground structures. Closing fills small background gaps/\allowbreak{}holes. Either can alter genuine features,\allowbreak{} so choose element size and shape with care.\par
+{\small\itshape Topic: morphology. Sources: HC2b pp.13–45; S2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q10 — A}\par\smallskip
+\textbf{A. Flip K horizontally and vertically before the sliding dot product.}\par
+Convolution reverses both spatial offsets. Symmetric kernels conceal this distinction; asymmetric derivative or shift kernels do not.\par
+{\small\itshape Topic: filtering. Sources: HC2b pp.78–80; S2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q11 — C}\par\smallskip
+\textbf{C. 5}\par
+Variances add: sigma\textasciicircum{}2 =\allowbreak{} 3\textasciicircum{}2 + 4\textasciicircum{}2 =\allowbreak{} 25. Standard deviations do not add directly.\par
+{\small\itshape Topic: filtering. Sources: HC2b pp.82–87; S2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q12 — B}\par\smallskip
+\textbf{B. sqrt(a*\allowbreak{}a + b*\allowbreak{}b),\allowbreak{} arctan2(b,\allowbreak{} a)}\par
+Magnitude is distance from the origin. Phase is the quadrant-aware angle measured from the positive real axis; NumPy takes (imaginary,\allowbreak{} real). See SOURCE\_\allowbreak{}NOTES.md for the slide argument-order issue.\par
+{\small\itshape Topic: fourier. Sources: HC2b pp.97–100; SOURCE\_\allowbreak{}NOTES.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q13 — A}\par\smallskip
+\textbf{A. Convolve the image with the corresponding derivative of the Gaussian.}\par
+d(I*\allowbreak{}G)/\allowbreak{}dx =\allowbreak{} I*\allowbreak{}(dG/\allowbreak{}dx). Smoothing controls noise before measuring spatial changes.\par
+{\small\itshape Topic: features. Sources: HC3a pp.20–54; S2; Lab2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q14 — D}\par\smallskip
+\textbf{D. Keep the connected weak chain and discard the disconnected chain.}\par
+Strong pixels seed edge following. Weak pixels survive only through a qualifying connection to a strong seed,\allowbreak{} under the declared neighbourhood rule.\par
+{\small\itshape Topic: features. Sources: HC3a pp.58–65; S2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q15 — B}\par\smallskip
+\textbf{B. Strong intensity variation in two independent directions: a good corner-like feature.}\par
+Both displacement directions produce a large change. One large and one small eigenvalue instead indicates an edge; two small values indicate a flat patch.\par
+{\small\itshape Topic: features. Sources: S3; Lab3 Sections 2–3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q16 — D}\par\smallskip
+\textbf{D. A vertical line cannot be represented by a finite m; an orthogonal-distance line model avoids this problem.}\par
+The slope-intercept model privileges y as the dependent variable. Total least squares uses perpendicular distances and a line representation that admits vertical lines.\par
+{\small\itshape Topic: fitting. Sources: HC3a pp.76–79; S3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q17 — C}\par\smallskip
+\textbf{C. It increases,\allowbreak{} often sharply.}\par
+The all-inlier sample probability is w\textasciicircum{}s. A lower w makes such samples rarer. RANSAC can work below 50\% inliers,\allowbreak{} but the required budget can be large.\par
+{\small\itshape Topic: fitting. Sources: HC3a pp.91–109; S3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q18 — A}\par\smallskip
+\textbf{A. A.T @ A: the local second-moment/\allowbreak{}structure tensor.}\par
+A.T A contains sums of Ix\textasciicircum{}2,\allowbreak{} Ix Iy and Iy\textasciicircum{}2. Its eigenvalues determine whether the local flow estimate is well constrained in both directions.\par
+{\small\itshape Topic: flow. Sources: HC3b p.47; S3; Lab3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q19 — D}\par\smallskip
+\textbf{D. A single common flow vector for all pixels in the window.}\par
+A larger window adds equations but can mix incompatible motions. Local motion consistency,\allowbreak{} not simply pixel count,\allowbreak{} matters.\par
+{\small\itshape Topic: flow. Sources: HC3b pp.39–47; Lab3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q20 — D}\par\smallskip
+\textbf{D. Parallelism of lines.}\par
+Affine transforms preserve parallelism and ratios along a line,\allowbreak{} not general angles or lengths. General homographies preserve straight lines but can map parallel lines to intersecting ones.\par
+{\small\itshape Topic: geometry. Sources: HC4a pp.17–22; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q21 — C}\par\smallskip
+\textbf{C. One homography,\allowbreak{} independent of scene depth.}\par
+Pure rotation makes the image mapping depend on ray direction rather than depth: H =\allowbreak{} K2 R21 K1\textasciicircum{}(-1). A planar scene is the other important homography case.\par
+{\small\itshape Topic: geometry. Sources: HC4a pp.33–35; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q22 — B}\par\smallskip
+\textbf{B. Without a scale constraint,\allowbreak{} h =\allowbreak{} 0 is a trivial minimizer and does not define a homography.}\par
+A homography is defined only up to nonzero scale. The constrained solution is the smallest-eigenvalue eigenvector of A.T A,\allowbreak{} equivalently the appropriate right singular vector of A.\par
+{\small\itshape Topic: geometry. Sources: HC4a pp.51–55.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q23 — B}\par\smallskip
+\textbf{B. The match is ambiguous even if the nearest absolute distance is small.}\par
+Repeated or weakly distinctive patterns can have several nearly equally plausible matches. The ratio compares distinctiveness relative to the next alternative.\par
+{\small\itshape Topic: matching. Sources: HC4a pp.41–44; S4; Lab4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q24 — B}\par\smallskip
+\textbf{B. Represent them identically,\allowbreak{} because it discards spatial arrangement.}\par
+The vocabulary gives fixed-length count vectors. Plain BoVW is orderless; a spatial extension would be needed to retain layout.\par
+{\small\itshape Topic: classification. Sources: HC4b pp.23–28; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q25 — D}\par\smallskip
+\textbf{D. Fit the vocabulary on training descriptors; select settings on validation data; evaluate once on untouched test data.}\par
+Unsupervised preprocessing can still leak information. The validation set selects hyperparameters; the test set measures the final chosen pipeline.\par
+{\small\itshape Topic: classification. Sources: HC4b pp.25–28,\allowbreak{}55–58; Lab5.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q26 — A}\par\smallskip
+\textbf{A. 0}\par
+It finds none of the minority examples: TP =\allowbreak{} 0 and FN is the minority count. Accuracy alone can hide complete failure on a rare class.\par
+{\small\itshape Topic: metrics. Sources: HC4b pp.80–86.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q27 — D}\par\smallskip
+\textbf{D. Translation equivariance: shifting the input shifts the feature map.}\par
+Shared local operations follow translations. Invariance would mean unchanged output; pooling and aggregation can provide limited or additional invariance,\allowbreak{} not the same property.\par
+{\small\itshape Topic: cnn. Sources: HC5b pp.22–24,\allowbreak{}64; S5.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q28 — C}\par\smallskip
+\textbf{C. Faster R-CNN uses a learned Region Proposal Network; Fast R-CNN normally relies on external proposals such as Selective Search.}\par
+Fast R-CNN shares a full-image convolutional feature map but retains external proposals. Faster R-CNN also learns proposals through an RPN sharing backbone features.\par
+{\small\itshape Topic: detection. Sources: HC5b pp.125–133; HC6a pp.18–38.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q29 — A}\par\smallskip
+\textbf{A. ResNet adds compatible activations; U-Net concatenates encoder and decoder features across matching scales.}\par
+Residual addition supports identity-like mappings and gradient paths. U-Net concatenation transfers high-resolution spatial information to the decoder.\par
+{\small\itshape Topic: architectures. Sources: HC6a pp.99–112,\allowbreak{}122–137.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q30 — B}\par\smallskip
+\textbf{B. An epipolar line on which the corresponding point must lie.}\par
+Epipolar geometry reduces correspondence search from 2D to 1D. It does not select a unique point along the line. The nonzero condition excludes the epipole's degenerate zero output.\par
+{\small\itshape Topic: stereo. Sources: HC6b pp.50–65.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q31 — -270.00}\par\smallskip
+\textbf{Submit -270.00.} Unrounded reference: \texttt{-270.0}.\par
+Xw-C =\allowbreak{} [2,\allowbreak{}3,\allowbreak{}4],\allowbreak{} Xc =\allowbreak{} [-3,\allowbreak{}2,\allowbreak{}4]. q[0] =\allowbreak{} 800*\allowbreak{}(-3) + 20*\allowbreak{}2 + 320*\allowbreak{}4 =\allowbreak{} -1080. Divide by 4: u =\allowbreak{} -270. A negative pixel coordinate can simply be outside the field of view.\par
+{\small\itshape Topic: camera. Sources: HC1b pp.24–45; S1.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q32 — 0.75}\par\smallskip
+\textbf{Submit 0.75.} Unrounded reference: \texttt{0.7452154112317649}.\par
+L.T L =\allowbreak{} diag(1.28,\allowbreak{}1.28,\allowbreak{}2.44) and L.T i =\allowbreak{} [0.384,\allowbreak{}0.064,\allowbreak{}1.66]. Thus g =\allowbreak{} [0.3,\allowbreak{}0.05,\allowbreak{}1.66/\allowbreak{}2.44]. Its norm is about 0.7452,\allowbreak{} so submit 0.75. Do not normalize g before taking its magnitude.\par
+{\small\itshape Topic: photometric. Sources: HC2a pp.34–39; Lab1; Coding examples Q1,\allowbreak{}Q5.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q33 — 4.00}\par\smallskip
+\textbf{Submit 4.00.} Unrounded reference: \texttt{4.0}.\par
+p =\allowbreak{} -2/\allowbreak{}2 =\allowbreak{} -1 and q =\allowbreak{} -(-1)/\allowbreak{}2 =\allowbreak{} 0.5. z(3,\allowbreak{}4) =\allowbreak{} 5 + 3*\allowbreak{}(-1) + 4*\allowbreak{}0.5 =\allowbreak{} 4. The declared sign convention is essential.\par
+{\small\itshape Topic: photometric. Sources: HC2a pp.41–43; Lab1; SOURCE\_\allowbreak{}NOTES.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q34 — 1}\par\smallskip
+\textbf{Submit 1.} Unrounded reference: \texttt{1}.\par
+CDF(1) =\allowbreak{} (1+3)/\allowbreak{}8 =\allowbreak{} 0.5; floor(3*\allowbreak{}0.5) =\allowbreak{} 1. Other equalization conventions can differ,\allowbreak{} which is why the mapping is specified.\par
+{\small\itshape Topic: histogram. Sources: HC2a pp.51–63; S1.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q35 — 8}\par\smallskip
+\textbf{Submit 8.} Unrounded reference: \texttt{8}.\par
+Dilation gives [1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}0]. Erosion of that fixed-length result gives [0,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}1,\allowbreak{}0,\allowbreak{}0],\allowbreak{} which has 8 foreground entries.\par
+{\small\itshape Topic: morphology. Sources: HC2b pp.13–45; S2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q36 — 8}\par\smallskip
+\textbf{Submit 8.} Unrounded reference: \texttt{8}.\par
+The flipped kernel is [[-2,\allowbreak{}0,\allowbreak{}3],\allowbreak{}[0,\allowbreak{}-1,\allowbreak{}0],\allowbreak{}[2,\allowbreak{}0,\allowbreak{}1]]. The dot product is -2 + 1 + 4 + 5 =\allowbreak{} 8. The unflipped result would be different.\par
+{\small\itshape Topic: filtering. Sources: HC2b pp.78–80; S2; Lab2.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q37 — 2.83}\par\smallskip
+\textbf{Submit 2.83.} Unrounded reference: \texttt{2.8284271247461903}.\par
+F[1] =\allowbreak{} 1 - 2i - 3 + 4i =\allowbreak{} -2 + 2i. Its magnitude is sqrt(4+4) =\allowbreak{} sqrt(8),\allowbreak{} so submit 2.83.\par
+{\small\itshape Topic: fourier. Sources: HC2b pp.95–104.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q38 — 59.04}\par\smallskip
+\textbf{Submit 59.04.} Unrounded reference: \texttt{59.04}.\par
+det(M) =\allowbreak{} 81-9 =\allowbreak{} 72; trace(M) =\allowbreak{} 18. R =\allowbreak{} 72 - 0.04*\allowbreak{}324 =\allowbreak{} 59.04. A positive response alone still needs thresholding and spatial non-maximum suppression.\par
+{\small\itshape Topic: features. Sources: S3; Lab3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q39 — 2.36}\par\smallskip
+\textbf{Submit 2.36.} Unrounded reference: \texttt{2.3636363636363638}.\par
+A.T A =\allowbreak{} [[6,\allowbreak{}1],\allowbreak{}[1,\allowbreak{}2]],\allowbreak{} A.T(-It) =\allowbreak{} [13,\allowbreak{}0]. Solve 6u+v=\allowbreak{}13 and u+2v=\allowbreak{}0: u=\allowbreak{}26/\allowbreak{}11,\allowbreak{} v=\allowbreak{}-13/\allowbreak{}11. Submit 2.36; forgetting the minus sign reverses the estimate.\par
+{\small\itshape Topic: flow. Sources: HC3b pp.39–47; S3; Lab3.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q40 — 34}\par\smallskip
+\textbf{Submit 34.} Unrounded reference: \texttt{34}.\par
+The all-inlier probability is 0.6\textasciicircum{}4 =\allowbreak{} 0.1296. The ratio of logarithms is approximately 33.18; round upwards,\allowbreak{} not to the nearest integer. N =\allowbreak{} 34.\par
+{\small\itshape Topic: fitting. Sources: HC3a pp.104–105; HC4a pp.45–48.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q41 — 7.33}\par\smallskip
+\textbf{Submit 7.33.} Unrounded reference: \texttt{7.333333333333333}.\par
+H @ [5,\allowbreak{}4,\allowbreak{}1] =\allowbreak{} [11,\allowbreak{}2,\allowbreak{}1.5]. Dehomogenize: x' =\allowbreak{} 11/\allowbreak{}1.5 =\allowbreak{} 7.3333,\allowbreak{} so submit 7.33. The third coordinate is not generally 1.\par
+{\small\itshape Topic: geometry. Sources: HC4a pp.20–22,\allowbreak{}51; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q42 — 48.75}\par\smallskip
+\textbf{Submit 48.75.} Unrounded reference: \texttt{48.75}.\par
+Weights are 0.1875,\allowbreak{} 0.0625,\allowbreak{} 0.5625 and 0.1875. The weighted sum is 1.875 + 1.875 + 28.125 + 16.875 =\allowbreak{} 48.75. Do not interchange x and y.\par
+{\small\itshape Topic: geometry. Sources: HC4a pp.24–31; Lab4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q43 — 0.63}\par\smallskip
+\textbf{Submit 0.63.} Unrounded reference: \texttt{0.631578947368421}.\par
+TP=\allowbreak{}12,\allowbreak{} FP=\allowbreak{}2+4=\allowbreak{}6,\allowbreak{} FN=\allowbreak{}3+5=\allowbreak{}8. F1 =\allowbreak{} 2TP/\allowbreak{}(2TP+FP+FN) =\allowbreak{} 24/\allowbreak{}38 =\allowbreak{} 0.6315789. Submit 0.63.\par
+{\small\itshape Topic: metrics. Sources: HC4b pp.80–86; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q44 — 0.57}\par\smallskip
+\textbf{Submit 0.57.} Unrounded reference: \texttt{0.5666666666666667}.\par
+AP =\allowbreak{} (1/\allowbreak{}1 + 2/\allowbreak{}3 + 3/\allowbreak{}5)/\allowbreak{}4 =\allowbreak{} 17/\allowbreak{}30. The missing relevant image contributes zero,\allowbreak{} so the denominator is 4,\allowbreak{} not 3. Submit 0.57.\par
+{\small\itshape Topic: metrics. Sources: HC5a pp.19–24,\allowbreak{}68–78; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q45 — 0.33}\par\smallskip
+\textbf{Submit 0.33.} Unrounded reference: \texttt{0.3333333333333333}.\par
+Each area is 24. The intersection is width 4 times height 3 =\allowbreak{} 12. Union =\allowbreak{} 24+24-12 =\allowbreak{} 36. IoU =\allowbreak{} 12/\allowbreak{}36 =\allowbreak{} 1/\allowbreak{}3; submit 0.33.\par
+{\small\itshape Topic: detection. Sources: HC5a p.62; S4.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q46 — 1680}\par\smallskip
+\textbf{Submit 1680.} Unrounded reference: \texttt{1680}.\par
+Hout =\allowbreak{} floor((31+2-5)/\allowbreak{}2)+1 =\allowbreak{} 15; Wout =\allowbreak{} floor((29-3)/\allowbreak{}2)+1 =\allowbreak{} 14. Total =\allowbreak{} 15*\allowbreak{}14*\allowbreak{}8 =\allowbreak{} 1680. Count output positions,\allowbreak{} not input positions.\par
+{\small\itshape Topic: cnn. Sources: HC5b pp.25–43,\allowbreak{}66–68; S5.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q47 — 368}\par\smallskip
+\textbf{Submit 368.} Unrounded reference: \texttt{368}.\par
+Each output channel has 5*\allowbreak{}3*\allowbreak{}3 =\allowbreak{} 45 weights and one bias. There are 8 output channels,\allowbreak{} so 8*\allowbreak{}(45+1) =\allowbreak{} 368. Spatial resolution and stride do not change this count.\par
+{\small\itshape Topic: cnn. Sources: HC5b pp.66–73; S5.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q48 — 7850}\par\smallskip
+\textbf{Submit 7850.} Unrounded reference: \texttt{7850}.\par
+The flattened input has 7*\allowbreak{}7*\allowbreak{}16 =\allowbreak{} 784 values. Count 784*\allowbreak{}10 weights plus 10 biases =\allowbreak{} 7850.\par
+{\small\itshape Topic: cnn. Sources: HC5b pp.16–24; S5.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q49 — 8}\par\smallskip
+\textbf{Submit 8.} Unrounded reference: \texttt{8}.\par
+After conv: r=\allowbreak{}3,\allowbreak{}j=\allowbreak{}1. After pool: r=\allowbreak{}4,\allowbreak{}j=\allowbreak{}2. After second conv: r=\allowbreak{}4+2*\allowbreak{}2=\allowbreak{}8,\allowbreak{}j=\allowbreak{}2. Pooling changes the spacing used by later layers.\par
+{\small\itshape Topic: cnn. Sources: HC5b pp.80–85; HC6a pp.6–9.}
+
+\end{minipage}
+\par\vspace{12pt}
+\begin{minipage}{\linewidth}
+\textbf{Q50 — 2.00}\par\smallskip
+\textbf{Submit 2.00.} Unrounded reference: \texttt{2.0}.\par
+l2=\allowbreak{}[0,\allowbreak{}-1,\allowbreak{}7],\allowbreak{} so the line is y=\allowbreak{}7. The candidate has y=\allowbreak{}9,\allowbreak{} giving distance |\allowbreak{} -9+7 |\allowbreak{} /\allowbreak{} 1 =\allowbreak{} 2. This tests the line constraint,\allowbreak{} not whether the candidate is the true appearance match.\par
+{\small\itshape Topic: stereo. Sources: HC6b pp.50–65.}
+
+\end{minipage}
+\par\vspace{12pt}
+
+\end{document}
