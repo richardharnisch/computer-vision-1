@@ -3,6 +3,10 @@
 \usepackage{fontspec}
 \setmainfont{TeX Gyre Pagella}
 \setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\setmathfont{TeX Gyre Pagella Math}
+\setcounter{MaxMatrixCols}{20}
 \usepackage{microtype}
 \usepackage{enumitem}
 \usepackage{fvextra}
@@ -62,7 +66,7 @@ Answer key and worked explanations. Source aliases and convention warnings are l
 \clearpage\section*{Worked solutions}
 \begin{minipage}{\linewidth}
 \textbf{Q01 — C}\par\smallskip
-\textbf{C. n\_\allowbreak{}w =\allowbreak{} R.T @ n\_\allowbreak{}c; translation does not act on a direction vector.}\par
+\textbf{C. \(n_w=R^{\mathsf T}n_c\); translation does not act on a direction vector.}\par
 Normals between rigid coordinate frames transform by rotation only. R maps world directions to camera directions; its transpose maps back. A general non-rigid affine transform would require a different normal rule,\allowbreak{} which is not asked here.\par
 {\small\itshape Topic: camera. Sources: HC1b pp.35–45; HC2a surface normals; prerequisite linear algebra.}
 
@@ -79,7 +83,7 @@ Subsampling reduces the representable frequency range. Filtering first suppresse
 \begin{minipage}{\linewidth}
 \textbf{Q03 — B}\par\smallskip
 \textbf{B. No; multiple albedo/\allowbreak{}shading combinations can produce the same image.}\par
-For positive scale c,\allowbreak{} A'=\allowbreak{}cA and S'=\allowbreak{}S/\allowbreak{}c preserve I,\allowbreak{} and further spatial ambiguities exist. Priors or extra observations are required.\par
+For positive scale c,\allowbreak{} \(A'=cA\text{ and }S'=\frac{S}{c}\) preserve I,\allowbreak{} and further spatial ambiguities exist. Priors or extra observations are required.\par
 {\small\itshape Topic: reflectance. Sources: HC2a pp.4–6,\allowbreak{}21–23,\allowbreak{}47–48; Lab1.}
 
 \end{minipage}
@@ -103,7 +107,7 @@ A channel integrates wavelength-dependent contributions. Material colour alone d
 \begin{minipage}{\linewidth}
 \textbf{Q06 — B}\par\smallskip
 \textbf{B. An additive constant in height.}\par
-Derivatives determine relative height,\allowbreak{} not the reference height. Fixing a height such as z(0,\allowbreak{}0)=\allowbreak{}0 removes this additive ambiguity on a connected region.\par
+Derivatives determine relative height,\allowbreak{} not the reference height. Fixing a height such as \(z(0,0)=0\) removes this additive ambiguity on a connected region.\par
 {\small\itshape Topic: photometric. Sources: HC2a pp.41–43; Lab1; Forsyth–Ponce §2.2.}
 
 \end{minipage}
@@ -118,8 +122,8 @@ Interior samples see a full constant patch and weights sum to 1. At a zero-padde
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q08 — A}\par\smallskip
-\textbf{A. It can fill sufficiently small gaps/\allowbreak{}holes relative to the element's shape,\allowbreak{} but need not fill a large cavity.}\par
-Closing is scale- and shape-dependent. It is dilation followed by erosion,\allowbreak{} not general topological hole filling.\par
+\textbf{A. \(I_t\) can fill sufficiently small gaps/\allowbreak{}holes relative to the element's shape,\allowbreak{} but need not fill a large cavity.}\par
+Closing is scale- and shape-dependent. \(I_t\) is dilation followed by erosion,\allowbreak{} not general topological hole filling.\par
 {\small\itshape Topic: morphology. Sources: HC2b pp.39–45; S2.}
 
 \end{minipage}
@@ -143,7 +147,7 @@ The translated spectrum is the original spectrum times a unit-magnitude complex 
 \begin{minipage}{\linewidth}
 \textbf{Q11 — B}\par\smallskip
 \textbf{B. They are complex conjugates,\allowbreak{} with indices interpreted modulo the image size.}\par
-Real-valued signals have Hermitian symmetry F[-k]=\allowbreak{}conj(F[k]). Thus magnitudes are symmetric and phases have opposite signs modulo a full turn,\allowbreak{} where defined.\par
+Real-valued signals have Hermitian symmetry \(F_{-k}=\overline{F_k}\). Thus magnitudes are symmetric and phases have opposite signs modulo a full turn,\allowbreak{} where defined.\par
 {\small\itshape Topic: fourier. Sources: HC2b pp.99–104; Szeliski §3.4.}
 
 \end{minipage}
@@ -167,15 +171,15 @@ Scale selection allows corresponding structures to be detected after resizing. D
 \begin{minipage}{\linewidth}
 \textbf{Q14 — B}\par\smallskip
 \textbf{B. Gradients remove the constant offset b,\allowbreak{} and descriptor normalization reduces the common gain a.}\par
-The derivative of aI+b is a times the derivative of I. Orientation and normalized magnitudes are relatively stable,\allowbreak{} provided clipping,\allowbreak{} quantization and nonlinear response do not disrupt the assumption.\par
+The derivative of \(aI+b\) is a times the derivative of I. Orientation and normalized magnitudes are relatively stable,\allowbreak{} provided clipping,\allowbreak{} quantization and nonlinear response do not disrupt the assumption.\par
 {\small\itshape Topic: matching. Sources: HC4a pp.41–44; Szeliski §7.1.2 pp.434–436.}
 
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q15 — B}\par\smallskip
-\textbf{B. It is geometrically degenerate and does not uniquely constrain a general 2D affine transform.}\par
-All-inlier probability alone is not enough. A minimal sample must also have the geometry required to determine the model. For affine transforms,\allowbreak{} the [x,\allowbreak{}y,\allowbreak{}1] design rows must have rank 3.\par
+\textbf{B. \(I_t\) is geometrically degenerate and does not uniquely constrain a general 2D affine transform.}\par
+All-inlier probability alone is not enough. A minimal sample must also have the geometry required to determine the model. For affine transforms,\allowbreak{} the \([x,y,1]\) design rows must have rank 3.\par
 {\small\itshape Topic: fitting. Sources: HC4a pp.17–22,\allowbreak{}45–55; Lab4.}
 
 \end{minipage}
@@ -222,8 +226,8 @@ Translation makes image displacement depend on depth. Blending can hide seams bu
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q21 — A}\par\smallskip
-\textbf{A. T @ H}\par
-Matrix composition applies the rightmost transformation first: source -> H -> reference -> T -> canvas. Transform direction and multiplication order must be explicit.\par
+\textbf{A. \(TH\)}\par
+Matrix composition applies the rightmost transformation first: \(\text{source}\xrightarrow{H}\text{reference}\xrightarrow{T}\text{canvas}\). Transform direction and multiplication order must be explicit.\par
 {\small\itshape Topic: geometry. Sources: HC4a pp.19,\allowbreak{}24–35; Lab4.}
 
 \end{minipage}
@@ -231,14 +235,14 @@ Matrix composition applies the rightmost transformation first: source -> H -> re
 \begin{minipage}{\linewidth}
 \textbf{Q22 — C}\par\smallskip
 \textbf{C. Unweighted 3-nearest-neighbour majority voting predicts class 0,\allowbreak{} although the closest example has class 1.}\par
-Squared distances are [.02,\allowbreak{}.82,\allowbreak{}.82,\allowbreak{}16.82]. The three nearest labels are [1,\allowbreak{}0,\allowbreak{}0],\allowbreak{} in an irrelevant tie order for the two zero labels. Their sum is 1,\allowbreak{} so the comparison is false and prediction=\allowbreak{}0. k-NN uses labelled examples; it does not update cluster centres. With k=\allowbreak{}1 the prediction would instead be 1.\par
+Squared distances are \(\begin{bmatrix}0.02&0.82&0.82&16.82\end{bmatrix}\). The three nearest labels are \(\begin{bmatrix}1&0&0\end{bmatrix}\),\allowbreak{} in an irrelevant tie order for the two zero labels. Their sum is 1,\allowbreak{} so the comparison is false and \(\text{prediction}=0\). k-NN uses labelled examples; it does not update cluster centres. With \(k=1\) the prediction would instead be 1.\par
 {\small\itshape Topic: classification. Sources: HC4b pp.37–53; Lab0.}
 
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q23 — C}\par\smallskip
-\textbf{C. Spatial terms encourage location coherence,\allowbreak{} and alpha sets their relative importance against colour differences.}\par
+\textbf{C. Spatial terms encourage location coherence,\allowbreak{} and \(\alpha\) sets their relative importance against colour differences.}\par
 K-means uses the metric in the supplied feature space. Scaling positions changes distances and can trade colour similarity against spatial compactness; it does not guarantee semantics or connectivity.\par
 {\small\itshape Topic: clustering. Sources: HC5a pp.91–118.}
 
@@ -246,7 +250,7 @@ K-means uses the metric in the supplied feature space. Scaling positions changes
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q24 — C}\par\smallskip
-\textbf{C. It permits margin violations while balancing fit against regularization.}\par
+\textbf{C. \(I_t\) permits margin violations while balancing fit against regularization.}\par
 A hard-margin separator is infeasible for nonseparable labels. Soft margin penalizes violations and controls model complexity; it does not know which labels are wrong.\par
 {\small\itshape Topic: classification. Sources: HC4b pp.69–78.}
 
@@ -303,7 +307,7 @@ SfM recovers geometry from correspondences and motion. Ordinary monocular recons
 \begin{minipage}{\linewidth}
 \textbf{Q31 — 260.00}\par\smallskip
 \textbf{Submit 260.00.} Unrounded reference: \texttt{260.0}.\par
-After crop and resize: fy'=\allowbreak{}300 and cy'=\allowbreak{}(240-20)/\allowbreak{}2=\allowbreak{}110. v'=\allowbreak{}300*\allowbreak{}(1/\allowbreak{}2)+110=\allowbreak{}260. Extrinsics do not change.\par
+After crop and resize: \(f_y'=300\) and \(c_y'=\frac{240-20}{2}=110\). \(v'=300\cdot\frac{1}{2}+110=260\). Extrinsics do not change.\par
 {\small\itshape Topic: camera. Sources: HC1b pp.24–45; S1.}
 
 \end{minipage}
@@ -311,7 +315,11 @@ After crop and resize: fy'=\allowbreak{}300 and cy'=\allowbreak{}(240-20)/\allow
 \begin{minipage}{\linewidth}
 \textbf{Q32 — 0.26}\par\smallskip
 \textbf{Submit 0.26.} Unrounded reference: \texttt{0.2625}.\par
-The per-pixel sums are [[10,\allowbreak{}10],\allowbreak{}[0,\allowbreak{}4]],\allowbreak{} with the zero denominator replaced by 1. Normalized red values are [[.6,\allowbreak{}.2],\allowbreak{}[0,\allowbreak{}.25]]. Their mean is 1.05/\allowbreak{}4=\allowbreak{}.2625; submit .26. Normalizing a spatially averaged RGB vector would be a different calculation.\par
+The per-pixel sums are
+\[\begin{bmatrix}10&10\\0&4\end{bmatrix},\]
+ with the zero denominator replaced by 1. Normalized red values are
+\[\begin{bmatrix}0.6&0.2\\0&0.25\end{bmatrix}.\]
+ Their mean is \(\frac{1.05}{4}=.2625\); submit .26. Normalizing a spatially averaged RGB vector would be a different calculation.\par
 {\small\itshape Topic: colour. Sources: Lab1 Section 1; Lab0 array axes.}
 
 \end{minipage}
@@ -319,7 +327,7 @@ The per-pixel sums are [[10,\allowbreak{}10],\allowbreak{}[0,\allowbreak{}4]],\a
 \begin{minipage}{\linewidth}
 \textbf{Q33 — 6.00}\par\smallskip
 \textbf{Submit 6.00.} Unrounded reference: \texttt{6.0}.\par
-Path A: p=\allowbreak{}0 along y=\allowbreak{}0,\allowbreak{} then q=\allowbreak{}4 along x=\allowbreak{}2,\allowbreak{} giving z\_\allowbreak{}A=\allowbreak{}12. Path B: q=\allowbreak{}0 along x=\allowbreak{}0,\allowbreak{} then p=\allowbreak{}3 along y=\allowbreak{}3,\allowbreak{} giving z\_\allowbreak{}B=\allowbreak{}6. Difference=\allowbreak{}6. The field is not integrable because dp/\allowbreak{}dy=\allowbreak{}1 differs from dq/\allowbreak{}dx=\allowbreak{}2.\par
+Path A: \(p=0\) along \(y=0\),\allowbreak{} then \(q=4\) along \(x=2\),\allowbreak{} giving \(z_A=12\). Path B: \(q=0\) along \(x=0\),\allowbreak{} then \(p=3\) along \(y=3\),\allowbreak{} giving \(z_B=6\). \(\text{Difference}=6\). The field is not integrable because \(\frac{\partial p}{\partial y}=1\) differs from \(\frac{\partial q}{\partial x}=2\).\par
 {\small\itshape Topic: photometric. Sources: HC2a pp.41–43; Lab1.}
 
 \end{minipage}
@@ -327,7 +335,7 @@ Path A: p=\allowbreak{}0 along y=\allowbreak{}0,\allowbreak{} then q=\allowbreak
 \begin{minipage}{\linewidth}
 \textbf{Q34 — 0.25}\par\smallskip
 \textbf{Submit 0.25.} Unrounded reference: \texttt{0.25}.\par
-n dot l =\allowbreak{} (-1/\allowbreak{}3)*\allowbreak{}.6+(2/\allowbreak{}3)*\allowbreak{}.8=\allowbreak{}1/\allowbreak{}3. It is positive,\allowbreak{} so I=\allowbreak{}.75/\allowbreak{}3=\allowbreak{}.25.\par
+\(n\cdot l=-\frac{1}{3}\cdot.6+\frac{2}{3}\cdot.8=\frac{1}{3}\). \(I_t\) is positive,\allowbreak{} so \(I=\frac{.75}{3}=.25\).\par
 {\small\itshape Topic: reflectance. Sources: HC2a pp.12–20; S1; Lab1.}
 
 \end{minipage}
@@ -335,7 +343,7 @@ n dot l =\allowbreak{} (-1/\allowbreak{}3)*\allowbreak{}.6+(2/\allowbreak{}3)*\a
 \begin{minipage}{\linewidth}
 \textbf{Q35 — 9}\par\smallskip
 \textbf{Submit 9.} Unrounded reference: \texttt{9}.\par
-Erosion leaves only the central pixel (4,\allowbreak{}4); the isolated corner pixel disappears. Dilation restores the central 3 by 3 block,\allowbreak{} giving 9 pixels. It does not restore the isolated noise.\par
+Erosion leaves only the central pixel (4,\allowbreak{}4); the isolated corner pixel disappears. Dilation restores the central 3 by 3 block,\allowbreak{} giving 9 pixels. \(I_t\) does not restore the isolated noise.\par
 {\small\itshape Topic: morphology. Sources: HC2b pp.39–42; S2.}
 
 \end{minipage}
@@ -343,7 +351,7 @@ Erosion leaves only the central pixel (4,\allowbreak{}4); the isolated corner pi
 \begin{minipage}{\linewidth}
 \textbf{Q36 — 10}\par\smallskip
 \textbf{Submit 10.} Unrounded reference: \texttt{10}.\par
-a+b=\allowbreak{}[0,\allowbreak{}10,\allowbreak{}10],\allowbreak{} whose median is 10. Both original medians are 0. The difference is 10,\allowbreak{} a concrete failure of additivity proving that median filtering is nonlinear.\par
+\(a+b=\begin{bmatrix}0&10&10\end{bmatrix}\),\allowbreak{} whose median is 10. Both original medians are 0. The difference is 10,\allowbreak{} a concrete failure of additivity proving that median filtering is nonlinear.\par
 {\small\itshape Topic: filtering. Sources: HC2b pp.47,\allowbreak{}89–91; Lab2.}
 
 \end{minipage}
@@ -351,7 +359,7 @@ a+b=\allowbreak{}[0,\allowbreak{}10,\allowbreak{}10],\allowbreak{} whose median 
 \begin{minipage}{\linewidth}
 \textbf{Q37 — 3}\par\smallskip
 \textbf{Submit 3.} Unrounded reference: \texttt{3}.\par
-c[3]=\allowbreak{}1*\allowbreak{}h[3]+0*\allowbreak{}h[2]+2*\allowbreak{}h[1]+0*\allowbreak{}h[0]=\allowbreak{}1+2=\allowbreak{}3. Wrap-around is part of the defined operation.\par
+\(c_3=1h_3+0h_2+2h_1+0h_0=1+2=3\). Wrap-around is part of the defined operation.\par
 {\small\itshape Topic: fourier. Sources: HC2b pp.101–103; Szeliski §3.4.}
 
 \end{minipage}
@@ -367,7 +375,9 @@ The left group has one strong 10 and four connected weak 6s,\allowbreak{} so all
 \begin{minipage}{\linewidth}
 \textbf{Q39 — 4.38}\par\smallskip
 \textbf{Submit 4.38.} Unrounded reference: \texttt{4.381966011250105}.\par
-M=\allowbreak{}[[6,\allowbreak{}1],\allowbreak{}[1,\allowbreak{}5]]. lambda\_\allowbreak{}min=\allowbreak{}(11-sqrt(5))/\allowbreak{}2=\allowbreak{}4.381966. Submit 4.38. The score tests the least constrained direction.\par
+
+\[M=\begin{bmatrix}6&1\\1&5\end{bmatrix}.\]
+ \(\lambda_{\min}=\frac{11-\sqrt{5}}{2}=4.381966\). Submit 4.38. The score tests the least constrained direction.\par
 {\small\itshape Topic: features. Sources: S3; Lab3 Sections 2–3.}
 
 \end{minipage}
@@ -375,7 +385,7 @@ M=\allowbreak{}[[6,\allowbreak{}1],\allowbreak{}[1,\allowbreak{}5]]. lambda\_\al
 \begin{minipage}{\linewidth}
 \textbf{Q40 — 14.62}\par\smallskip
 \textbf{Submit 14.62.} Unrounded reference: \texttt{14.615915982243466}.\par
-Scale coarse displacement by 8: [14,\allowbreak{}-4]. Add the residual: [14.25,\allowbreak{}-3.25]. Magnitude=\allowbreak{}sqrt(14.25\textasciicircum{}2+3.25\textasciicircum{}2)=\allowbreak{}about 14.62 pixels. Resizing the array alone is not enough.\par
+Scale coarse displacement by 8: \(\begin{bmatrix}14&-4\end{bmatrix}\). Add the residual: \(\begin{bmatrix}14.25&-3.25\end{bmatrix}\). \(\text{Magnitude}=\sqrt{14.25^2+3.25^2}\approx14.62\) pixels. Resizing the array alone is not enough.\par
 {\small\itshape Topic: flow. Sources: HC3b pp.48–54; Lab3.}
 
 \end{minipage}
@@ -383,7 +393,7 @@ Scale coarse displacement by 8: [14,\allowbreak{}-4]. Add the residual: [14.25,\
 \begin{minipage}{\linewidth}
 \textbf{Q41 — 105}\par\smallskip
 \textbf{Submit 105.} Unrounded reference: \texttt{105}.\par
-w\textasciicircum{}3=\allowbreak{}.064. log(.001)/\allowbreak{}log(.936)=\allowbreak{}104.4417. Ceiling gives 105. A homography would require a different sample size and a larger budget.\par
+\(w^3=.064\). \(\frac{\log(.001)}{\log(.936)}=104.4417\). Ceiling gives 105. A homography would require a different sample size and a larger budget.\par
 {\small\itshape Topic: fitting. Sources: HC3a pp.104–105; Lab4.}
 
 \end{minipage}
@@ -391,7 +401,9 @@ w\textasciicircum{}3=\allowbreak{}.064. log(.001)/\allowbreak{}log(.936)=\allowb
 \begin{minipage}{\linewidth}
 \textbf{Q42 — 2.33}\par\smallskip
 \textbf{Submit 2.33.} Unrounded reference: \texttt{2.3333333333333335}.\par
-The first pair gives c=\allowbreak{}1,\allowbreak{}f=\allowbreak{}2. The next pairs imply a=\allowbreak{}3g+2,\allowbreak{}d=\allowbreak{}2g,\allowbreak{}b=\allowbreak{}h,\allowbreak{}e=\allowbreak{}4h+2. The last pair gives h=\allowbreak{}0,\allowbreak{}g=\allowbreak{}1. Thus H=\allowbreak{}[[5,\allowbreak{}0,\allowbreak{}1],\allowbreak{}[2,\allowbreak{}2,\allowbreak{}2],\allowbreak{}[1,\allowbreak{}0,\allowbreak{}1]]. At (.5,\allowbreak{}.5),\allowbreak{} x'=\allowbreak{}3.5/\allowbreak{}1.5=\allowbreak{}7/\allowbreak{}3; submit 2.33. Averaging target corner positions would not implement a projective map.\par
+The first pair gives \(c=1,\;f=2\). The next pairs imply \(a=3g+2,\;d=2g,\;b=h,\;e=4h+2\). The last pair gives \(h=0,\;g=1\). Thus
+\[H=\begin{bmatrix}5&0&1\\2&2&2\\1&0&1\end{bmatrix}.\]
+ At (.5,\allowbreak{}.5),\allowbreak{} \(x'=\frac{3.5}{1.5}=\frac{7}{3}\); submit 2.33. Averaging target corner positions would not implement a projective map.\par
 {\small\itshape Topic: geometry. Sources: HC4a pp.47–55; S4.}
 
 \end{minipage}
@@ -399,7 +411,7 @@ The first pair gives c=\allowbreak{}1,\allowbreak{}f=\allowbreak{}2. The next pa
 \begin{minipage}{\linewidth}
 \textbf{Q43 — 2.00}\par\smallskip
 \textbf{Submit 2.00.} Unrounded reference: \texttt{2.0}.\par
-Ordinary ratios are [2/\allowbreak{}3,\allowbreak{}3/\allowbreak{}4,\allowbreak{}1/\allowbreak{}2,\allowbreak{}5/\allowbreak{}6,\allowbreak{}1/\allowbreak{}2]. Accepted nearest distances are [2,\allowbreak{}1,\allowbreak{}.5],\allowbreak{} whose maximum is 2. Comparing D1/\allowbreak{}D2 directly with .7 would use the wrong threshold.\par
+Ordinary ratios are \(\begin{bmatrix}2/3&3/4&1/2&5/6&1/2\end{bmatrix}\). Accepted nearest distances are \(\begin{bmatrix}2&1&0.5\end{bmatrix}\),\allowbreak{} whose maximum is 2. Comparing \(\frac{D_1}{D_2}\) directly with .7 would use the wrong threshold.\par
 {\small\itshape Topic: matching. Sources: HC4a pp.43–44; S4; Lab4.}
 
 \end{minipage}
@@ -407,7 +419,7 @@ Ordinary ratios are [2/\allowbreak{}3,\allowbreak{}3/\allowbreak{}4,\allowbreak{
 \begin{minipage}{\linewidth}
 \textbf{Q44 — 0.50}\par\smallskip
 \textbf{Submit 0.50.} Unrounded reference: \texttt{0.5}.\par
-Assignments produce counts [1,\allowbreak{}2,\allowbreak{}3]. After normalization by 6,\allowbreak{} the final bin is 3/\allowbreak{}6=\allowbreak{}.5. The fixed vocabulary gives the same histogram length for every image.\par
+Assignments produce counts \(\begin{bmatrix}1&2&3\end{bmatrix}\). After normalization by 6,\allowbreak{} the final bin is \(\frac{3}{6}=.5\). The fixed vocabulary gives the same histogram length for every image.\par
 {\small\itshape Topic: classification. Sources: HC4b pp.23–28; S4.}
 
 \end{minipage}
@@ -415,7 +427,7 @@ Assignments produce counts [1,\allowbreak{}2,\allowbreak{}3]. After normalizatio
 \begin{minipage}{\linewidth}
 \textbf{Q45 — 0.57}\par\smallskip
 \textbf{Submit 0.57.} Unrounded reference: \texttt{0.5714285714285714}.\par
-The first four predictions are positive. TP=\allowbreak{}2,\allowbreak{} FP=\allowbreak{}2,\allowbreak{} FN=\allowbreak{}1. F1=\allowbreak{}4/\allowbreak{}(4+2+1)=\allowbreak{}4/\allowbreak{}7=\allowbreak{}.5714286; submit .57. The score exactly at .6 is positive because the rule is inclusive.\par
+The first four predictions are positive. \(\mathrm{TP}=2,\;\mathrm{FP}=2,\;\mathrm{FN}=1\). \(F_1=\frac{4}{4+2+1}=\frac{4}{7}=.5714286\); submit .57. The score exactly at .6 is positive because the rule is inclusive.\par
 {\small\itshape Topic: metrics. Sources: HC4b pp.80–86; S4.}
 
 \end{minipage}
@@ -423,7 +435,7 @@ The first four predictions are positive. TP=\allowbreak{}2,\allowbreak{} FP=\all
 \begin{minipage}{\linewidth}
 \textbf{Q46 — 0.45}\par\smallskip
 \textbf{Submit 0.45.} Unrounded reference: \texttt{0.45}.\par
-Cumulative precisions are [0,\allowbreak{}1/\allowbreak{}2,\allowbreak{}1/\allowbreak{}3,\allowbreak{}2/\allowbreak{}4,\allowbreak{}3/\allowbreak{}5],\allowbreak{} recalls [0,\allowbreak{}1/\allowbreak{}4,\allowbreak{}1/\allowbreak{}4,\allowbreak{}2/\allowbreak{}4,\allowbreak{}3/\allowbreak{}4]. The future-maximum precision at each TP is .6. Three increments of .25 contribute .25*\allowbreak{}.6 each,\allowbreak{} so AP=\allowbreak{}.45. The missing final quarter of recall contributes zero; raw uninterpolated AP would instead be .40.\par
+Cumulative precisions are \(\begin{bmatrix}0&1/2&1/3&2/4&3/5\end{bmatrix}\),\allowbreak{} recalls \(\begin{bmatrix}0&1/4&1/4&2/4&3/4\end{bmatrix}\). The future-maximum precision at each TP is .6. Three increments of .25 contribute \(.25\cdot.6\) each,\allowbreak{} so \(\mathrm{AP}=.45\). The missing final quarter of recall contributes zero; raw uninterpolated AP would instead be .40.\par
 {\small\itshape Topic: metrics. Sources: HC5a pp.68–78; S4.}
 
 \end{minipage}
@@ -431,7 +443,7 @@ Cumulative precisions are [0,\allowbreak{}1/\allowbreak{}2,\allowbreak{}1/\allow
 \begin{minipage}{\linewidth}
 \textbf{Q47 — 4448}\par\smallskip
 \textbf{Submit 4448.} Unrounded reference: \texttt{4448}.\par
-Counts are (64+1)*\allowbreak{}16=\allowbreak{}1040,\allowbreak{} (3*\allowbreak{}3*\allowbreak{}16+1)*\allowbreak{}16=\allowbreak{}2320,\allowbreak{} and (16+1)*\allowbreak{}64=\allowbreak{}1088. Total=\allowbreak{}4448. The identity shortcut has no parameters.\par
+Counts are \((64+1)\cdot16=1040\),\allowbreak{} \((3\cdot3\cdot16+1)\cdot16=2320\),\allowbreak{} and \((16+1)\cdot64=1088\). \(\text{Total}=4448\). The identity shortcut has no parameters.\par
 {\small\itshape Topic: architectures. Sources: HC5b pp.70–73; HC6a pp.107–111; S5.}
 
 \end{minipage}
@@ -439,7 +451,7 @@ Counts are (64+1)*\allowbreak{}16=\allowbreak{}1040,\allowbreak{} (3*\allowbreak
 \begin{minipage}{\linewidth}
 \textbf{Q48 — 275}\par\smallskip
 \textbf{Submit 275.} Unrounded reference: \texttt{275}.\par
-Each filter has 3*\allowbreak{}3*\allowbreak{}3*\allowbreak{}2=\allowbreak{}54 weights. Five filters and five biases give (54+1)*\allowbreak{}5=\allowbreak{}275. Do not count frames as independent input channels for this 3D convolution.\par
+Each filter has \(3\cdot3\cdot3\cdot2=54\) weights. Five filters and five biases give \((54+1)\cdot5=275\). Do not count frames as independent input channels for this 3D convolution.\par
 {\small\itshape Topic: cnn. Sources: S5 Exercise 5.}
 
 \end{minipage}
@@ -447,7 +459,7 @@ Each filter has 3*\allowbreak{}3*\allowbreak{}3*\allowbreak{}2=\allowbreak{}54 w
 \begin{minipage}{\linewidth}
 \textbf{Q49 — 0.36}\par\smallskip
 \textbf{Submit 0.36.} Unrounded reference: \texttt{0.36}.\par
-Box confidence=\allowbreak{}.75*\allowbreak{}.6=\allowbreak{}.45. Class-specific score=\allowbreak{}.8*\allowbreak{}.45=\allowbreak{}.36. The convention is explicitly given because different YOLO versions use different outputs and targets.\par
+\(\text{Box confidence}=.75\cdot.6=.45\). \(\text{Class-specific score}=.8\cdot.45=.36\). The convention is explicitly given because different YOLO versions use different outputs and targets.\par
 {\small\itshape Topic: detection. Sources: HC6a pp.66–72; SOURCE\_\allowbreak{}NOTES.}
 
 \end{minipage}
@@ -455,7 +467,7 @@ Box confidence=\allowbreak{}.75*\allowbreak{}.6=\allowbreak{}.45. Class-specific
 \begin{minipage}{\linewidth}
 \textbf{Q50 — 0.31}\par\smallskip
 \textbf{Submit 0.31.} Unrounded reference: \texttt{0.3125}.\par
-Sensitivity magnitude is 180/\allowbreak{}144=\allowbreak{}1.25 metres per pixel. Multiply by .25: .3125 metres,\allowbreak{} so submit .31. Depth becomes increasingly sensitive to disparity errors at small disparity/\allowbreak{}large depth.\par
+Sensitivity magnitude is \(\frac{180}{144}=1.25\) metres per pixel. Multiply by .25: .3125 metres,\allowbreak{} so submit .31. Depth becomes increasingly sensitive to disparity errors at small disparity/\allowbreak{}large depth.\par
 {\small\itshape Topic: stereo. Sources: HC6b pp.84–90; Szeliski §12.1; prerequisite calculus.}
 
 \end{minipage}

@@ -8,17 +8,17 @@
 
 | Exam | Questions | Separate solutions |
 |---|---|---|
-| 1 | [PDF](pdf/exam-1.pdf) | [Solutions PDF](pdf/exam-1-solutions.pdf) |
-| 2 | [PDF](pdf/exam-2.pdf) | [Solutions PDF](pdf/exam-2-solutions.pdf) |
-| 3 | [PDF](pdf/exam-3.pdf) | [Solutions PDF](pdf/exam-3-solutions.pdf) |
+| 1 | [PDF](exams/exam-1.pdf) | [Solutions PDF](exams/exam-1-solutions.pdf) |
+| 2 | [PDF](exams/exam-2.pdf) | [Solutions PDF](exams/exam-2-solutions.pdf) |
+| 3 | [PDF](exams/exam-3.pdf) | [Solutions PDF](exams/exam-3-solutions.pdf) |
 
-Standalone LaTeX sources are in `study-pack/latex/`. To regenerate the PDFs, run `uv run --no-project study-pack/tools/build_pdfs.py` with XeLaTeX and `latexmk` installed. The PDF build checks extracted text against the question and solution content and rejects missing glyphs or overflowing boxes.
+The PDFs use native LaTeX math for equations, fractions, subscripts, powers and matrices. Python code remains literal. Standalone LaTeX sources are beside the PDFs in `study-pack/exams/`. To regenerate them, run `uv run --no-project study-pack/tools/build_pdfs.py` with XeLaTeX and `latexmk` installed. The build checks all 50 question headings, extracted prose/code and numeric data grids in each PDF, and rejects missing glyphs or overflowing boxes. Math-renderer tests are in `study-pack/tools/test_pdf_math.py`; text extraction alone cannot verify mathematical layout.
 
 | Practice exam | Focus | Questions |
 |---|---|---:|
-| [Exam 1](exams/exam-1.md) | Foundations under pressure | 50 |
-| [Exam 2](exams/exam-2.md) | Implementation and failure diagnosis | 50 |
-| [Exam 3](exams/exam-3.md) | Synthesis and transfer | 50 |
+| [Exam 1](exams/exam-1.pdf) | Foundations under pressure | 50 |
+| [Exam 2](exams/exam-2.pdf) | Implementation and failure diagnosis | 50 |
+| [Exam 3](exams/exam-3.pdf) | Synthesis and transfer | 50 |
 
 Each exam has **30 single-answer multiple-choice questions and 20 numerical questions**. Numerical work includes array/code interpretation, fitting, filtering, geometry and CNN calculations. Use [the reusable answer sheet](answer-sheet.md).
 
@@ -36,9 +36,9 @@ The raw practice score is **not an official exam grade**. The actual ANS grading
 
 ### Solutions — open after your attempt
 
-- [Exam 1 key and worked solutions](solutions/exam-1-solutions.md)
-- [Exam 2 key and worked solutions](solutions/exam-2-solutions.md)
-- [Exam 3 key and worked solutions](solutions/exam-3-solutions.md)
+- [Exam 1 key and worked solutions](exams/exam-1-solutions.pdf)
+- [Exam 2 key and worked solutions](exams/exam-2-solutions.pdf)
+- [Exam 3 key and worked solutions](exams/exam-3-solutions.pdf)
 
 Each file has a quick answer key, then explanations, numerical references and source citations. The internal `data/` and `tools/` files also contain answers; avoid them during an attempt.
 
@@ -79,6 +79,17 @@ Also use the lecturer's [ANS interface-test instructions](../exam-prep/ans_test.
 ## Rebuild and verification
 
 From `/home/richard/Documents/academics/1/computer-vision-1`, with `uv` installed:
+
+For the delivered PDFs (no Markdown exam files required):
+
+```bash
+uv run --no-project study-pack/tools/test_pdf_math.py
+uv run --no-project study-pack/tools/build_pdfs.py
+```
+
+The renderer tests also recompute all 60 numerical answers and execute the eight short NumPy computation snippets. PDF-only notation is in `study-pack/tools/pdf_math.py`; the canonical question and solution text stays unchanged.
+
+For optional Markdown exam exports and the original full-pack verifier:
 
 ```bash
 uv run --no-project study-pack/tools/build.py

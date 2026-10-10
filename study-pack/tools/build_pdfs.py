@@ -9,10 +9,11 @@ import subprocess
 import unicodedata
 
 from build import RULES
+from pdf_math import chunks, numeric_atoms, text_grid
 
 ROOT = Path(__file__).resolve().parents[1]
-TEX = ROOT / "latex"
-PDF = ROOT / "pdf"
+TEX = ROOT / "exams"
+PDF = ROOT / "exams"
 BUILD = Path("/tmp/opencode/cv1-study-pack-latex")
 
 ESCAPES = {
@@ -29,16 +30,34 @@ def escape(text):
 
 
 def inline(text):
+    # These multiple-choice answers are Python expressions, not equations.
+    if text.startswith("I.mean("):
+        return r"\texttt{" + escape(text) + "}"
     parts = re.split(r"(`[^`\n]+`|\*\*.*?\*\*)", text)
     output = []
     for part in parts:
         if part.startswith("`"):
             output.append(r"\texttt{" + escape(part[1:-1]) + "}")
         elif part.startswith("**"):
-            output.append(r"\textbf{" + escape(part[2:-2]) + "}")
+            output.append(r"\textbf{" + inline(part[2:-2]) + "}")
         else:
-            output.append(escape(part))
-    return "".join(output)
+            segments = list(chunks(part))
+            for index, (source, latex) in enumerate(segments):
+                if latex is None:
+                    output.append(escape(source))
+                elif r"\\" in latex or len(latex) > 110 or r"\frac{\text{" in latex:
+                    # Multirow matrices need their own line, not tall inline
+                    # boxes that disrupt reading order and paragraph spacing.
+                    punctuation = ""
+                    if index + 1 < len(segments):
+                        following, next_math = segments[index + 1]
+                        if next_math is None and following.startswith((".", ",", ";", ":")):
+                            punctuation = following[0]
+                            segments[index + 1] = following[1:], None
+                    output.append("\n\\[" + latex + punctuation + "\\]\n")
+                else:
+                    output.append(r"\(" + latex + r"\)")
+    return re.sub(r"[ \t]+\n", "\n", "".join(output))
 
 
 def prose(text):
@@ -46,7 +65,11 @@ def prose(text):
     for part in re.split(r"(```[^\n]*\n.*?\n```)", text, flags=re.S):
         if part.startswith("```"):
             code = part.split("\n", 1)[1].rsplit("\n```", 1)[0]
-            output.append("\n\\begin{Code}\n" + code + "\n\\end{Code}\n")
+            math = text_grid(code) if part.startswith("```text\n") else None
+            if math is not None:
+                output.append("\n\\[\n" + math + "\n\\]\n")
+            else:
+                output.append("\n\\begin{Code}\n" + code + "\n\\end{Code}\n")
         else:
             output.append(inline(part))
     return "".join(output)
@@ -58,6 +81,10 @@ def preamble(title, subtitle, header):
 \usepackage{fontspec}
 \setmainfont{TeX Gyre Pagella}
 \setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\setmathfont{TeX Gyre Pagella Math}
+\setcounter{MaxMatrixCols}{20}
 \usepackage{microtype}
 \usepackage{enumitem}
 \usepackage{fvextra}
@@ -133,7 +160,7 @@ def solution_document(exam):
                r"\clearpage\section*{Worked solutions}" + "\n"]
     for q in exam["questions"]:
         if q["kind"] == "mc":
-            body = r"\textbf{" + escape(q["answer"] + ". " + q["correct"]) + r"}\par" + "\n"
+            body = r"\textbf{" + escape(q["answer"] + ". ") + inline(q["correct"]) + r"}\par" + "\n"
         else:
             body = (r"\textbf{Submit " + escape(q["display_answer"]) + ".} "
                     + "Unrounded reference: " + r"\texttt{" + escape(q["answer"]) + r"}.\par" + "\n")
@@ -148,15 +175,28 @@ def normalized(text):
     return re.sub(r"\s+", "", unicodedata.normalize("NFKC", text).replace("’", "'"))
 
 
-def source_text(text):
-    # Strip Markdown only outside fences: '**' inside Python is exponentiation.
-    parts = []
-    for part in re.split(r"(```[^\n]*\n.*?\n```)", text, flags=re.S):
+def required_fragments(text):
+    """PDF text extraction reorders fractions/matrices; check prose and code.
+
+    Each native-math span is checked in the renderer tests and compilation.
+    Numeric data grids additionally have their numeric entries checked here.
+    """
+    if text.startswith("I.mean("):
+        yield text, False
+        return
+    for part in re.split(r"(```[^\n]*\n.*?\n```|`[^`\n]+`)", text, flags=re.S):
         if part.startswith("```"):
-            parts.append(part.split("\n", 1)[1].rsplit("\n```", 1)[0])
+            code = part.split("\n", 1)[1].rsplit("\n```", 1)[0]
+            if part.startswith("```text\n") and text_grid(code) is not None:
+                yield code, True
+            else:
+                yield code, False
+        elif part.startswith("`"):
+            yield part[1:-1], False
         else:
-            parts.append(part.replace("`", "").replace("**", ""))
-    return "".join(parts)
+            for source, latex in chunks(part.replace("**", "")):
+                if latex is None and source.strip():
+                    yield source, False
 
 
 def compile_and_check(job):
@@ -178,21 +218,30 @@ def compile_and_check(job):
     headings = re.findall(r"^\s*Q(\d{2})\s+—", text, flags=re.M)
     if headings != [f"{n:02d}" for n in range(1, 51)]:
         raise AssertionError(f"Missing/reordered PDF questions: {tex_path}")
-    visible = normalized(text)
-    for q in exam["questions"]:
+    # Raw extraction follows TeX reading order; layout extraction can insert
+    # fraction numerators into an unrelated line of surrounding prose.
+    reading_order = subprocess.check_output(["pdftotext", "-raw", str(artifact), "-"], text=True)
+    sections = re.split(r"^\s*Q\d{2}\s+—[^\n]*\n", reading_order, flags=re.M)[1:]
+    assert len(sections) == 50, tex_path
+    for q, section in zip(exam["questions"], sections):
+        visible = normalized(section)
         required = [q["explanation"], q["source"]] if solutions else [q["stem"]]
         required += [q["correct"]] if solutions and q["kind"] == "mc" else []
         required += q["options"] if not solutions and q["kind"] == "mc" else []
         for value in required:
-            if normalized(source_text(value)) not in visible:
-                raise AssertionError(f"PDF content mismatch: {tex_path.name} {q['id']}: {value[:90]}")
+            for fragment, grid in required_fragments(value):
+                if grid:
+                    if numeric_atoms(fragment) - numeric_atoms(section):
+                        raise AssertionError(f"PDF grid mismatch: {tex_path.name} {q['id']}")
+                elif normalized(fragment.strip(" \n.,;:!?()")) not in visible:
+                    raise AssertionError(f"PDF content mismatch: {tex_path.name} {q['id']}: {fragment[:90]}")
     if not solutions:
         assert "Unrounded reference" not in text and "Worked solutions" not in text
     destination = PDF / artifact.name
     shutil.copy2(artifact, destination)
     info = subprocess.check_output(["pdfinfo", str(destination)], text=True)
     pages = re.search(r"^Pages:\s+(\d+)", info, flags=re.M).group(1)
-    return f"PASS: {destination.relative_to(ROOT)} — {pages} pages; all 50 questions and content verified."
+    return f"PASS: {destination.relative_to(ROOT)} — {pages} pages; 50 questions, prose/code and data grids checked; no missing glyphs or overflow."
 
 
 def main():

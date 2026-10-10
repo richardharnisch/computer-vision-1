@@ -3,6 +3,10 @@
 \usepackage{fontspec}
 \setmainfont{TeX Gyre Pagella}
 \setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\setmathfont{TeX Gyre Pagella Math}
+\setcounter{MaxMatrixCols}{20}
 \usepackage{microtype}
 \usepackage{enumitem}
 \usepackage{fvextra}
@@ -46,12 +50,12 @@ Solutions are in a separate PDF. Do not open them until you finish.
 \clearpage\section*{Part A — Single-answer multiple choice}
 \begin{minipage}{\linewidth}
 \textbf{Q01 — Multiple choice}\par\smallskip
-R1 and R2 are proper 3D rotation matrices. Which statement is correct?
+\(R_1\) and \(R_2\) are proper 3D rotation matrices. Which statement is correct?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item The inverse is always R2.T @ R1.T.
+\item The inverse is always \(R_2^{\mathsf T}R_1^{\mathsf T}\).
 \item A rotation matrix has 9 independent degrees of freedom.
-\item The inverse of R2 @ R1 is R1.T @ R2.T; rotation order generally matters.
-\item R1 @ R2 always equals R2 @ R1.
+\item The inverse of \(R_2 R_1\) is \(R_1^{\mathsf T}R_2^{\mathsf T}\); rotation order generally matters.
+\item \(R_1 R_2\) always equals \(R_2 R_1\).
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
@@ -59,9 +63,9 @@ R1 and R2 are proper 3D rotation matrices. Which statement is correct?
 \textbf{Q02 — Multiple choice}\par\smallskip
 Crop an image by removing 40 pixels from the left and 20 from the top,\allowbreak{} with no resize. In the continuous-coordinate model,\allowbreak{} how does K change?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item Subtract 40 from fx and 20 from fy.
-\item Keep K unchanged and add [40,\allowbreak{}20,\allowbreak{}0] to camera translation.
-\item Subtract 40 from cx and 20 from cy; keep focal lengths and skew unchanged.
+\item Subtract 40 from \(f_x\) and 20 from \(f_y\).
+\item Keep K unchanged and add \(\begin{bmatrix}40&20&0\end{bmatrix}\) to camera translation.
+\item Subtract 40 from \(c_x\) and 20 from \(c_y\); keep focal lengths and skew unchanged.
 \item Multiply both focal lengths by the crop's remaining image area.
 \end{enumerate}
 \end{minipage}
@@ -87,16 +91,16 @@ out = (I.max(axis=2) + I.min(axis=2)) / 2
 \textbf{Q04 — Multiple choice}\par\smallskip
 Which expression computes per-channel image means that broadcast correctly onto an array of shape (H,\allowbreak{}W,\allowbreak{}3)?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item I.mean(axis=\allowbreak{}0,\allowbreak{} keepdims=\allowbreak{}True),\allowbreak{} which always has shape (1,\allowbreak{}1,\allowbreak{}3)
-\item I.mean(axis=\allowbreak{}(0,\allowbreak{}1),\allowbreak{} keepdims=\allowbreak{}True)
-\item I.mean(axis=\allowbreak{}(0,\allowbreak{}1,\allowbreak{}2),\allowbreak{} keepdims=\allowbreak{}True)
-\item I.mean(axis=\allowbreak{}2,\allowbreak{} keepdims=\allowbreak{}True)
+\item \texttt{I.mean(axis=\allowbreak{}0,\allowbreak{} keepdims=\allowbreak{}True),\allowbreak{} which always has shape (1,\allowbreak{}1,\allowbreak{}3)}
+\item \texttt{I.mean(axis=\allowbreak{}(0,\allowbreak{}1),\allowbreak{} keepdims=\allowbreak{}True)}
+\item \texttt{I.mean(axis=\allowbreak{}(0,\allowbreak{}1,\allowbreak{}2),\allowbreak{} keepdims=\allowbreak{}True)}
+\item \texttt{I.mean(axis=\allowbreak{}2,\allowbreak{} keepdims=\allowbreak{}True)}
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q05 — Multiple choice}\par\smallskip
-Suppose the true lighting matrix is Ltrue =\allowbreak{} 2 *\allowbreak{} Lused,\allowbreak{} with no shadows or noise. You solve i =\allowbreak{} Lused ghat. How do the estimated normal and albedo relate to the true ones?
+Suppose the true lighting matrix is \(L_{\mathrm{true}}=2L_{\mathrm{used}}\),\allowbreak{} with no shadows or noise. You solve \(i=L_{\mathrm{used}}\widehat g\). How do the estimated normal and albedo relate to the true ones?
 \begin{enumerate}[label=\textbf{\Alph*.}]
 \item The normal doubles in length after normalization; albedo is unchanged.
 \item Both normal direction and albedo are unchanged.
@@ -107,7 +111,7 @@ Suppose the true lighting matrix is Ltrue =\allowbreak{} 2 *\allowbreak{} Lused,
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q06 — Multiple choice}\par\smallskip
-For the intrinsic-image model I =\allowbreak{} A *\allowbreak{} S,\allowbreak{} where multiplication is elementwise,\allowbreak{} which recolouring operation preserves the estimated shading?
+For the intrinsic-image model \(I=A\odot S\),\allowbreak{} where multiplication is elementwise,\allowbreak{} which recolouring operation preserves the estimated shading?
 \begin{enumerate}[label=\textbf{\Alph*.}]
 \item Divide the target albedo by S.
 \item Change the object's albedo A and multiply the changed A by the original S.
@@ -164,10 +168,10 @@ A system labels every pixel by semantic class,\allowbreak{} including pixels of 
 \textbf{Q11 — Multiple choice}\par\smallskip
 Why is a median filter often preferable to averaging for sparse salt-and-pepper noise?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item It is a linear filter with a fixed kernel of average weights.
-\item It increases the magnitude of all high-frequency components.
-\item It is less affected by extreme isolated values and can preserve edges better.
-\item It guarantees removal of every type of noise without information loss.
+\item \(I_t\) is a linear filter with a fixed kernel of average weights.
+\item \(I_t\) increases the magnitude of all high-frequency components.
+\item \(I_t\) is less affected by extreme isolated values and can preserve edges better.
+\item \(I_t\) guarantees removal of every type of noise without information loss.
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
@@ -189,7 +193,7 @@ You multiply two same-length unpadded DFTs and take the inverse DFT. What operat
 \item Pointwise multiplication of the original spatial samples.
 \item Circular convolution,\allowbreak{} with wrap-around at the signal boundaries.
 \item Cross-correlation with no complex conjugation or reversal.
-\item Full linear convolution of length N+M-1 regardless of padding.
+\item Full linear convolution of length \(N+M-1\) regardless of padding.
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
@@ -206,7 +210,7 @@ A kernel measures the x derivative of an image. Which edge orientation usually g
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q15 — Multiple choice}\par\smallskip
-Compared with a small Gaussian sigma,\allowbreak{} what is a likely effect of increasing sigma in Canny?
+Compared with a small Gaussian \(\sigma\),\allowbreak{} what is a likely effect of increasing \(\sigma\) in Canny?
 \begin{enumerate}[label=\textbf{\Alph*.}]
 \item Suppress finer detail and noise,\allowbreak{} while potentially merging edges and reducing localization precision.
 \item Remove the need for non-maximum suppression.
@@ -219,21 +223,21 @@ Compared with a small Gaussian sigma,\allowbreak{} what is a likely effect of in
 \textbf{Q16 — Multiple choice}\par\smallskip
 For a structure tensor at a pixel,\allowbreak{} which implementation follows the usual order of operations?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item Compute Ix*\allowbreak{}Ix,\allowbreak{} Ix*\allowbreak{}Iy and Iy*\allowbreak{}Iy first,\allowbreak{} then aggregate or smooth those products over the neighbourhood.
-\item Use Ixx and Iyy as the diagonal entries and Ixy off diagonal,\allowbreak{} because the structure tensor is the image Hessian.
-\item Smooth Ix and Iy to one mean each,\allowbreak{} then use only the outer product of those two means.
-\item Aggregate only Ix and Iy and use their signed means as the diagonal entries,\allowbreak{} setting the off-diagonal entries to zero.
+\item Compute \(I_x^2,\;I_x I_y\text{ and }I_y^2\) first,\allowbreak{} then aggregate or smooth those products over the neighbourhood.
+\item Use \(I_{xx}\) and \(I_{yy}\) as the diagonal entries and \(I_{xy}\) off diagonal,\allowbreak{} because the structure tensor is the image Hessian.
+\item Smooth \(I_x\) and \(I_y\) to one mean each,\allowbreak{} then use only the outer product of those two means.
+\item Aggregate only \(I_x\) and \(I_y\) and use their signed means as the diagonal entries,\allowbreak{} setting the off-diagonal entries to zero.
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q17 — Multiple choice}\par\smallskip
-Shi–Tomasi's corner score for structure-tensor eigenvalues lambda1 and lambda2 is which expression?
+Shi–Tomasi's corner score for structure-tensor eigenvalues \(\lambda_1\text{ and }\lambda_2\) is which expression?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item max(lambda1,\allowbreak{} lambda2)
-\item lambda1 + lambda2,\allowbreak{} regardless of their relative sizes
-\item min(lambda1,\allowbreak{} lambda2)
-\item lambda1 - lambda2
+\item \(\max(\lambda_1,\lambda_2)\)
+\item \(\lambda_1+\lambda_2\),\allowbreak{} regardless of their relative sizes
+\item \(\min(\lambda_1,\lambda_2)\)
+\item \(\lambda_1-\lambda_2\)
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
@@ -274,10 +278,10 @@ A fixed image template is tracked with SSD. The target's shape and position rema
 \textbf{Q21 — Multiple choice}\par\smallskip
 Which statement about mean-shift clustering is correct?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item It always requires the desired number of clusters K as its central input.
-\item It minimizes the same fixed-K objective as k-means using identical updates.
+\item \(I_t\) always requires the desired number of clusters K as its central input.
+\item \(I_t\) minimizes the same fixed-K objective as k-means using identical updates.
 \item Its result cannot depend on the bandwidth.
-\item It seeks density modes; kernel bandwidth influences how many modes and clusters are found.
+\item \(I_t\) seeks density modes; kernel bandwidth influences how many modes and clusters are found.
 \end{enumerate}
 \end{minipage}
 \par\vspace{12pt}
@@ -307,9 +311,9 @@ What is the generic minimum data requirement for an unconstrained 2D affine tran
 \textbf{Q24 — Multiple choice}\par\smallskip
 Which statement accurately describes backward image warping?
 \begin{enumerate}[label=\textbf{\Alph*.}]
-\item It guarantees valid source data for every destination pixel,\allowbreak{} even outside source coverage.
-\item It forward-maps each source pixel without interpolation.
-\item It always avoids aliasing during downsampling,\allowbreak{} even without a low-pass filter.
+\item \(I_t\) guarantees valid source data for every destination pixel,\allowbreak{} even outside source coverage.
+\item \(I_t\) forward-maps each source pixel without interpolation.
+\item \(I_t\) always avoids aliasing during downsampling,\allowbreak{} even without a low-pass filter.
 \item For each destination pixel,\allowbreak{} inverse-map its coordinate and sample/\allowbreak{}interpolate the source; out-of-domain samples still need a boundary rule.
 \end{enumerate}
 \end{minipage}
@@ -338,7 +342,7 @@ At a fixed detection IoU threshold,\allowbreak{} two same-class detections both 
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q27 — Multiple choice}\par\smallskip
-Three same-class boxes have descending scores A>B>C. IoU(A,\allowbreak{}B)>threshold,\allowbreak{} IoU(B,\allowbreak{}C)>threshold,\allowbreak{} but IoU(A,\allowbreak{}C)<threshold. What does greedy hard NMS keep?
+Three same-class boxes have descending scores \(A>B>C\). \(\operatorname{IoU}(A,B)>\text{threshold}\),\allowbreak{} \(\operatorname{IoU}(B,C)>\text{threshold}\),\allowbreak{} but \(\operatorname{IoU}(A,C)<\text{threshold}\). What does greedy hard NMS keep?
 \begin{enumerate}[label=\textbf{\Alph*.}]
 \item A only,\allowbreak{} because overlap is transitively inherited through B.
 \item A and C.
@@ -383,19 +387,23 @@ A camera only rotates about its optical centre while viewing a static scene. Why
 \clearpage\section*{Part B — Numerical values}
 \begin{minipage}{\linewidth}
 \textbf{Q31 — Numerical}\par\smallskip
-A world-to-camera extrinsic transform is Xc=\allowbreak{}R@Xw+t,\allowbreak{} with R=\allowbreak{}[[0,\allowbreak{}0,\allowbreak{}1],\allowbreak{}[0,\allowbreak{}1,\allowbreak{}0],\allowbreak{}[-1,\allowbreak{}0,\allowbreak{}0]] and t=\allowbreak{}[-3,\allowbreak{}2,\allowbreak{}1] metres. Report the Euclidean distance of the camera centre from the world origin. Use C=\allowbreak{}-R.T@t.
+A world-to-camera extrinsic transform is \(X_c=R X_w+t\),\allowbreak{} with
+\[R=\begin{bmatrix}0&0&1\\0&1&0\\-1&0&0\end{bmatrix}\]
+ and \(t=\begin{bmatrix}-3&2&1\end{bmatrix}^{\mathsf T}\) metres. Report the Euclidean distance of the camera centre from the world origin. Use \(C=-R^{\mathsf T}t\).
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q32 — Numerical}\par\smallskip
-An RGB image has per-channel means [80,\allowbreak{}40,\allowbreak{}20]. A pixel has RGB value [100,\allowbreak{}30,\allowbreak{}10]. Grey-World correction uses target=\allowbreak{}(80+40+20)/\allowbreak{}3,\allowbreak{} then corrected =\allowbreak{} pixel/\allowbreak{}channel\_\allowbreak{}means*\allowbreak{}target. Ignore clipping and quantization. Report the corrected green value.
+An RGB image has per-channel means \(\begin{bmatrix}80&40&20\end{bmatrix}\). A pixel has RGB value \(\begin{bmatrix}100&30&10\end{bmatrix}\). Grey-World correction uses \(\text{target}=\frac{80+40+20}{3}\),\allowbreak{} then
+\[\text{corrected}=\frac{\text{pixel}}{\text{channel means}}\cdot\text{target}.\]
+ Ignore clipping and quantization. Report the corrected green value.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q33 — Numerical}\par\smallskip
-Weighted photometric stereo minimizes sum\_\allowbreak{}j (w[j]*\allowbreak{}(L[j]@g-i[j]))\textasciicircum{}2. The last light vector's magnitude also encodes its strength. Report g[2].
+Weighted photometric stereo minimizes \(\sum_j\bigl(w_j(L_j g-i_j)\bigr)^2\). The last light vector's magnitude also encodes its strength. Report \(g_2\).
 
 
 \begin{Code}
@@ -412,28 +420,24 @@ Provided routine: \texttt{np.linalg.lstsq(L*\allowbreak{}w[:,\allowbreak{}None],
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q34 — Numerical}\par\smallskip
-Use the simplified Phong model I =\allowbreak{} Ia + kd*\allowbreak{}max(n dot l,\allowbreak{}0) + ks*\allowbreak{}max(v dot r,\allowbreak{}0)\textasciicircum{}s. Let Ia=\allowbreak{}0.1,\allowbreak{} kd=\allowbreak{}0.6,\allowbreak{} n dot l=\allowbreak{}0.5,\allowbreak{} ks=\allowbreak{}0.8,\allowbreak{} v dot r=\allowbreak{}0.5,\allowbreak{} and s=\allowbreak{}4. Report I.
+Use the simplified Phong model \(I=I_a+k_d\max(n\cdot l,0)+k_s\max(v\cdot r,0)^s\). Let \(I_a=0.1\),\allowbreak{} \(k_d=0.6\),\allowbreak{} \(n\cdot l=0.5\),\allowbreak{} \(k_s=0.8\),\allowbreak{} \(v\cdot r=0.5\),\allowbreak{} and \(s=4\). Report I.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q35 — Numerical}\par\smallskip
-Linearly stretch intensities from input range [50,\allowbreak{}150] to [0,\allowbreak{}255]. Report the output for input intensity 70. No clipping is needed for this value.
+Linearly stretch intensities from input range \(\begin{bmatrix}50&150\end{bmatrix}\) to \(\begin{bmatrix}0&255\end{bmatrix}\). Report the output for input intensity 70. No clipping is needed for this value.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q36 — Numerical}\par\smallskip
-For the binary image below,\allowbreak{} compute the number of foreground components under 4-connectivity and under 8-connectivity. Report count4-count8 as one exact integer. Background is not counted.
+For the binary image below,\allowbreak{} compute the number of foreground components under 4-connectivity and under 8-connectivity. Report \(\text{count}_4-\text{count}_8\) as one exact integer. Background is not counted.
 
 
-\begin{Code}
-1 0 1 0 0
-0 1 0 0 1
-0 0 1 0 1
-0 0 0 1 0
-1 0 0 0 1
-\end{Code}
+\[
+\begin{bmatrix}1&0&1&0&0\\0&1&0&0&1\\0&0&1&0&1\\0&0&0&1&0\\1&0&0&0&1\end{bmatrix}
+\]
 
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
@@ -443,18 +447,16 @@ For the binary image below,\allowbreak{} compute the number of foreground compon
 Report the centre output of a 3 by 3 median filter on this patch. Use all nine entries and report an exact integer.
 
 
-\begin{Code}
-[[0, 7,8],
- [8,255,9],
- [10,11,0]]
-\end{Code}
+\[
+\begin{bmatrix}0&7&8\\8&255&9\\10&11&0\end{bmatrix}
+\]
 
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q38 — Numerical}\par\smallskip
-Construct a magnitude-weighted UNSIGNED HoG histogram from Gx=\allowbreak{}[3,\allowbreak{}-3,\allowbreak{}0,\allowbreak{}2] and Gy=\allowbreak{}[4,\allowbreak{}-4,\allowbreak{}5,\allowbreak{}0]. Use angles theta=\allowbreak{}degrees(atan2(Gy,\allowbreak{}Gx)) modulo 180. Use nine HARD bins [0,\allowbreak{}20),\allowbreak{}[20,\allowbreak{}40),\allowbreak{}...,\allowbreak{}[160,\allowbreak{}180),\allowbreak{} numbered 0..8; no interpolation and no histogram normalization. Report the value of bin 2,\allowbreak{} which covers [40,\allowbreak{}60) degrees.
+Construct a magnitude-weighted UNSIGNED HoG histogram from \(G_x=\begin{bmatrix}3&-3&0&2\end{bmatrix}\) and \(G_y=\begin{bmatrix}4&-4&5&0\end{bmatrix}\). Use angles \(\theta=\operatorname{degrees}(\operatorname{atan2}(G_y,G_x))\bmod180\). Use nine HARD bins [0,\allowbreak{}20),\allowbreak{}[20,\allowbreak{}40),\allowbreak{}...,\allowbreak{}[160,\allowbreak{}180),\allowbreak{} numbered 0..8; no interpolation and no histogram normalization. Report the value of bin 2,\allowbreak{} which covers [40,\allowbreak{}60) degrees.
 
 Provided functions: \texttt{np.arctan2(y,\allowbreak{}x)} gives quadrant-aware angles in radians; \texttt{np.degrees(angle)} converts radians to degrees. Magnitude is \texttt{np.sqrt(Gx*\allowbreak{}Gx+Gy*\allowbreak{}Gy)}.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
@@ -462,13 +464,13 @@ Provided functions: \texttt{np.arctan2(y,\allowbreak{}x)} gives quadrant-aware a
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q39 — Numerical}\par\smallskip
-A complex Fourier coefficient is F=\allowbreak{}-3-4i. Report its principal phase in degrees in the range (-180,\allowbreak{}180]. Provided function: \texttt{np.degrees(np.arctan2(F.imag,\allowbreak{} F.real))} uses quadrant-aware atan2(y,\allowbreak{}x).
+A complex Fourier coefficient is \(F=-3-4\mathrm{i}\). Report its principal phase in degrees in the range (-180,\allowbreak{}180]. Provided function: \texttt{np.degrees(np.arctan2(F.imag,\allowbreak{} F.real))} uses quadrant-aware \(\operatorname{atan2}(y,x)\).
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q40 — Numerical}\par\smallskip
-In Lucas–Kanade,\allowbreak{} solve A@[u,\allowbreak{}v] =\allowbreak{} -It by least squares and report v.
+In Lucas–Kanade,\allowbreak{} solve \(A\begin{bmatrix}u&v\end{bmatrix}^{\mathsf T}=-I_t\) by least squares and report v.
 
 
 \begin{Code}
@@ -502,7 +504,11 @@ answer = int(np.argmin(costs))
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q42 — Numerical}\par\smallskip
-Fit a 2D affine transform by least squares. Source rows are [[0,\allowbreak{}0],\allowbreak{}[1,\allowbreak{}0],\allowbreak{}[0,\allowbreak{}1],\allowbreak{}[1,\allowbreak{}1]]; target rows are [[2,\allowbreak{}-1],\allowbreak{}[4,\allowbreak{}-1],\allowbreak{}[3,\allowbreak{}2],\allowbreak{}[5,\allowbreak{}3]]. Build A with rows [x,\allowbreak{}y,\allowbreak{}1] and solve A@P=\allowbreak{}targets. Report the predicted target y coordinate for source (2,\allowbreak{}3).
+Fit a 2D affine transform by least squares. Source rows are
+\[\begin{bmatrix}0&0\\1&0\\0&1\\1&1\end{bmatrix};\]
+ target rows are
+\[\begin{bmatrix}2&-1\\4&-1\\3&2\\5&3\end{bmatrix}.\]
+ Build A with rows \([x,y,1]\) and solve \(AP=\text{targets}\). Report the predicted target y coordinate for source (2,\allowbreak{}3).
 
 Provided routine: \texttt{P=\allowbreak{}np.linalg.lstsq(A,\allowbreak{} targets,\allowbreak{} rcond=\allowbreak{}None)[0]}; prediction is \texttt{np.array([2,\allowbreak{}3,\allowbreak{}1])@P}.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
@@ -510,19 +516,19 @@ Provided routine: \texttt{P=\allowbreak{}np.linalg.lstsq(A,\allowbreak{} targets
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q43 — Numerical}\par\smallskip
-Rows contain [nearest\_\allowbreak{}distance,\allowbreak{} second\_\allowbreak{}nearest\_\allowbreak{}distance] from descriptor matching. Keep a match iff d1/\allowbreak{}d2 < 0.75 (strict inequality). Report the count kept.
+Rows contain [nearest\_\allowbreak{}distance,\allowbreak{} second\_\allowbreak{}nearest\_\allowbreak{}distance] from descriptor matching. Keep a match iff \(\frac{d_1}{d_2}<0.75\) (strict inequality). Report the count kept.
 
 
-\begin{Code}
-[[.30,.50], [.40,.50], [.60,1.00], [.20,.21], [.10,.40]]
-\end{Code}
+\[
+\begin{bmatrix}0.3&0.5\\0.4&0.5\\0.6&1.0\\0.2&0.21\\0.1&0.4\end{bmatrix}
+\]
 
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q44 — Numerical}\par\smallskip
-Run ONE assignment/\allowbreak{}update iteration of 1D k-means with initial centres [0,\allowbreak{}10] and data [0,\allowbreak{}2,\allowbreak{}3,\allowbreak{}9,\allowbreak{}11]. Use squared Euclidean distance. Report the updated smaller centre.
+Run ONE assignment/\allowbreak{}update iteration of 1D k-means with initial centres \(\begin{bmatrix}0&10\end{bmatrix}\) and data \(\begin{bmatrix}0&2&3&9&11\end{bmatrix}\). Use squared Euclidean distance. Report the updated smaller centre.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
@@ -531,11 +537,9 @@ Run ONE assignment/\allowbreak{}update iteration of 1D k-means with initial cent
 Rows are actual classes; columns are predicted classes. Report MACRO recall as a fraction for this matrix.
 
 
-\begin{Code}
-[[30,10,0],
- [ 5,10,5],
- [ 0, 2,8]]
-\end{Code}
+\[
+\begin{bmatrix}30&10&0\\5&10&5\\0&2&8\end{bmatrix}
+\]
 
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
@@ -545,38 +549,38 @@ Rows are actual classes; columns are predicted classes. Report MACRO recall as a
 Greedy hard NMS processes one class in score order A,\allowbreak{}B,\allowbreak{}C,\allowbreak{}D (all scores distinct). Exact pairwise IoUs are below; fractions mean ordinary division. Suppress a lower-scoring box only when its IoU with a KEPT box is strictly greater than 0.5. Report the number kept.
 
 
-\begin{Code}
-      A    B    C    D
-A     1   3/5  1/3  1/7
-B    3/5   1   3/5  1/3
-C    1/3  3/5   1   3/5
-D    1/7  1/3  3/5   1
-\end{Code}
+\[
+\begin{array}{c|rrrr}&A&B&C&D\\\hline A&1&\frac{3}{5}&\frac{1}{3}&\frac{1}{7}\\[6pt]B&\frac{3}{5}&1&\frac{3}{5}&\frac{1}{3}\\[6pt]C&\frac{1}{3}&\frac{3}{5}&1&\frac{3}{5}\\[6pt]D&\frac{1}{7}&\frac{1}{3}&\frac{3}{5}&1\end{array}
+\]
 
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q47 — Numerical}\par\smallskip
-A CNN layer uses a valid stride-1 CROSS-CORRELATION,\allowbreak{} no bias,\allowbreak{} I=\allowbreak{}[[1,\allowbreak{}3,\allowbreak{}5],\allowbreak{}[2,\allowbreak{}-1,\allowbreak{}4]] and W=\allowbreak{}[[1,\allowbreak{}0],\allowbreak{}[-1,\allowbreak{}2]]. Its two output positions receive upstream loss gradients [2,\allowbreak{}-1]. Report dLoss/\allowbreak{}dW[1,\allowbreak{}1],\allowbreak{} with zero-based indices. The derivative sums upstream\_\allowbreak{}gradient *\allowbreak{} the corresponding input value over BOTH output positions.
+A CNN layer uses a valid stride-1 CROSS-CORRELATION,\allowbreak{} no bias,\allowbreak{}
+\[I=\begin{bmatrix}1&3&5\\2&-1&4\end{bmatrix}\]
+ and
+\[W=\begin{bmatrix}1&0\\-1&2\end{bmatrix}.\]
+ Its two output positions receive upstream loss gradients \(\begin{bmatrix}2&-1\end{bmatrix}\). Report \(\frac{\partial\mathrm{Loss}}{\partial W_{1,1}}\),\allowbreak{} with zero-based indices. The derivative sums \(\text{upstream gradient}\cdot\text{the corresponding input value}\) over BOTH output positions.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q48 — Numerical}\par\smallskip
-A final feature map has shape 9 x 9 x 8. Global average pooling replaces each channel by its spatial mean. A fully connected 5-class head then uses one bias per class. Report the head's trainable parameter count; exclude the backbone.
+A final feature map has shape \(9\times9\times8\). Global average pooling replaces each channel by its spatial mean. A fully connected 5-class head then uses one bias per class. Report the head's trainable parameter count; exclude the backbone.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q49 — Numerical}\par\smallskip
-Use ORIGINAL YOLO v1,\allowbreak{} whose output shape is S x S x (5*\allowbreak{}B+C): B boxes with 5 values each,\allowbreak{} and ONE shared C-class probability vector per cell. Let S=\allowbreak{}7,\allowbreak{} B=\allowbreak{}2 and C=\allowbreak{}4. Report the total number of scalar outputs.
+Use ORIGINAL YOLO v1,\allowbreak{} whose output shape is \(S\times S\times(5B+C)\): B boxes with 5 values each,\allowbreak{} and ONE shared C-class probability vector per cell. Let \(S=7,\;B=2\text{ and }C=4\). Report the total number of scalar outputs.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
 \begin{minipage}{\linewidth}
 \textbf{Q50 — Numerical}\par\smallskip
-An ideal rectified stereo pair has focal length f=\allowbreak{}1200 pixels,\allowbreak{} baseline B=\allowbreak{}0.12 metres,\allowbreak{} and matching horizontal coordinates uL=\allowbreak{}414,\allowbreak{} uR=\allowbreak{}390. Both principal points are equal. Use disparity d=\allowbreak{}uL-uR and depth Z=\allowbreak{}f*\allowbreak{}B/\allowbreak{}d. Report Z in metres.
+An ideal rectified stereo pair has focal length \(f=1200\) pixels,\allowbreak{} baseline \(B=0.12\) metres,\allowbreak{} and matching horizontal coordinates \(u_L=414,\;u_R=390\). Both principal points are equal. Use disparity \(d=u_L-u_R\) and depth \(Z=\frac{fB}{d}\). Report Z in metres.
 \par\medskip\textbf{Answer:} \rule{55mm}{0.4pt}
 \end{minipage}
 \par\vspace{12pt}
