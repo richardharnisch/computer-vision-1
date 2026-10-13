@@ -1,0 +1,1009 @@
+% CV1 2026: six A4 sides. Compile with pdfLaTeX; see README.md.
+% Source: all supplied HC1a--HC6b decks, Seminars 1--5, Labs 0--5,
+% current exam-preparation checklist, and supporting textbook passages.
+% Course files and existing study-pack authoring sources are not modified.
+\documentclass[a4paper]{article}
+\usepackage[left=5mm,right=5mm,top=5mm,bottom=5mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype,xcolor,listings}
+\usepackage[pdftex,pdftitle={Computer Vision 1: Six-page Exam Cheat Sheet},
+  pdfauthor={},pdfsubject={2026 course: formulas, concepts and code},
+  hidelinks]{hyperref}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7pt}
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{1pt}
+\setlength{\arraycolsep}{2pt}
+\renewcommand{\arraystretch}{0.9}
+\thinmuskip=2mu
+\medmuskip=2mu plus 1mu minus 1mu
+\thickmuskip=3mu plus 1mu minus 1mu
+\emergencystretch=0.5em
+\tolerance=1200
+\raggedbottom
+\lstset{language=Python,basicstyle=\fontfamily{lmtt}\fontsize{6.25}{6.7}\selectfont,
+  aboveskip=1pt,belowskip=1pt,columns=fullflexible,keepspaces=true,
+  breaklines=true,breakatwhitespace=false,showstringspaces=false,
+  keywordstyle=\bfseries,commentstyle=\itshape,upquote=true}
+\newcommand{\key}[1]{\textbf{#1}}
+\newcommand{\Topic}[1]{\par\vspace{1.7pt}\noindent
+  {\fontsize{7.7}{8.0}\selectfont\bfseries #1}\par\vspace{0.3pt}}
+\newcommand{\eq}[1]{\par\noindent\mbox{\(\displaystyle #1\)}\par}
+\newcommand{\smat}[1]{\left[\begin{smallmatrix}#1\end{smallmatrix}\right]}
+\newcommand{\norm}[1]{\lVert #1\rVert}
+\newcommand{\trans}{^{\mathsf T}}
+\newcommand{\inv}{^{-1}}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\ii}{\mathrm i}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\relu}{\operatorname{ReLU}}
+\newcounter{sheet}
+\newcounter{sheetcolumn}
+\newlength{\colwidth}
+\setlength{\colwidth}{\dimexpr(\textwidth-6mm)/3\relax}
+\newlength{\colmax}
+\setlength{\colmax}{\dimexpr\textheight-15pt\relax}
+\newsavebox{\columnbox}
+\newcommand{\Sheet}[2]{\ifnum\value{sheet}>0\newpage\fi
+  \stepcounter{sheet}\setcounter{sheetcolumn}{0}
+  {\fontsize{8.5}{9}\selectfont\bfseries CV1 2026 \quad \thesheet/6\quad #1
+  \hfill {\fontsize{6.3}{7}\selectfont #2}}\par
+  \vspace{-1pt}\hrule height 0.35pt\vspace{2pt}\noindent
+  \hbox to\textwidth\bgroup\ignorespaces}
+\newcommand{\EndSheet}{\unskip\egroup\par}
+\newenvironment{sheetcol}{\stepcounter{sheetcolumn}
+  \begin{lrbox}{\columnbox}\begin{minipage}[t]{\colwidth}\vspace{0pt}
+  \fontsize{7.0}{7.6}\selectfont}
+  {\end{minipage}\end{lrbox}
+  \typeout{CV1COL|\thesheet|\thesheetcolumn|\the\dimexpr\ht\columnbox+\dp\columnbox\relax}
+  \usebox{\columnbox}\ignorespacesafterend}
+\newcommand{\Sep}{\hfill}
+\begin{document}
+\typeout{CV1MAX|\the\colmax}
+
+% ======================== SIDE 1 ========================
+\Sheet{IMAGE FORMATION}{Camera \(\cdot\) colour \(\cdot\) reflectance \(\cdot\) photometric stereo}
+\begin{sheetcol}
+\Topic{1. Coordinates, pinhole and calibration}
+\key{Conventions throughout:} column vectors; image arrays \(I[y,x]\), x right/y down unless stated; world-to-camera \(X_c=RX_w+t\); virtual image plane in front; visible \(Z_c>0\). A question's convention takes priority. \(\sim\) means equal up to nonzero scale; \(\odot\) is elementwise multiplication.
+
+\key{Pinhole:} camera-frame origin = optical centre/pinhole; optical axis = z-axis. Similar triangles give \(x=fX_c/Z_c,\ y=fY_c/Z_c\). Physical plane at \(-f\) gives both minus signs (inverted image). Apparent fronto-parallel size \(h=fH/Z\): twice f doubles size, twice depth halves it. A pixel gives a ray, not depth. For sensor width W, \(\mathrm{FOV}=2\arctan(W/(2f))\); match units. Greater f means narrower FOV.
+
+\key{Optics:} larger pinhole admits more light but increases geometric blur; tiny holes lose light and cause diffraction. A lens focuses rays from a chosen depth. Depth of field = acceptably sharp depth range; smaller aperture increases it, larger aperture decreases it (other settings fixed). Focus and focal length are different quantities.
+
+\key{Homogeneous coordinates:} \((x,y)\mapsto(x,y,1)\); \((a,b,w)\mapsto(a/w,b/w)\) if \(w\ne0\). \(w=0\) is a point at infinity/direction, not a finite location. Common nonzero scale does not change a point. Translation becomes matrix multiplication; composition is simple, rightmost first.
+
+\eq{K=\smat{f_x&s&c_x\\0&f_y&c_y\\0&0&1},\quad P=K[R\mid t].}
+\(f_x=f/p_x, f_y=f/p_y\) for pixel pitches \(p_x,p_y\); use matching physical units. \((c_x,c_y)\) = principal point (optical-axis intersection, not necessarily image centre). Skew s models nonorthogonal sensor axes, usually 0. K: \(3\!\times\!3\), 5 DoF; R: \(3\!\times\!3\), 3 DoF; t: \(3\!\times\!1\), 3 DoF; extrinsic block: \(3\!\times\!4\); P: \(3\!\times\!4\), 11 DoF up to scale.
+
+\eq{\tilde x\sim P\smat{X_w\\1},\quad
+ u=\frac{f_xX_c+sY_c}{Z_c}+c_x,\quad
+ v=\frac{f_yY_c}{Z_c}+c_y.}
+Always compute camera coordinates before perspective division. Neither the 4D world point's last entry nor focal length is the denominator: use projected third entry (\(Z_c\) for this K).
+
+\key{Pose/centre:} \(R\trans R=I,\det R=+1, R\inv=R\trans\). Camera centre \(C=-R\trans t\), so \(t=-RC\); t is \emph{not} generally camera position. Camera-to-world is \(X_w=R\trans X_c+C\). If camera-to-world orientation is Q, world-to-camera R is \(Q\trans\).
+\eq{T_{cw}=\smat{R&t\\0\ 0\ 0&1},\quad
+ T_{cw}\inv=\smat{R\trans&-R\trans t\\0\ 0\ 0&1}.}
+Points use R and t; directions/normals use only R: \(n_c=Rn_w\). Solve \(Kd=\tilde x\) for a camera ray; world ray \(C+\lambda R\trans K\inv\tilde x\), \(\lambda>0\). Normal transformation under a general nonrigid A uses \(A^{-\mathsf T}\), then normalize.
+
+\key{Right-handed active rotations}, c=cos\(\theta\), s=sin\(\theta\):
+\eq{R_x=\smat{1&0&0\\0&c&-s\\0&s&c},\quad
+ R_y=\smat{c&0&s\\0&1&0\\-s&0&c}.}
+\eq{R_z=\smat{c&-s&0\\s&c&0\\0&0&1}.}
+Camera rotation vs point rotation can require a transpose. y-down changes apparent rotation direction. Rotate then translate: \(TR\); translate then rotate: \(RT\) (rotate the translation too). In 3D, \(R_1R_2\ne R_2R_1\) in general.
+
+\key{Crop/resize:} crop top-left \((x_0,y_0)\), then resize \((a_x,a_y)\):
+\eq{K'=\smat{a_x&0&-a_xx_0\\0&a_y&-a_yy_0\\0&0&1}K.}
+Thus \(f'_x=a_xf_x,s'=a_xs,c'_x=a_x(c_x-x_0)\), similarly y. Extrinsics do not change. This ignores half-pixel resampling offsets; follow a stated pixel-centre rule.
+
+\key{Orthographic:} parallel rays, \((X,Y,Z)\mapsto(X,Y)\) (possibly scaled/translated), no Z-dependent size; suitable distant-view approximation. Perspective causes foreshortening; parallel 3D lines can meet at a vanishing point. Plane directions' vanishing points form a vanishing line/horizon; \(v\sim KRd_w\).
+
+\key{Distortion/calibration:} radial distortion gives barrel/pincushion effects; tangential distortion comes from misalignment. These are outside ideal K. Undistort before fitting ideal lines/H/F. Calibration estimates intrinsics, distortion and poses from known geometry plus observations; more data cannot repair a degenerate configuration.
+
+\Topic{2. Sensor, sampling and colour formation}
+\key{Representation:} grayscale \(I:\mathbb Z^2\to\R\); RGB \(\mathbb Z^2\to\R^3\); binary \(\{0,1\}\); labels = discrete class IDs. Spatial sampling discretizes position; quantization discretizes values. b bits give \(2^b\) levels \(0,\ldots,2^b-1\); uint8: 256 levels, 0--255. Float is not automatically [0,1]. Sensor noise and saturation limit dynamic range; rolling shutter exposes rows at different times and can distort motion.
+
+\key{Sensor colour:} \(c_k\propto\int E(\lambda)\rho(\lambda)S_k(\lambda)\,d\lambda\), plus orientation, visibility, gain/response. E: source spectrum; \(\rho\): material reflectance; S: sensor sensitivity. Different spectra can produce equal RGB (metamers); RGB does not uniquely recover spectra. CCD = Charge-Coupled Device (photons to accumulated charge); retina rods/cones measure light. OpenCV normally loads BGR; display/coefficients may require RGB.
+
+\key{Vectorized projection} of N world points stored as rows:
+\begin{lstlisting}
+Xc = Xw @ R.T + t.reshape(1,3)
+qh = Xc @ K.T
+uv = qh[:, :2] / qh[:, 2:3] # mask Zc<=0
+C = -R.T @ t
+ray_c = np.linalg.solve(K, [u,v,1.])
+ray_w = R.T @ ray_c
+\end{lstlisting}
+Row-vector storage changes multiplication placement, not pose convention. \texttt{Xw @ R} would use the wrong rotation here. For camera at \((2,0,0)\), R=I gives \(t=(-2,0,0)\); point \((5,1,10)\) becomes \((3,1,10)\). With \(f_x=f_y=100,c_x=c_y=0\), pixel = (30,10), not (70,10). Moving camera +x shifts stationary scene -x.
+
+\key{Units:} f=5 mm and pitch=10 micrometres=0.01 mm gives \(f_x=500\) pixels. Resizing cannot change physical focal length, but does change focal length in pixel units. Changing the world origin changes extrinsics, not intrinsic K.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{3. Colour spaces, grayscale and constancy}
+
+\key{Grayscale:} average \((R+G+B)/3\); lightness \((\max+\min)/2\); usual luma approximation \(0.299R+0.587G+0.114B\). Use supplied coefficients, not a universal physical-luminance claim. For BGR reverse coefficient order. Convert uint8 to float before sums/differences; unsigned subtraction can wrap (e.g. 0\(-\)1\(\to\)255).
+
+\key{Normalized RGB:} \(r=R/(R+G+B)\), similarly g,b; \(r+g+b=1\), 2 independent values. Removes common positive multiplicative gain, not channel-dependent gain, offsets, clipping or arbitrary lighting. Black pixels need a mask/fallback. Averaging normalized colours \(\ne\) normalizing their average.
+
+\key{Opponent:} \(O_1=(R-G)/\sqrt2\), \(O_2=(R+G-2B)/\sqrt6\), \(O_3=(R+G+B)/\sqrt3\): red--green, yellow--blue, intensity. Differences may be negative; display scaling is separate. YCbCr separates luma Y and blue-/red-difference chroma Cb/Cr; exact coefficients/offsets depend on standard/range.
+
+\key{HSV:} hue cyclic colour angle; saturation distance from gray; value \(V=\max(R,G,B)\), not HSL lightness. Let \(M=\max,m=\min,\Delta=M-m\); \(S=\Delta/M\) if \(M>0\), else 0. Hue is undefined when \(\Delta=0\). With normalized RGB, hue in degrees:
+\eq{H=60\!\times\!\begin{cases}((G-B)/\Delta)\bmod6&M=R\\(B-R)/\Delta+2&M=G\\(R-G)/\Delta+4&M=B.\end{cases}}
+Lab/OpenCV uint8 HSV: H=0--179 (half-degrees), S,V=0--255; do not mix with float [0,1] or ordinary degrees. Separate brightness/chroma operations can reduce colour changes, not guarantee illumination invariance.
+
+\key{Colour constancy:} estimate and remove illuminant cast. Grey-World assumes neutral scene-average reflectance; spatial means \(m_c\), target \(\bar m=(m_R+m_G+m_B)/3\), then \(I'_c=I_c\bar m/m_c\). Monochromatic scenes, zero means, clipping/nonuniform light cause failures. White-Patch (optional example for Lab1's open choice) assumes a brightest/reference patch is neutral; vulnerable to coloured highlights/saturation.
+\begin{lstlisting}
+I = I.astype(float)
+mc = I.mean(axis=(0, 1), keepdims=True)
+out = I / mc * mc.mean()  # mask mc==0
+out = np.clip(out, 0, 255).astype(np.uint8)
+gray = (I.max(-1) + I.min(-1)) / 2
+rgb = bgr[..., ::-1].copy()
+\end{lstlisting}
+\((0,1)\) reduces H,W and retains channels. Reducing \((0,1,2)\) gives the same scalar as target and cancels correction. \(\operatorname{mean}(\text{axis}=2)\) instead gives one grayscale value per pixel.
+
+\Topic{4. Reflection and the BRDF}
+\key{Normal n}: unit surface-perpendicular vector. \key{Albedo \(\rho\)}: material diffuse reflectance, calibrated physical \(0\le\rho\le1\). \key{Irradiance}: incoming power/area. \key{Radiance}: directional power/(projected area\(\times\)solid angle), related to camera signal. Distant directional light has constant parallel direction; strength may be vector magnitude.
+
+\key{Lambertian:} with unit vectors toward light \(\ell\) and viewer v,
+\eq{I=\rho J\max(0,n\trans\ell).}
+Cosine law: maximum face-on; zero at \(90^\circ\), clamp back-facing values. Radiance is view-independent, but visibility/projected area is not. Light strength J and camera gain can be absorbed in L/effective \(\rho\). Physical Lambertian BRDF = \(\rho/\pi\); do not insert \(\pi\) into an already absorbed course coefficient.
+
+\key{Diffuse vs specular:} body scattering yields matte diffuse appearance; surface reflection yields view-dependent glossy/mirror highlights. Phong sums ambient, diffuse and specular:
+\eq{I=k_aI_a+J[k_d\max(0,n\trans\ell)
+ +k_s\max(0,v\trans r)^s].}
+\(r=2(n\trans\ell)n-\ell\); higher shininess s gives narrower highlights. At mirror-sphere highlight, \(\ell=2(n\trans v)n-v\); known sphere geometry gives n. Normalize directions and state outward-vector signs.
+
+\key{Seminar colour invariants:} under white light, diffuse \((R,G,B)=a(k_R,k_G,k_B)\); colours lie on a ray through RGB origin, \(R/G=k_R/k_G\). Equal-channel specular term b gives \((R,G,B)=a\mathbf k+b\mathbf1\); \((R-G)/(R-B)=(k_R-k_G)/(k_R-k_B)\). Valid nonzero denominators, linear response and shared scalar factors required; coloured specular light/clipping can break invariance.
+
+\key{BRDF} = Bidirectional Reflectance Distribution Function, \(f_r(\ell,v)=dL_o(v)/dE_i(\ell)\): incoming and outgoing directions each need two angles (4D angular function). Reciprocal materials satisfy \(f_r(\ell,v)=f_r(v,\ell)\) (Helmholtz reciprocity). BRDF angular arguments depend on local normal: general reflectance inversion is nonlinear.
+\eq{L_o(v)=\int_{\Omega^+}f_r(\ell,v)L_i(\ell)
+ (n\trans\ell)\,d\omega.}
+The simple directional-light model is a special case; shadows, interreflection, transparency and nonlinear camera response are not explained by one dot product.
+
+\Topic{Colour/lighting calculation recipes}
+\begin{lstlisting}
+S = I.sum(axis=-1, keepdims=True) # float RGB
+rgbn = np.divide(I, S, out=np.zeros_like(I),
+                 where=S>0)
+o1 = (I[...,0] - I[...,1]) / np.sqrt(2)
+o2 = (I[...,0]+I[...,1]-2*I[...,2])/np.sqrt(6)
+# Unit normal from surface tangent vectors a,b
+n = np.cross(a, b)
+n = n / np.linalg.norm(n) # nonparallel a,b
+Id = rho * J * max(0., np.dot(n, light))
+\end{lstlisting}
+Grey-World means (4,2,2) give target 8/3 and gains (2/3,4/3,4/3), corrected means equal 8/3 before clipping. Dark/zero channels cannot be corrected by division. Material \(\rho=.4\), light J=200, angle \(60^\circ\) gives diffuse intensity 40; face-on gives 80. Albedo alone is not measured brightness.
+
+\key{Light models:} distant directional strength constant; point-light irradiance additionally decreases with squared distance and direction changes across object. A calibrated single L row per image assumes its direction/strength applies across the modeled surface; nearby-light effects need a different model. Lambertian is view-independent, not independent of light or normal.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{5. Intrinsic images and shape from shading}
+
+\key{Intrinsic image model:} \(I=A\odot S\), material/albedo A times shading S; possible extra specular layer \(I=A\odot S+H\). Recolour A inside object mask, leave S fixed, multiply (not divide) to reconstruct. Match [0,1] vs [0,255] units: normalized multiplicative layers avoid an unwanted extra factor 255. Synthetic rendering can expose exact layers; synthetic performance is not proof on real scenes.
+\begin{lstlisting}
+mask = np.any(albedo != 0, axis=-1)
+A = albedo.astype(float).copy()
+A[mask] = [1., 0., 0.]  # normalized RGB
+recolored = A * shading # compatible shapes
+\end{lstlisting}
+\key{Shape from shading:} single-view intensity mixes light, material and orientation. Usual assumptions: diffuse constant albedo, known distant light, orthographic camera; still needs boundary/prior/integrability constraints. One intensity constrains n to a cone, not a unique direction. Texture/material changes must not be mistaken for shape.
+
+\Topic{6. Calibrated photometric stereo (Lab1)}
+\key{Setup:} fixed object and camera, multiple lighting directions. Unlike geometric stereo (different viewpoints), it recovers local normals/albedo first, then height by integration. For m lights stacked as rows \(L\in\R^{m\times3}\), observations \(i\in\R^m\), \(g=\rho n\):
+\eq{i=Lg,\quad \hat g=\argmin_g\norm{Lg-i}_2^2=L^+i.}
+Full column rank: \(\hat g=(L\trans L)\inv L\trans i\); use stable least squares, not explicit inversion. At least 3 linearly independent valid lights; \(\operatorname{rank}L=3\). Three images alone are insufficient. Repeating dependent lights cannot reveal nullspace components. More independent measurements can reduce noise and reveal residual errors, not remove systematic model error.
+
+\key{Recover:} \(\rho=\norm{\hat g}_2\), \(n=\hat g/\rho\) for \(\rho>0\). Unknown common positive light/gain factor scales \(\rho\), not n. Colour-channel fits should agree on geometry; a zero-reflectance channel gives \(g=0\), no valid direction. Light columns/pixels-as-rows are also possible: follow shapes before transposing.
+\begin{lstlisting}
+g = np.linalg.lstsq(L, i, rcond=None)[0]
+rho = np.linalg.norm(g)
+n = g / rho             # only if rho > 0
+# All N pixels: obs is (m,N)
+G = np.linalg.lstsq(L, obs, rcond=None)[0]
+albedo = np.linalg.norm(G, axis=0)
+normals = G / albedo[None, :]  # mask zeros
+\end{lstlisting}
+\key{Residuals:} \(r=Lg-i\); least squares minimizes squared error, not necessarily exact equality. Overdetermined inconsistent data leaves residuals. Large residuals suggest bad lights, shadows, specularity, motion, interreflection or nonlinearity; small residuals do not prove physically correct geometry.
+
+\key{Weighted LS:} \(\min\sum_j\alpha_j(L_jg-i_j)^2\); multiply each equation by \(\sqrt{\alpha_j}\). If using row factors \(w_j\), actual weights are \(w_j^2\).
+\eq{g=(L\trans WL)\inv L\trans Wi,\quad W=\diag(\alpha_j).}
+Lab1 shadow trick multiplies by intensity: \(\diag(i)Lg=\diag(i)i\). Thus \(W=\diag(i_j^2)\): dark equations count less; bright specular outliers can count \emph{more}. Weighting is a heuristic, not automatic robust recovery; retain rank after removing/downweighting observations.
+\begin{lstlisting}
+gw = np.linalg.lstsq(i[:,None]*L, i*i,
+                    rcond=None)[0]
+\end{lstlisting}
+\Topic{7. Normals to height: signs and integrability}
+For upward height graph \(z(x,y)\), p=\(z_x\), q=\(z_y\):
+\eq{n=\frac{(-p,-q,1)\trans}{\sqrt{1+p^2+q^2}},\quad
+ p=-n_x/n_z,\quad q=-n_y/n_z.}
+\key{Source conflict:} HC2a uses these minus signs; Lab1 prints positive ratios. For Lab1 code interpretation use its stated definition; for geometry use declared axes/normal convention. Reversing the whole normal does not change \(n_x/n_z\). Near \(n_z=0\) slopes are unstable/vertical, and a single-valued height graph may fail.
+
+\key{Integrate:} \(dz=p\,dx+q\,dy\); discrete \(z[y,x+1]-z[y,x]\simeq p[y,x]\Delta x\), \(z[y+1,x]-z[y,x]\simeq q[y,x]\Delta y\). Start from an anchor and accumulate along a stated path. With pixel steps 1, sums give relative heights; with physical spacing multiply slopes by spacing.
+
+\key{Integrability:} \(p_y=q_x\) (smooth field, simply connected domain) gives path independence. Noisy/non-Lambertian normals may violate it; different row-first/column-first paths can disagree and accumulate drift. Valid gradients determine z only up to an additive constant.
+
+\key{Global integration:} solve all neighbouring height-difference equations in LS with one anchor. Equivalent continuous normal equation \(\nabla^2z=p_x+q_y\) with boundary/gauge constraints. Distributes inconsistency rather than committing to one path; does not create missing absolute height.
+
+\key{Sanity checks:} \(\norm n=1\); L's column rank; correct observation/light row order; valid object mask; consistent light-direction signs; input linearization; calibrated light strengths. Flat front-facing surface \(n=(0,0,1)\) gives \(p=q=0\); \(z=ax+by+c\) gives \(n\propto(-a,-b,1)\).
+
+\key{One integration path} (unit spacing, left/top differences assigned to outgoing edges, anchor z[0,0]=0):
+\begin{lstlisting}
+z = np.zeros_like(p, dtype=float)
+z[0,1:] = np.cumsum(p[0,:-1])
+for y in range(1, z.shape[0]):
+    z[y,:] = z[y-1,:] + q[y-1,:]
+# Opposite path may differ if p_y != q_x
+qy, qx = np.gradient(q) # axis 0=y, axis 1=x
+py, px = np.gradient(p)
+curl_error = py - qx
+\end{lstlisting}
+An upward normal \((-2,1,2)/3\) gives p=1,q=-1/2; moving 4 x-units and 2 y-units changes height by \(4-1=3\). Multiplying n by -1 leaves both ratios unchanged. Nonintegrability is about mixed derivatives, not whether p and q individually vary.
+
+\key{Weight shapes:} \texttt{sqrt(alpha)[:,None]*L} scales light rows; \texttt{sqrt(alpha)*i} scales matching observations. Multiply \emph{both} sides. Intensity-derived weights differ per pixel; one common weighted inverse generally cannot serve all pixels.
+\end{sheetcol}\EndSheet
+
+% ======================== SIDE 2 ========================
+\Sheet{IMAGE PROCESSING}{Point operators \(\cdot\) morphology \(\cdot\) filtering \(\cdot\) Fourier \(\cdot\) NumPy}
+\begin{sheetcol}
+\Topic{1. Histograms, point operations and thresholding}
+\key{Histogram:} \(h(r)=\#\{I=r\}\); normalized \(p(r)=h(r)/N\), \(\sum p=1\); CDF \(F(r)=\sum_{j\le r}p(j)\), nondecreasing, ends at 1. Counts reveal intensity distribution, not layout, edges or connectivity; multiple images share h. Too few bins merge distinctions, too many give sparse/noisy estimates. Separate RGB histograms lose cross-channel association; joint histograms preserve association, still not spatial layout.
+
+\key{Point operator:} \(s=T(r)\), output depends only on input at same pixel (mapping may depend on global statistics). Linear contrast stretch \(s=c+(r-a)(d-c)/(b-a)\), \(b>a\); clip if specified. \(s=\alpha r+\beta\): \(\alpha\) contrast, \(\beta\) brightness. Negative for levels \(0\ldots L-1\): \(s=L-1-r\). Gamma \(s=cr^\gamma\), normalized \(0<r<1\): \(\gamma<1\) brightens, \(\gamma>1\) darkens. Some systems define inverse gamma; read the formula.
+
+\key{Histogram equalization:} intensity lookup through scaled CDF. Common versions:
+\eq{s(r)=\operatorname{round}[(L-1)F(r)]\quad\text{or}}
+\eq{s(r)=\operatorname{round}\!\left[\frac{(L-1)(F(r)-F_{\min})}{1-F_{\min}}\right].}
+F\(_{\min}\): first positive CDF; constant image needs a fallback in second rule. Use stated floor/round and number of levels. Output bin count is sum of counts for every input level mapped there. Cannot split identical input levels, so not necessarily flat/uniform. Map pixels back with the lookup table. Equalize an intensity channel to reduce colour distortion; independent R/G/B mappings can change ratios/hue. Global equalization can amplify noise or neglect local contrast.
+\begin{lstlisting}
+h = np.bincount(I.ravel(), minlength=L)
+cdf = h.cumsum() / h.sum()
+lut = np.rint((L-1)*cdf).astype(int)
+J = lut[I]  # I must contain integer levels
+\end{lstlisting}
+\key{Threshold:} \(B[y,x]=1\) if \(I[y,x]\ge T\) (or specified strict rule); binarization discards graded appearance. Lighting/shadows can alter B; component count is not automatically object count.
+
+\Topic{2. Connected components and morphology}
+\key{Pixel graph:} vertices = foreground pixels; edges = allowed adjacency. 4-neighbours: up/down/left/right. 8-neighbours also diagonals; diagonal contact joins only under 8-connectivity. Component = maximal foreground-connected set. Touching objects can merge; one broken object can split. Foreground/background connectivity must be specified; using complementary 4/8 rules can avoid digital-topology ambiguities.
+
+\key{Two-pass labelling:} raster scan; 4-connectivity checks already-seen left/up; 8 checks left, upper-left, up, upper-right. No labelled neighbour: new provisional label. Otherwise use one neighbour label and record equivalences among all touching labels. Second pass resolves equivalence classes (e.g. union--find) and assigns one label per component. Flood-fill/BFS/DFS is an alternative. Count labels excluding background.
+
+\key{Structuring element K:} active offsets with an origin. Zeros are ignored, \emph{not} requirements that corresponding image pixels are 0. For binary set B, \(K_z=\{z+k:k\in K\}\):
+\eq{B\oplus K=\{b+k:b\in B,k\in K\},\quad
+ B\ominus K=\{z:K_z\subseteq B\}.}
+Thus dilation at z tests \(B(z-k)\) (any active k); erosion tests \(B(z+k)\) (all k). Symmetric K makes reflected/nonreflected versions equal; for asymmetric K use the stated convention. Grayscale flat dilation = max; erosion = min over correct offsets.
+
+\key{Dilation:} grows foreground, joins regions, fills small gaps/holes. \key{Erosion:} shrinks/removes small foreground structures, breaks thin bridges. With origin in K, dilation is extensive and erosion anti-extensive (consistent whole-domain definitions).
+\eq{B\circ K=(B\ominus K)\oplus K\quad\text{(opening)},}
+\eq{B\bullet K=(B\oplus K)\ominus K\quad\text{(closing)}.}
+Opening removes small foreground/protrusions/bridges; closing fills small background gaps/cracks and may join regions. Erosion/dilation are not inverses. Ideal opening/closing are idempotent, \((B\circ K)\circ K=B\circ K\), and open\(\subseteq B\subseteq\)close. Cropped finite intermediates/padding can change these ideal properties.
+
+\key{Boundary:} zero, mirror, clamp and wrap differ; apply at \emph{each} stage. Zero-padded 3\(\times\)3 erosion of all ones removes border pixels. Closing can lose border foreground because dilation beyond cropped frame is discarded. Larger K means stronger size-dependent effects; cross vs square K changes diagonal coverage. Complement duality: \((B\oplus K)^c=B^c\ominus\hat K\), with reflected \(\hat K=-K\).
+
+\key{Measurements:} area \(A=\sum B\); centroid \((\bar x,\bar y)=(\sum xB/A,\sum yB/A)\); physical area = pixel count\(\times\)pixel area. Inner boundary \(B-(B\ominus K)\); outer \((B\oplus K)-B\); morphological gradient \((B\oplus K)-(B\ominus K)\). Threshold \(\to\) opening/separation \(\to\) labelling can count objects, but may destroy genuine small ones.
+
+\Topic{Discrete calculations and morphology code}
+\key{Equalization example:} 4 levels, h=(2,1,1,0), N=4; CDF=(.5,.75,1,1). With \(s=\lfloor3F\rfloor\), lookup=(1,2,3,3), output h'=(0,2,1,1). Levels mapping to same output combine counts; don't substitute a 256-level scale or subtract \(F_{min}\) unless asked. \texttt{np.rint} uses ties-to-even, which can differ from half-up rounding.
+
+\key{Symmetric element, zero-padding, odd K:} reduce only active mask positions; full sliding windows below give one output/input pixel.
+\begin{lstlisting}
+from numpy.lib.stride_tricks import sliding_window_view
+r = K.shape[0]//2         # square, odd support
+W = sliding_window_view(np.pad(B, r), K.shape)
+dilated = np.any(W[..., K.astype(bool)], axis=-1)
+eroded = np.all(W[..., K.astype(bool)], axis=-1)
+# Opening: recompute windows after erosion
+# Closing: recompute windows after dilation
+\end{lstlisting}
+For all-ones 5\(\times\)5 B and 3\(\times\)3 all-active K: zero-padded erosion keeps 9 pixels; dilation within frame keeps 25. Opening restores 25, while cropped zero-padded closing leaves 9--border handling can defeat ideal extensivity. In 3\(\times\)3 identity foreground, 4-connectivity gives 3 components, 8 gives 1; area=3, centroid=(1,1) in zero-based x,y.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{3. Spatial filtering and noise (Lab2)}
+\key{Linear:} \(H(aI+bJ)=aH(I)+bH(J)\). Fixed unbiased weighted sums are linear; fixed nonzero bias makes an affine map. Median/max/thresholding are nonlinear. Shift invariance means identical translated neighbourhood rules (boundaries can break it).
+\eq{(I*K)[y,x]=\sum_{a,b}K[a,b]I[y-a,x-b],}
+\eq{(I\star K)[y,x]=\sum_{a,b}K[a,b]I[y+a,x+b].}
+Convolution flips kernel in both axes; cross-correlation does not. CNN/OpenCV routines often call correlation ``convolution''. For symmetric K they agree. For odd antisymmetric derivative K they differ by sign; gradient magnitude and unsigned HOG agree, signed angles differ by \(180^\circ\).
+
+\key{Modes:} valid requires full support, size \((H-K_h+1)\!\times\!(W-K_w+1)\); full \((H+K_h-1)\!\times\!(W+K_w-1)\); same matches input grid using stated padding/origin. Even kernels need alignment conventions. Zero padding can darken constant borders; reflect/replicate preserve constant values, wrap is periodic. Mirror variants can include/exclude edge pixels; inspect the rule.
+
+\key{Box/mean:} K\(\times\)K all \(1/K^2\), low-pass; larger support smooths more but blurs edges. Smoothing kernel sum 1 preserves constants in valid regions. Sequential linear convolutions combine by kernel convolution: \((I*K_1)*K_2=I*(K_1*K_2)\); resulting support per axis \(K_1+K_2-1\). Order commutes ideally, not necessarily with intermediate cropping/padding.
+
+\key{Gaussian:}
+\eq{g_\sigma(x)=\frac{e^{-x^2/(2\sigma^2)}}{\sqrt{2\pi}\sigma},\quad
+ G_\sigma(x,y)=\frac{e^{-(x^2+y^2)/(2\sigma^2)}}{2\pi\sigma^2}.}
+Sample a finite centred grid (often radius \(\lceil3\sigma\rceil\)), normalize by actual sum; sigma in pixel units unless stated. \(G(x,y)=g(x)g(y)\) is separable. Anisotropic \(G=g_{\sigma_x}(x)g_{\sigma_y}(y)\) still separable. Rank-1 kernel \(K=ab\trans\) allows two 1D passes. Direct cost \(O(HWK^2)\), separable \(O(HWK)\): \(K^2\) vs about 2K products/pixel.
+\eq{G_{\sigma_1}*G_{\sigma_2}=G_{\sqrt{\sigma_1^2+\sigma_2^2}}.}
+Variances add, not sigmas. Extra blur to target scale: \(\sigma_{add}=\sqrt{\sigma_{target}^2-\sigma_{current}^2}\), only if target\(\ge\)current. Larger sigma suppresses fine detail/noise and lowers effective frequency cutoff; finite sampled implementations approximate these identities.
+
+\key{Median:} middle sorted neighbourhood value (specified even-sample convention), robust to sparse salt-and-pepper outliers, nonlinear, may remove thin structures. Mean/Gaussian can reduce random additive noise but spread impulse outliers and blur transitions. No filter is universally best; noise type/scale and signal detail matter.
+
+\Topic{4. Derivatives, gradients and scale}
+For centred correlation, \(I_x\simeq[I(x+1)-I(x-1)]/2\); omit factor only if stated. \(I_y\) similarly down rows. Sobel x = \(\smat{-1&0&1\\-2&0&2\\-1&0&1}=\smat{1\\2\\1}[-1,0,1]\); smoothing perpendicular to derivative direction. Opposite sign appears in sources. Laplacian discrete example \(\smat{0&1&0\\1&-4&1\\0&1&0}\), sum 0; second derivatives also amplify noise.
+\eq{\nabla I=(I_x,I_y),\quad m=\sqrt{I_x^2+I_y^2},\quad
+ \theta=\operatorname{atan2}(I_y,I_x).}
+Gradient points toward maximum intensity increase and is normal to edge tangent. Large x derivative often indicates a vertical edge. Smooth before differentiation; derivative kernels sum 0 to remove constants (away from boundary artifacts).
+\eq{\partial_x(I*G)=I*(\partial_xG),\quad
+ g'_\sigma=-\frac{x}{\sigma^2}g_\sigma,}
+\eq{g''_\sigma=\left(\frac{x^2}{\sigma^4}-\frac1{\sigma^2}\right)g_\sigma,\quad
+ \nabla^2G_\sigma=\frac{x^2+y^2-2\sigma^2}{\sigma^4}G_\sigma.}
+First derivative extrema correspond to second derivative zero-crossings for ideal smoothed steps; require sufficient response, not every zero-crossing. Scale-normalized mth derivative multiplies by \(\sigma^m\). LoG = Laplacian of Gaussian. \key{Difference} of Gaussians \(G_{k\sigma}-G_\sigma\simeq(k-1)\sigma^2\nabla^2G_\sigma\) for k near 1; band-pass/blob-scale response. It is not a spatial \key{derivative} of Gaussian.
+
+\key{Gabor (taught definition):} Gaussian envelope times sinusoidal carrier, oriented/local-frequency analysis: \(e^{-(x'^2+\gamma^2y'^2)/(2\sigma^2)}\cos(2\pi x'/\lambda+\phi)\), with sine imaginary partner; rotated coordinates x',y'. Advanced filter-bank implementation is optional.
+
+\Topic{Kernel construction and manual response recipes}
+\begin{lstlisting}
+x = np.arange(-r, r+1, dtype=float)
+g = np.exp(-x*x/(2*sigma*sigma))
+g /= g.sum()
+G = np.outer(g, g)      # sum 1, separable
+gx = -x/(sigma*sigma)*g # spatial derivative
+Gx = np.outer(g, gx)    # rows=y, columns=x
+P = np.pad(I.astype(float), r)
+W = sliding_window_view(P, G.shape)
+Jcorr = np.einsum('yxab,ab->yx', W, G)
+Jconv = np.einsum('yxab,ab->yx', W, G[::-1,::-1])
+\end{lstlisting}
+\texttt{sliding\_window\_view} imported at left; r=kernel radius, sigma>0. gx uses sampled g; derivative sum\(\approx0\), do not normalize to sum1. Flip asymmetric kernels for convolution.
+
+\key{Seminar kernel W:} \(\smat{1&-2&1\\-2&4&-2\\1&-2&1}=\smat{1\\-2\\1}[1,-2,1]\): second difference in x and y, approximates mixed fourth derivative \(I_{xxyy}\); responds to variation in both axes, not a general guaranteed corner/blob classifier. Combining it with 3\(\times\)3 box uses a 5\(\times\)5 kernel, not a 3\(\times\)3 elementwise product.
+
+Independent equal-variance noise: averaging n samples divides variance by n, standard deviation by \(\sqrt n\); not true for correlated noise.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{5. Fourier analysis: complex numbers to filtering}
+\key{Meaning:} weighted spatial sinusoids/complex exponentials; magnitude = amount, phase = spatial placement. Low frequency: slow broad variation; high: fine detail/edges (also noise). DC = constant component. Complex coefficients are needed even for real images: encode cosine and sine/phase jointly.
+\eq{e^{\ii\theta}=\cos\theta+\ii\sin\theta,\quad
+ z=a+\ii b=Ae^{\ii\phi},}
+\eq{A=\sqrt{a^2+b^2},\quad\phi=\operatorname{atan2}(b,a),\quad
+ a=A\cos\phi,\ b=A\sin\phi.}
+\(A^2\) is power, not magnitude. Phase at A=0 has no physical meaning. \(\arctan(b/a)\) loses quadrants/divides by zero. \key{NumPy order:} \texttt{atan2(imag,real)}; HC2b's printed argument order is reversed. \(Ae^{\ii(\omega x+\phi)}\): radius A, angular rate \(\omega\), initial angle \(\phi\); frequency f, \(\omega=2\pi f\), period \(T=1/f\). Negative exponent rotates clockwise in complex plane.
+
+\key{DFT convention} (NumPy default, indices 0-based):
+\eq{F[k]=\sum_{n=0}^{N-1}f[n]e^{-2\pi\ii kn/N},}
+\eq{f[n]=\frac1N\sum_{k=0}^{N-1}F[k]e^{2\pi\ii kn/N}.}
+\eq{F[v,u]=\sum_{y=0}^{H-1}\sum_{x=0}^{W-1}I[y,x]
+ e^{-2\pi\ii(vy/H+ux/W)}.}
+2D inverse divides by HW. \(F[0]=\sum f\), \(F[0,0]=\sum I\); mean = DC/sample count. Frequency k means k cycles across N samples, \(k/N\) cycles/pixel, interpreted with modulo/negative frequencies. Real input: \(F[-k]=\overline{F[k]}\) (mod N); in 2D \(F[-v,-u]=\overline{F[v,u]}\). DC and even-length Nyquist coefficients are real. Other normalizations change coefficient scales.
+
+\key{Theorems:} spatial convolution \(\leftrightarrow\) pointwise spectral multiplication; spatial multiplication \(\leftrightarrow\) frequency convolution with normalization factors. Spatial translation by \(\Delta\) multiplies spectrum by \(e^{-\ii\omega\Delta}\): magnitude unchanged, phase changed. Phase holds arrangement; magnitude alone cannot reconstruct a general image. Discarding imaginary coefficients loses phase. Linearity applies in both domains.
+
+\key{Boundary/padding:} finite DFT multiplication yields \emph{circular} convolution (periodic extension). For full linear convolution lengths N,M, pad to at least \(N+M-1\); 2D pad to \(H+K_h-1,W+K_w-1\). Place kernel origin consistently (centred kernels need correct shift before FFT). Zero-padding does not add missing measurements.
+
+\key{Frequency filters:} multiply F by transfer H then inverse transform. Low-pass keeps central low frequencies; high-pass removes DC/slow trends; band-pass selects a range. Ideal sharp cutoff can ring; Gaussian smoother cutoff reduces this. Derivatives multiply continuous spectra by \(\ii\omega_x\) or \(\ii\omega_y\); discrete differences have their own transfer function. Parseval for this DFT: \(\sum_n|f[n]|^2=(1/N)\sum_k|F[k]|^2\).
+
+\key{Sampling:} Nyquist limit = half sampling rate; spatial frequencies above it alias into lower ones. Low-pass before decimation; factor a downsample reduces admissible original-grid frequency to \(1/(2a)\) cycles/pixel. Resizing without appropriate antialiasing can create moir\'e. FFT is fast DFT evaluation, typically \(O(N\log N)\), not a different transform.
+\begin{lstlisting}
+F = np.fft.fft2(I)
+mag, phase = np.abs(F), np.angle(F)
+Fc = np.fft.fftshift(F) # DC -> centre
+display = np.log1p(np.abs(Fc))
+out = np.fft.ifft2(np.fft.ifftshift(Fc*Hc))
+# .real only if conjugate symmetry is valid
+\end{lstlisting}
+\texttt{fftshift} reorders coefficients, not filtering; undo shift for inverse. Log magnitude is display compression, not a new spectrum. A real spatial filter should preserve conjugate symmetry; a sizeable imaginary inverse signals inconsistency.
+
+\Topic{6. NumPy shape, axes and safe computation (Lab0)}
+\texttt{*}: elementwise/broadcast; \texttt{@}: matrix product. Broadcasting compares trailing dimensions: equal or 1; \((H,W,3)/(3,)\) is channelwise. \((N,3)/(N,)\) is usually wrong; row norms need \((N,1)\). \texttt{axis} names what is \emph{removed}; \texttt{keepdims=True} retains singleton dimensions.
+\begin{lstlisting}
+Vn = np.linalg.norm(V, axis=1, keepdims=True)
+Vunit = np.divide(V, Vn, out=np.zeros_like(V),
+                  where=Vn>0) # V is float
+chw = hwc.transpose(2,0,1)  # not hwc.T
+cols_reversed = A[:, ::-1]
+patch = I[y-r:y+r+1, x-r:x+r+1]
+rows = A[np.any(A == 8, axis=1)]
+\end{lstlisting}
+Slice stop is exclusive; negative starts do not pad. Basic slices are usually views, \texttt{copy()} separates storage; advanced indexing usually copies. \texttt{reshape} preserves element count/order, does not resize or interpolate; \texttt{transpose} permutes axes, .T reverses all axes. \texttt{stack} adds an axis; \texttt{concatenate} joins an existing one. \texttt{argmin/argmax} return first tie by traversal; specify axes/tie rules. \texttt{sum} vs \texttt{mean}, \texttt{norm} axis vs flattened norm are distinct. Retain full precision until final rounding/counts.
+
+\key{FFT linear-convolution recipe}, real arrays I and K; output full support, K indexed from array corner:
+\begin{lstlisting}
+shape = np.array(I.shape) + np.array(K.shape) - 1
+J = np.fft.ifft2(np.fft.fft2(I, s=shape)
+                 * np.fft.fft2(K, s=shape)).real
+# Centred same output, odd K:
+ry, rx = np.array(K.shape)//2
+Jsame = J[ry:ry+I.shape[0], rx:rx+I.shape[1]]
+\end{lstlisting}
+\key{4-point DFT roots:} \(e^{-2\pi\ii k/4}\) for k=0,1,2,3 are \(1,-\ii,-1,\ii\). Input [1,0,0,0] gives [1,1,1,1]; [0,1,0,0] gives [1,\(-\ii\),-1,\(\ii\)] (same magnitude, shifted phase); [a,a,a,a] gives [4a,0,0,0]. Sampling \(\cos(2\pi\cdot .75n)\) equals \(\cos(2\pi\cdot .25n)\) at integer n: explicit aliasing.
+
+\key{Derivative sign check:} centred correlation \([-1,0,1]\) on (2,5,9) gives7 (3.5 with factor1/2); convolution gives-7. Constant (5,5,5) gives0. Gradient (3,4) has magnitude5, direction \(53.13^\circ\), not \(\arctan(3/4)\); unsigned orientation ignores simultaneous sign reversal.
+\end{sheetcol}\EndSheet
+
+% ======================== SIDE 3 ========================
+\Sheet{FEATURES, FITTING AND MOTION}{Edges \(\cdot\) corners \(\cdot\) SIFT \(\cdot\) RANSAC \(\cdot\) optical flow \(\cdot\) tracking}
+\begin{sheetcol}
+\Topic{1. Edges and Canny}
+\key{Edge:} rapid local intensity change, from material, illumination/shadow, surface orientation or depth discontinuity; not necessarily an object boundary. Texture/noise generate edges; missing/fragmented responses do not automatically form complete curves. Edge tangent is perpendicular to \(\nabla I\). Derivative scale selects level of detail.
+
+\key{Canny pipeline:} (1) Gaussian smooth/derivative-of-Gaussian filtering; (2) gradient magnitude/direction; (3) directional non-maximum suppression; (4) double threshold and hysteresis linking. Good detection, localization and single/thin response are the design goals. Larger sigma suppresses noise but merges/weaken nearby/fine edges; thresholds set sensitivity.
+
+\key{Directional NMS:} compare m to neighbours/interpolated values along \emph{gradient normal}, not edge tangent; retain local maxima. Coarse direction bins often 0,45,90,135 degrees, modulo 180. Specify tie rule. Example: horizontal gradient compares left/right even if the edge itself is vertical.
+
+\key{Hysteresis:} high \(T_H\) seeds strong edges; low \(T_L<T_H\) defines weak candidates. Pixels below \(T_L\) rejected; weak pixels survive only through a connected weak/strong path to a strong seed (usually 8-connected). Several weak steps are allowed; isolated weak components vanish. It is not simply keeping every value above low threshold.
+
+\key{Second-derivative method:} LoG zero-crossings after smoothing, with strength tests. Difference-of-Gaussians approximates scale-normalized LoG; derivative-of-Gaussian computes spatial derivative. Do not confuse their shared acronym. First derivative gives signed slope; second derivative detects slope change, with stronger noise sensitivity.
+
+\Topic{2. Corners, second moments and selection (Lab3)}
+\key{Local shift SSD:} \(E(u,v)=\sum_w[I(x+u,y+v)-I(x,y)]^2\simeq (u,v)M(u,v)\trans\). Structure/second-moment tensor:
+\eq{M=\sum_{x,y\in W}w(x,y)
+ \smat{I_x^2&I_xI_y\\I_xI_y&I_y^2}=\smat{a&b\\b&c}.}
+Sum products of gradients, not products of summed/mean gradients. PSD: \(a,c\ge0,ac-b^2\ge0\). Eigenvalues give variation along principal directions:
+\eq{\lambda_{1,2}=\frac{a+c\pm\sqrt{(a-c)^2+4b^2}}2.}
+Both small = flat/unobservable; one large/one small = edge (ambiguous tangent); both large = corner/textured patch, good 2D localization. Large trace alone does not guarantee a corner. Ill-conditioning \(\lambda_{max}/\lambda_{min}\gg1\) makes estimates unstable.
+
+\key{Harris:} \(R_H=\det M-k(\tr M)^2=\lambda_1\lambda_2-k(\lambda_1+\lambda_2)^2\), often k=0.04--0.06 (use supplied). Large positive = corner-like; negative = edge; small = flat/weak. \key{Shi--Tomasi:} \(R_{ST}=\min(\lambda_1,\lambda_2)\); threshold plus spatial suppression/minimum distance. Used for LK features because both displacement directions need evidence.
+
+\key{Invariance:} with isotropic window, rotation transforms M by orthogonal similarity, preserving eigenvalues/determinant/trace. Single-scale Harris is not scale invariant. Under \(I'=aI+b\), interior derivatives scale a, M scales \(a^2\), Harris \(a^4\), ST \(a^2\); intensity gain changes numerical thresholds. Spatial NMS picks response-map maxima, distinct from Canny directional NMS and box NMS.
+
+\key{Scale selection:} Gaussian scale space \(L(x,y,\sigma)=G_\sigma*I\); scale-normalized LoG \(\sigma^2\nabla^2L\) peaks at a characteristic structure size. Extremum over location \emph{and} scale allows corresponding detections after resizing. Small structures can disappear at large scales.
+
+\Topic{3. Histogram of Oriented Gradients (Seminar 3)}
+Compute \(I_x,I_y\), \(m=\sqrt{I_x^2+I_y^2}\), \(\theta=\operatorname{atan2}(I_y,I_x)\). Signed orientation 0--360; unsigned \(\theta\bmod180^\circ\) merges opposite gradients. A 9-bin unsigned hard histogram often uses 20-degree bins; use stated bin edges/centres and interpolation.
+\eq{h_j=\sum_{p\in\mathrm{cell}}m_p\,\mathbf1\{\theta_p\in B_j\}.}
+Unweighted version counts instead of summing m. Zero gradients have no magnitude vote; placeholder angle is meaningless. Modern HOG often aggregates cells, concatenates blocks, normalizes. Seminar's \emph{raw} histogram doubles if image intensity doubles; normalized nonzero histogram can remove common gain. Constant additive offset disappears under derivatives away from padding/clipping.
+
+\key{Rotation/sign:} basic HOG is not rotation invariant: orientation/spatial bins change; SIFT uses orientation alignment. Flipping both derivative signs preserves m and unsigned orientations but rotates signed angles by \(180^\circ\). Edge tangent vs gradient normal differs by \(90^\circ\).
+\begin{lstlisting}
+mag = np.hypot(Ix, Iy)
+ang = np.degrees(np.arctan2(Iy, Ix)) % 180
+h, _ = np.histogram(ang, bins=np.arange(0,181,20),
+                    weights=mag)
+M = np.array([[np.sum(Ix*Ix), np.sum(Ix*Iy)],
+              [np.sum(Ix*Iy), np.sum(Iy*Iy)]])
+lam = np.linalg.eigvalsh(M) # ascending
+\end{lstlisting}
+\key{Corner calculation:} \(M=\smat{16&0\\0&4}\) gives eigenvalues 16,4, trace20, det64; k=.04 gives Harris \(64-.04(400)=48\), Shi--Tomasi=4. Edge \(M=\smat{25&0\\0&0}\) gives Harris=-25, ST=0 despite strong trace. M uses squared derivatives, so opposite gradient vectors add evidence rather than cancelling.
+
+\key{HOG example:} gradients (3,4) and (-3,-4) both have magnitude5; signed angles \(53.13^\circ,233.13^\circ\), unsigned both \(53.13^\circ\). Hard 20-degree bins place total10 in [40,60); zero-gradient neighbours contribute0. Count-only histogram gives2. Normalized histogram differs from this raw vote sum.
+
+\key{Canny chain:} for low=3, high=8 and adjacent NMS responses 9--5--4--2--6, the 5 and 4 survive through the strong9, the 2 is rejected, and the isolated6 cannot link across2. Hysteresis must run on the thinned response map, not restore a suppressed nonmaximum.
+
+\key{Invariance requires} corresponding detected locations/scales, not merely normalized descriptor values; fixed-size patches are not automatically scale invariant.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{4. SIFT and local matching (Lab4)}
+\key{Detect vs describe:} detector chooses repeatable locations/scale/orientation; descriptor encodes local appearance to compare. Repeatability is not distinctiveness. Local descriptors allow matches from visible parts under occlusion; geometry/consensus still needed.
+
+\key{SIFT = Scale-Invariant Feature Transform} (David Lowe): (1) Gaussian scale-space pyramid/octaves; DoG \(D=L(k\sigma)-L(\sigma)\); (2) find extrema against 26 neighbours (8 same scale + 9 above + 9 below); (3) localize/refine, reject low contrast/edge-like unstable responses; (4) assign dominant gradient orientation; (5) sample scale-/orientation-aligned gradient histograms, normalize.
+
+\key{Descriptor:} standard 16\(\times\)16 patch, 4\(\times\)4 cells, 8 orientation bins/cell = 128 values; magnitude plus spatial Gaussian weighting, usually interpolation among spatial/orientation bins. Express positions/angles relative to keypoint scale and dominant orientation. L2-normalize, clip strong components (standard 0.2), renormalize. Gradients suppress constant offsets, normalization reduces positive gain; not exact invariance to arbitrary perspective, deformation, shadows/clipping. Multiple dominant orientations can yield multiple descriptors.
+
+\key{Matching:} nearest descriptor distance under metric (often L2 for SIFT); brute force n query by m database descriptors of D dimensions costs \(O(nmD)\). Nearest absolute distance alone does not show distinctiveness in repeated texture. Ratio test with nearest \(d_1\), second-nearest \(d_2>0\): keep if \(d_1/d_2<\tau\). Near 1 = ambiguous. \(\tau\) is a chosen threshold, not guaranteed correctness. If squared distances \(D_i=d_i^2\), compare \(D_1/D_2<\tau^2\), not \(\tau\). Mutual nearest/cross-check tests a different consistency rule.
+
+\key{Geometric verification:} estimate affine/H/F from matches with RANSAC, count residual-compatible inliers, refit. Descriptor match \(\ne\) physically correct match. Local-keypoint retrieval can survive partial occlusion; histograms/global embeddings can lose layout. SURF = Speeded-Up Robust Features; ORB = Oriented FAST and Rotated BRIEF (named alternatives, not advanced implementation requirements).
+
+\Topic{5. Least squares and robust line/shape fitting}
+\key{OLS:} \(\min_\theta\norm{A\theta-y}^2\); full-column-rank solution \((A\trans A)\inv A\trans y\), stable implementation \texttt{lstsq}. Rank deficiency gives nonunique solutions; numerical routine may return a minimum-norm fit, not evidence of unique geometry. Normal equations square condition number. An eigenvector/SVD nullspace solves \emph{homogeneous} fitting (page 4), not ordinary \(A\theta=y\).
+
+\key{Line y=mx+b:} rows \([x_i,1]\), unknown \((m,b)\); vertical y residuals, unsuitable for vertical lines/symmetric x,y noise. For \(ax+by+c=0\), perpendicular residual \((ax_i+by_i+c)/\sqrt{a^2+b^2}\); normalize \(a^2+b^2=1\). Total LS: subtract point centroid; smallest-eigenvalue eigenvector of scatter matrix gives normal \((a,b)\); \(c=-a\bar x-b\bar y\). Vertical line has b=0.
+
+\key{Loss choice:} scalar constant minimizing squared error = mean; absolute error = median (even count: any point between middle two is optimal). L2 gives large outliers quadratic influence. Huber \(\ell_\delta(r)=r^2/2\) for \(|r|\le\delta\), else \(\delta(|r|-\delta/2)\): quadratic near 0, linear tails. Robustness does not remove all ambiguity.
+
+\key{Hough (Seminar 2):} each edge point votes for line parameters; accumulator peaks identify supported lines. Normal form \(\rho=x\cos\theta+y\sin\theta\) handles vertical lines with bounded \(\theta\), unlike y=ax+b's infinite slope. In slope/intercept space each point votes on \(b=y-ax\); intersections indicate common lines. Bin resolution, noise and multiple peaks affect detection. Hough votes in parameter space; RANSAC samples models and tests consensus.
+
+\Topic{6. RANSAC = RANdom SAmple Consensus}
+Sample minimal nondegenerate subset \(\to\) fit \(\to\) residuals for all data \(\to\) threshold/count inliers \(\to\) retain best \(\to\) refit using consensus. Choose model, residual units, threshold, iteration budget and score/tie rule. Inliers are threshold-compatible, not guaranteed true matches. Larger threshold increases count but can bias fit; zero threshold is unrealistic with noise.
+
+\key{Minimal sample:} line 2 distinct; circle 3 noncollinear; 3D plane 3 noncollinear; 2D affine 3 noncollinear source pairs; homography 4 pairs in general position (no three collinear in minimal set). Duplicate/collinear/dependent geometry can make all-inlier samples unusable.
+\eq{q=w^s,\quad p_N=1-(1-q)^N,\quad
+ N=\left\lceil\frac{\log(1-p)}{\log(1-w^s)}\right\rceil.}
+w = inlier fraction; s = sample size; p = desired success. Lower w/higher s/higher p requires more iterations. Use ceiling, \(0<q<1\); q=0 impossible, q=1 one trial if nondegenerate. With distinct draws within a finite sample, exact \(q=\binom Is/\binom Ns\) for I inliers/N points (rename iteration count to avoid confusion).
+
+\key{Guarantees:} random resampling can repeat bad subsets indefinitely; finite budget gives probability, not certainty. If enumerating every distinct subset without repetition, worst-case first all-inlier sample occurs by \(\binom Ns-\binom Is+1\) (assuming valid all-inlier sets). No universal 50\%-inlier requirement. Competing structures can dominate; refitting one consensus does not solve arbitrary multi-model fitting.
+
+\key{TLS and iteration-budget code:}
+\begin{lstlisting}
+mu = pts.mean(axis=0)    # N x 2 points
+_, _, Vt = np.linalg.svd(pts-mu)
+a, b = Vt[-1]           # unit line normal
+c = -np.dot([a,b], mu)
+import math
+trials = math.ceil(math.log1p(-p)
+                   / math.log1p(-(w**s)))
+\end{lstlisting}
+With w=.5, s=4, target p=.99, trials=72 (not71); with s=2 it is17. These budgets presume independent trials and nondegenerate all-inlier samples. A ratio test with distances10,12 and \(\tau=.8\) rejects (10/12\(>.8\)); squared distances100,144 also reject when compared to .64. Equal closest distances remain ambiguous even if both tiny.
+
+\key{Plane:} \(ax+by+cz+d=0\), distance \(|ax+by+cz+d|/\sqrt{a^2+b^2+c^2}\). Cross two sample displacements for its normal; parallel vectors are degenerate.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{7. Optical flow and the aperture problem}
+\key{Optical flow:} apparent image-plane displacement/velocity \((u,v)\), not directly metric 3D motion. True projected motion field and measured flow can differ: lighting changes yield apparent motion; uniform rotating sphere can have physical motion but no visible change. Camera and object motion, depth and projection all affect flow.
+
+\key{Brightness constancy:} \(I(x+u,y+v,t+1)=I(x,y,t)\). First-order Taylor expansion for small motion:
+\eq{I_xu+I_yv+I_t=0.}
+If u,v are displacement/frame, \(I_t\) is change over that frame step; physical-time derivatives give velocity units. One equation/two unknowns: constrains normal motion only. Minimum-norm normal flow \(-I_t\nabla I/\norm{\nabla I}^2\); any tangent component remains free. Straight edge observed through a small aperture cannot reveal motion along itself.
+
+\Topic{8. Lucas--Kanade estimation (Lab3)}
+Assume one constant flow vector in local W; stack \([I_x,I_y]\) rows into \(A\in\R^{n\times2}\), \(b=-I_t\):
+\eq{\hat f=\argmin_f\norm{Af-b}^2,\quad
+ (A\trans A)\hat f=A\trans b.}
+Weighted windows: \(M=A\trans WA\), \(b'= -\sum w[I_x,I_y]\trans I_t\). With \(a=\sum wI_x^2,b=\sum wI_xI_y,c=\sum wI_y^2\), \(d=-\sum wI_xI_t,e=-\sum wI_yI_t\):
+\eq{u=\frac{cd-be}{ac-b^2},\quad
+ v=\frac{ae-bd}{ac-b^2}.}
+Requires rank 2, both eigenvalues sufficiently large, reasonable condition number. Flat patch: both small/no evidence. Edge: rank\(\approx1\)/tangent ambiguity. Corner: both directions constrained. Same tensor as corner detection. Larger window adds evidence but may combine different motions/depths and violate constant-flow assumption.
+
+\key{Assumptions/failures:} brightness constancy; small displacement for linearization; local constant motion; sufficient texture; visible correspondence. Lighting/shadows/specular changes, occlusion/disocclusion, repetitive patterns, large motion, motion boundaries and changing shape can fail. Occluded points have no matching measurement. A stable least-squares result alone does not prove those assumptions.
+\begin{lstlisting}
+A = np.column_stack((Ix.ravel(), Iy.ravel()))
+b = -It.ravel()
+u, v = np.linalg.lstsq(A, b, rcond=None)[0]
+\end{lstlisting}
+\key{Coarse to fine:} antialias/downsample images; estimate at coarsest scale; upsample vector field and multiply vector values by scale ratio; warp second frame with current flow; solve small residual increment; update/refine at each finer scale. Half-resolution displacement \((u_c,v_c)\) becomes \((2u_c,2v_c)\) at full resolution, \emph{not} just a spatial resize. For downscale factor a, full displacement = a\(\times\)coarse displacement.
+
+\key{Iterative warp:} compare reference \(I_1(x,y)\) to \(I_2(x+u,y+v)\), then estimate residual; sign depends on which frame is sampled. Pyramids permit larger motion but small/thin features can vanish; bad coarse matches can trap fine refinement. Border/occlusion masks needed.
+
+\key{Sparse vs dense:} sparse estimates selected keypoints (fast, useful for tracks); dense estimates most/all pixels (richer field, greater cost/ambiguity in textureless regions). Horn--Schunck uses global smoothness for dense flow; LK uses local constant-motion constraints (advanced HS code optional).
+
+\key{Applications:} stabilization estimates/removes global camera motion; interpolation warps frames toward intermediate times (fails at occlusions/new content); traffic speed needs calibration, depth/road geometry, timing--pixels/frame alone is not km/h. Known camera translation/baseline plus parallax can constrain depth; flow alone does not set metric scale. Also motion segmentation, compression, denoising/super-resolution.
+
+\Topic{9. Template, detection and mean-shift tracking}
+\key{Template tracking:} search near previous position, minimize \(\mathrm{SSD}(d)=\sum_x[I(x+d)-T(x)]^2\), or maximize \(\mathrm{CC}(d)=\sum_xI(x+d)T(x)\). SSD \(=\norm I^2+\norm T^2-2\mathrm{CC}\); maximizing CC equals minimizing SSD only when candidate energy is constant. SSD is sensitive to offsets/gain; raw CC can favour bright/high-energy patches.
+\eq{\mathrm{ZNCC}=\frac{\sum(I-\bar I)(T-\bar T)}
+ {\sqrt{\sum(I-\bar I)^2\sum(T-\bar T)^2}}.}
+For nonzero variance, mean subtraction removes additive offset; normalization removes positive gain. Non-centred normalized correlation does not remove offsets. Uniform patches make normalization undefined. Limited search = motion prior/computation saving, but can miss fast motion; wide search raises ambiguity.
+
+\key{Tracking by detection:} classify candidate regions each frame, associate with appearance/motion, update target model. Drift: wrong self-labelled updates progressively learn background/occluder. Conservative updates and reliable visible features can help, not guarantee recovery. Fixed template avoids update drift but cannot adapt well to appearance/pose change.
+
+\key{Mean-shift tracking:} move candidate window toward increased colour-histogram similarity to target; local mode-seeking, not exhaustive search. Histogram tolerates some pixel rearrangement/partial occlusion but loses spatial layout; similarly coloured background, large jumps and lighting/scale changes can fail. Colour similarity can use Bhattacharyya coefficient \(\sum_b\sqrt{p_bq_b}\); bandwidth/window sets scale. Local feature tracks can survive occlusion if enough visible, geometrically consistent matches remain.
+
+\key{Flow units/example:} coarse flow (1.5,-.5) at one-quarter resolution means full displacement (6,-2) pixels/frame. At 25 frames/s, horizontal speed=150 pixels/s, not150 metres/s. Converting it to physical speed needs calibrated scene geometry; changing frame spacing changes displacement even for the same physical velocity.
+
+If patch equations are \(2u=4\) and \(3v=-3\), LK gives (2,-1). Replacing the second by \(4u=8\) leaves v unconstrained despite two observations: rank matters, not equation count.
+\end{sheetcol}\EndSheet
+
+% ======================== SIDE 4 ========================
+\Sheet{GEOMETRY AND 3D VISION}{Global transforms \(\cdot\) stitching \(\cdot\) epipolar geometry \(\cdot\) stereo \(\cdot\) SfM}
+\begin{sheetcol}
+\Topic{1. Global 2D transforms and invariants}
+One mapping across image, unlike independent per-pixel flow. With column homogeneous coordinates \(\tilde x'\sim H\tilde x\):
+\eq{T=\smat{1&0&t_x\\0&1&t_y\\0&0&1},\quad
+ S=\diag(s_x,s_y,1),\quad
+ R=\smat{c&-s&0\\s&c&0\\0&0&1}.}
+\key{Translation} 2 DoF; \key{rigid/Euclidean} \(x'=Rx+t\), 3 DoF, preserves distances/angles/area; \key{similarity} \(x'=sRx+t\), 4 DoF, preserves angles and length ratios, changes absolute lengths/area. Reflection is not a proper rotation. Nonuniform scaling/shear can change angles.
+
+\key{Affine} \(x'=Ax+t\), H last row \([0,0,1]\), 6 DoF; nonsingular A preserves lines, collinearity, parallelism, and ratios \emph{along one line}; not general lengths/angles. Areas scale by \(|\det A|\), not necessarily unchanged. \key{Projective/homography}: nonsingular 3\(\times\)3 H up to scale, 8 DoF, preserves incidence/lines/collinearity (and cross-ratios), generally not parallelism, angles, distance ratios.
+\eq{x'=\frac{h_{11}x+h_{12}y+h_{13}}{h_{31}x+h_{32}y+h_{33}},\quad
+ y'=\frac{h_{21}x+h_{22}y+h_{23}}{h_{31}x+h_{32}y+h_{33}}.}
+Denominator zero maps to infinity. H and \(\alpha H\) equivalent, \(\alpha\ne0\); can set \(h_{33}=1\) only when nonzero. H followed by T = TH, not HT; inverse map uses \(H\inv\). General line transforms as \(\ell'\sim H^{-\mathsf T}\ell\). In 3D use 4\(\times\)4 translation/rotation/scale; rotate\(\to\)translate\(\to\)scale = STR.
+
+\Topic{2. Estimating affine transforms and homographies}
+\key{Affine:} unknown \((a,b,t_x,c,d,t_y)\); each pair \((x,y)\leftrightarrow(u,v)\) gives rows \([x,y,1,0,0,0]\) with target u and \([0,0,0,x,y,1]\) with v. Stack \(2N\!\times\!6\) LS system. Minimum 3 noncollinear source pairs; use extra pairs for noise, RANSAC for outliers.
+
+\key{Homography DLT:} vector h = row-major entries of H; each pair gives:
+\eq{\smat{x&y&1&0&0&0&-ux&-uy&-u\\
+ 0&0&0&x&y&1&-vx&-vy&-v}\,h=0.}
+Stack A shape \(2N\!\times\!9\). Minimum 4 pairs in general position. \(\min\norm{Ah}^2\) alone gives invalid h=0; enforce \(\norm h=1\). Smallest eigenvector of \(A\trans A\) / last \emph{full} right singular vector of A solves homogeneous LS. Normalize coordinates for numerical stability (centroid 0, mean distance \(\sqrt2\)), fit \(H_n\), denormalize \(H=T_2\inv H_nT_1\). SVD nullspace differs from \texttt{lstsq(A,0)}.
+\begin{lstlisting}
+_, _, Vt = np.linalg.svd(A, full_matrices=True)
+H = Vt[-1].reshape(3,3) # 4-pair A is 8x9
+q = H @ np.array([x,y,1.])
+uv = q[:2] / q[2]
+\end{lstlisting}
+\key{Residual:} one-way reprojection \(\norm{x'_i-\pi(H\tilde x_i)}\), \(\pi(a,b,w)=(a/w,b/w)\); symmetric adds reverse direction. Algebraic DLT residual is not pixel distance. RANSAC selects inliers using declared residual/units, then refit and optionally minimize geometric error.
+
+\Topic{3. Warping, interpolation and stitching (Lab4)}
+\key{Forward:} map source grid points to destination and splat; rounding can make holes/collisions. \key{Backward:} for every output point q, evaluate \(I_{out}(q)=I_{src}(\pi(H\inv\tilde q))\); sample source by interpolation. Fills covered destination grid, not invalid/outside coverage. Anti-alias before strong minification.
+
+\key{Bilinear:} source x=i+a, y=j+b, \(0\le a,b<1\); weights TL \((1-a)(1-b)\), TR \(a(1-b)\), BL \((1-a)b\), BR ab; sum 1, access \(I[j,i]\). Nearest uses nearest pixel (blocky); bilinear is linear in each coordinate, not higher-order image reconstruction. Use specified out-of-domain rule.
+
+\key{One H exists} for one scene plane (between suitable ideal cameras), or pure rotation about same optical centre: \(H=K_2R_{21}K_1\inv\). Translation through nonplanar scene gives depth-dependent parallax; one H cannot align all depths. Undistort first; camera-centre rotation differs from rotating about some external pivot.
+
+\key{Stitching:} detect/describe (e.g. SIFT), match/ratio test, affine/H RANSAC, refit, compute warped corner bounds, choose canvas translation, inverse warp and blend. Source-to-canvas \(T_{canvas}H\); account for negative minima. Keep coverage mask: actual black intensity is not missing data.
+
+\key{Blending:} \(I=(w_1I_1+w_2I_2)/(w_1+w_2)\) where covered, or \(\alpha I_1+(1-\alpha)I_2\). Distance/ramp weights soften seams; exposure compensation can reduce brightness mismatch. Misalignment/parallax/moving objects still produce ghosting; blending cannot repair geometry. Outside overlap copy valid source rather than average with zero fill.
+
+\Topic{4. Calibration and lens distortion}
+Known pattern/object coordinates and image observations estimate K, distortion and poses. Intrinsics describe sensor/lens mapping; extrinsics depend on reference frame/view. Planar target images from different poses can calibrate a camera; 2D image-to-image H is not a complete arbitrary-scene 3D reconstruction.
+
+\key{Typical distortion model} in normalized x,y with \(r^2=x^2+y^2\): radial factor \(a=1+k_1r^2+k_2r^4+\cdots\), tangential \(p_1,p_2\):
+\eq{x_d=ax+2p_1xy+p_2(r^2+2x^2),}
+\eq{y_d=ay+p_1(r^2+2y^2)+2p_2xy.}
+Coefficients/signs depend on model. Apply K after normalized-coordinate distortion; undistortion solves the reverse, not simply applying the same polynomial. Higher-order distortion is outside simple pinhole P.
+
+\key{Warp/sample code:} already computed source coordinates xs,ys must be valid for chosen interpolation; don't confuse x with row index.
+\begin{lstlisting}
+ix, iy = np.floor(xs).astype(int), np.floor(ys).astype(int)
+a, b = xs-ix, ys-iy
+val = ((1-a)*(1-b)*I[iy,ix] + a*(1-b)*I[iy,ix+1]
+       + (1-a)*b*I[iy+1,ix] + a*b*I[iy+1,ix+1])
+\end{lstlisting}
+For corner values TL=0, TR=10, BL=20, BR=30 and a=.25,b=.5, weights=(.375,.125,.375,.125), interpolated value=12.5. At a=b=0, returns TL. At image last row/column, use specified edge rule--blindly accessing +1 is invalid.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{5. Two-view geometry: rays, planes and epipoles}
+Camera centres \(C_1,C_2\) and scene point X define epipolar plane; intersections with image planes are epipolar lines. Epipole e = other camera centre's image (possibly at infinity). All epipolar lines in one view pass through its epipole. Point in view 1 restricts correspondence in view 2 from 2D search to a 1D line, not a unique match.
+
+\key{Fundamental matrix} on pixel homogeneous points:
+\eq{\tilde x_2\trans F\tilde x_1=0,\quad
+ \ell_2=F\tilde x_1,\quad\ell_1=F\trans\tilde x_2.}
+F: 3\(\times\)3, rank 2, 7 DoF = 9 entries minus common scale minus rank constraint. \(Fe_1=0\), \(F\trans e_2=0\). \key{Rank is from epipolar null direction, not scale ambiguity}: identity up to scale is still rank 3. For line \(\ell=(a,b,c)\), point distance \(|ax+by+c|/\sqrt{a^2+b^2}\); raw algebraic residual depends on line scale.
+
+\key{Essential matrix} on calibrated normalized coordinates \(y_i=K_i\inv\tilde x_i\), relative pose \(X_2=RX_1+t\):
+\eq{E=[t]_\times R,\quad y_2\trans Ey_1=0,\quad
+ F=K_2^{-\mathsf T}EK_1\inv.}
+\eq{[t]_\times=\smat{0&-t_z&t_y\\t_z&0&-t_x\\-t_y&t_x&0},\quad
+ E=K_2\trans FK_1.}
+E: rank 2, two equal nonzero singular values and one 0, 5 DoF = rotation 3 + translation \emph{direction} 2. Epipolar geometry does not recover translation magnitude. E and F are not interchangeable without intrinsics.
+
+\key{Estimation overview:} F linear 8-point algorithm (not the same as 7 DoF); each \(\tilde x_2\trans F\tilde x_1=0\) is one equation. Normalize points, solve homogeneous system, enforce rank 2 by SVD setting last singular value 0, denormalize. E can use calibrated 5-point algorithm; advanced derivation not required here. RANSAC excludes mismatches before pose/reconstruction. Pure rotation has t=0, E=0 and no ordinary triangulation baseline; use rotation homography, depth remains unknown.
+
+\Topic{6. Rectification, disparity and depth}
+\key{Rectification:} warp views so corresponding epipolar lines become horizontal rows, often with common calibration/principal-point convention. This simplifies matching, not making images identical; occlusion and horizontal disparity remain. Matched v coordinates agree in ideal rectified case.
+
+\key{Declared convention:} parallel cameras, right centre translated +B along left-camera x, f in pixels, equal \(c_x\); \(d=u_L-u_R\):
+\eq{u_L=c_x+fX/Z,\quad u_R=c_x+f(X-B)/Z,}
+\eq{d=fB/Z,\quad Z=fB/d,}
+\eq{X=(u_L-c_x)Z/f_x,\quad Y=(v_L-c_y)Z/f_y.}
+If \(c_{xL}\ne c_{xR}\), use corrected \(d=(u_L-c_{xL})-(u_R-c_{xR})\). HC6b prints opposite disparity sign in one diagram; never copy sign without camera convention. Baseline/depth share physical units; f,d both pixels. Near objects larger d; infinite depth d\(\to0\). Negative d under this setup suggests sign mismatch/bad correspondence (or incompatible camera setup).
+
+\key{Sensitivity:} \(\partial Z/\partial d=-fB/d^2\); \(\sigma_Z\simeq(fB/d^2)\sigma_d\), relative \(\sigma_Z/Z\simeq\sigma_d/|d|\). Greater f/B increases disparity for fixed depth and can improve depth precision; larger baseline also changes visibility/appearance. No baseline gives no metric depth from parallax.
+
+\key{Matching:} evaluate \(C(x,y,d)\) along epipolar row; local SSD \(\sum_W[I_L(x,y)-I_R(x-d,y)]^2\), SAD \(\sum_W|\cdot|\), or correlation/ZNCC. Winner-take-all \(\argmin_d C\) can be noisy. Small windows preserve boundaries but ambiguous; large windows reduce noise but mix depths/oversmooth edges. Textureless/repeated regions, specularity, illumination differences and occlusion break simple matching.
+
+\key{Regularized stereo:}
+\eq{E(D)=\sum_p C(p,D_p)+\lambda\sum_{(p,q)}V(D_p,D_q).}
+Data term measures appearance consistency; smoothness encourages nearby compatible disparities (e.g. \(|D_p-D_q|\), truncated penalties). Large \(\lambda\) can erase true depth jumps; \(\lambda=0\) allows noisy independent choices. Left--right consistency can reject occluded/bad matches; filling holes is inference, not measured correspondence.
+
+\key{Triangulation:} intersect backprojected rays from different centres; with noise minimize reprojection/ray discrepancy. For known camera P and observed \((u,v)\), homogeneous point obeys \((uP_3-P_1)X_h=0\), \((vP_3-P_2)X_h=0\); stack views, solve constrained nullspace, dehomogenize. Rays nearly parallel give poor depth conditioning. Cheirality checks positive depth in visible cameras.
+
+\key{Fast sanity checks:} projected scale \(\propto f/Z\); camera at C means \(RC+t=0\); proper R preserves vector norm; H maps one point to one point, F maps one point to a \emph{line}; rectify before using row-only disparity formula; small disparity means large/error-sensitive depth; pure rotation cannot triangulate scale/depth.
+
+\key{Unit recipes:} stereo \(f=800\) px, B=0.10 m, d=20 px \(\Rightarrow Z=4\) m. Doubling d halves Z. At image downscale a, \(f'=f/a,d'=d/a\) leaves \(f'B/d'=Z\). Cropping changes principal points; neglecting unequal crops can bias d and Z. A finite homography point \((6,9,3)\) is \((2,3)\), not \((6,9)\). Always divide once at final projective step.
+
+\key{Epipolar/depth computation:}
+\begin{lstlisting}
+F = np.linalg.solve(K2.T, E) @ np.linalg.inv(K1)
+l2 = F @ np.array([u1,v1,1.])
+dist = abs(l2 @ [u2,v2,1.]) / np.hypot(l2[0],l2[1])
+Z = f * B / disparity    # valid rectified convention
+sigma_Z = abs(f*B / disparity**2) * sigma_d
+\end{lstlisting}
+At f=800,B=.1,d=20, \(\sigma_d=.5\) pixel yields \(\sigma_Z\simeq.1\) m (2.5\% of Z=4 m). Halving disparity doubles Z and quadruples absolute depth uncertainty at fixed \(\sigma_d\). Reversing F's point order requires transpose; multiplying F by any nonzero scalar leaves distance after absolute normalization unchanged.
+
+\key{Multi-view counts:} M calibrated poses have 6M unknowns, N 3D points 3N; each point/view observation gives 2 pixel residuals, not3. A connected calibrated monocular model has 7-DoF global similarity gauge. More equations than unknowns does not ensure rank/uniqueness; one-view/unobserved points lack triangulation evidence.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{7. Structure from Motion and multi-view stereo}
+\key{SfM = Structure from Motion:} jointly recover camera poses and mostly sparse static-scene 3D points from overlapping images. Unknown extrinsics/structure vs known-camera stereo. Moving objects violate common rigid-scene explanation. \key{MVS = Multi-View Stereo:} densify using estimated/calibrated cameras and multiple observations; usually after SfM.
+
+\key{Incremental pipeline:} extract repeatable descriptors \(\to\) match images/build tracks \(\to\) geometrically verify with E/F/H RANSAC \(\to\) choose well-conditioned initial pair \(\to\) recover relative pose/triangulate \(\to\) register new cameras via 2D--3D PnP \(\to\) triangulate new points \(\to\) filter outliers/refine \(\to\) repeat. Good initialization requires overlap/texture and useful baseline, not pure rotation. Track = same scene point seen across images, not unrelated pairwise matches.
+
+\key{PnP = Perspective-n-Point:} known 3D points + their observed 2D locations + intrinsics \(\to\) camera pose. Unlike two-view E/F fit (2D--2D) or triangulation (known cameras, unknown 3D point). Outliers and degenerate geometry still need care. Pose changes require transforming world points before projection.
+
+\key{Bundle adjustment:} joint nonlinear camera/point refinement minimizes summed reprojection error:
+\eq{\min_{\{K_i,R_i,t_i,X_j\}}\sum_{(i,j)\in\mathcal O}
+ \norm{x_{ij}-\pi(K_i(R_iX_j+t_i))}^2.}
+May use robust residual loss; optimize only specified camera parameters. O contains available visible observations; not every camera sees every point. Gauge/reference constraints required to prevent arbitrary global frame/scale changes. BA is not just independent point fitting with fixed cameras, and minimizes image error rather than a supplied ground-truth 3D distance.
+
+\key{Ambiguity:} calibrated monocular reconstruction is defined up to global similarity (rotation, translation, positive scale); cannot call units metres without metric reference. Known baseline/object dimension sets scale. Uncalibrated reconstruction can have larger projective ambiguity. Scale ambiguity in SfM and homogeneous scale of individual matrices/points are related bookkeeping issues, not proof that every matrix is singular.
+
+\key{Global vs hierarchical:} global estimates multi-camera relations jointly; incremental adds views one at a time; hierarchical reconstructs subgroups and merges, often by similarity transforms. All need correct image associations, outlier handling and connected observation coverage. More views can improve coverage/noise, but repeated texture and systematic errors remain.
+
+\key{Sparse vs dense:} sparse keypoints give a skeleton/poses; MVS recovers surfaces/depth maps where photometric consistency and visibility support them. Occluded/textureless/reflective surfaces remain hard. Fusion merges compatible multi-view estimates; it cannot turn invisible geometry into a direct observation. COLMAP/OpenMVG/Photo Tourism are example SfM systems, not required advanced implementations.
+
+\Topic{8. Shape from X: cues and assumptions}
+\key{Shading:} normal-related intensity, needs assumptions on material/light/camera; convex/concave and light-direction ambiguities. \key{Photometric stereo:} fixed view/different known lights, albedo and normals then integration (page 1). \key{Geometric stereo/motion:} different centres, matching/parallax then depth. Don't use varying-light equations for moving-camera data without aligning geometry.
+
+\key{Texture:} assumed repetitive surface pattern; density, scale, distortion and foreshortening reveal orientation/depth variation. Unknown texture can be mistaken for geometry. \key{Focus/defocus:} sweep focus; highest local sharpness/high-frequency response relates to depth through calibrated optics. Textureless regions offer poor focus cues. \key{Specularities:} view-dependent reflection constrains surface orientation under known/constrained illumination; diffuse assumptions fail.
+
+\key{Shadows:} shadow geometry gives shape/height constraints with light and viewing geometry. Shadow edge is not necessarily a surface/material edge. \key{Silhouettes:} known cameras define viewing cones; intersection is visual hull. Concavities that never alter silhouettes cannot generally be recovered; silhouettes give boundary/occupancy constraints, not complete internal surface detail. SIRFS = Shape, Illumination and Reflectance from Shading; jointly estimating unknown components needs stronger priors than basic known-light SfS.
+
+\key{What geometry cannot promise:} correct matrix dimensions alone do not establish calibration, unique solution, accurate match, visibility or metric scale. Check rank, residual definition, conditioning, frame/sign, masks and model applicability before arithmetic.
+
+\Topic{Multi-view algebra and reconstruction recipes}
+\key{Global scale proof:} for any a>0, replace \(X_j\to aX_j,t_i\to at_i\), leave R,K unchanged. Then \(K_i(R_i(aX_j)+at_i)=aK_i(R_iX_j+t_i)\); perspective division cancels a. Therefore all pixels/reprojection errors unchanged while all scene/camera distances scale a. Baseline or known physical dimension removes this ambiguity.
+
+\key{Two-camera triangulation} from pixel coordinates and known P1,P2:
+\begin{lstlisting}
+A = np.stack([u1*P1[2]-P1[0], v1*P1[2]-P1[1],
+              u2*P2[2]-P2[0], v2*P2[2]-P2[1]])
+_, _, Vt = np.linalg.svd(A)
+Xh = Vt[-1]
+X = Xh[:3] / Xh[3]      # only if finite
+# Reproject to check pixel residuals and depth
+q = P1 @ np.r_[X,1.]
+err = np.linalg.norm(q[:2]/q[2] - [u1,v1])
+\end{lstlisting}
+For f=800, B=.1 m, \((c_x,c_y)=(320,240)\), left pixel (400,260), right (380,260): d=20, Z=4 m, X=.4 m, Y=.1 m. With same point viewed by right camera, camera-frame x=.3 m; reproject right u=380. A two-pixel/three-pixel residual has Euclidean magnitude \(\sqrt{13}\), squared contribution13--don't mix error with squared error in thresholds.
+
+\key{Low parallax:} good homography alignment need not constrain depth. Pure rotation has no baseline; more near-identical views do not repair this.
+
+\end{sheetcol}\EndSheet
+
+% ======================== SIDE 5 ========================
+\Sheet{RECOGNITION, EVALUATION AND LEARNING}{Clustering \(\cdot\) BoVW \(\cdot\) classifiers \(\cdot\) AP/mAP \(\cdot\) training}
+\begin{sheetcol}
+\Topic{1. Tasks, representations and variation}
+\key{Classification}: label whole image (single/multilabel). \key{Localization}: class + position of a target, often one box. \key{Detection}: classes and boxes of multiple instances. \key{Retrieval}: rank database images relevant to query. \key{Semantic segmentation}: class per pixel, no same-class instance separation. \key{Instance}: distinct object masks; \key{panoptic}: semantic labels for all pixels plus instance IDs for countable ``things'', including ``stuff'' like sky.
+
+\key{Semantic gap:} low-level pixels/features vs high-level meaning. Challenges: viewpoint, illumination, scale, deformation, clutter, occlusion, intraclass variation, interclass similarity. Low-level = colour/edges; mid-level = motion/depth; high-level = recognition/semantic interpretation. SLAM = Simultaneous Localization and Mapping; SAM = Segment Anything Model (intro applications, not advanced architecture requirement).
+
+\Topic{2. Clustering: k-means vs mean shift}
+\key{k-means:} unsupervised, choose K centres; minimize
+\eq{J=\sum_i\norm{x_i-\mu_{z_i}}_2^2.}
+Initialize centres; alternate \(z_i=\argmin_k\norm{x_i-\mu_k}^2\) and \(\mu_k=(1/n_k)\sum_{z_i=k}x_i\); stop assignments/objective/iteration cap. Each exact step cannot increase J; local optimum, not necessarily global. K, feature scaling, metric, initial seeds, empty-cluster rule and outliers matter; multiple starts help. Mean minimizes fixed-cluster squared error.
+
+\key{Image clustering:} colour-only features can assign disconnected distant pixels same cluster; cluster ID \(\ne\) semantic object/class \(\ne\) connected component. Adding \((\alpha x,\alpha y)\) encourages spatial compactness; relative units/\(\alpha\) set influence. Large K can fragment, small K merge; no universal choice.
+
+\key{Mean shift:} mode-seeking kernel-density procedure; update location to local weighted mean:
+\eq{x^{new}=\frac{\sum_iw_i(x)x_i}{\sum_iw_i(x)},\quad
+ w_i=g(\norm{(x-x_i)/h}^2).}
+Move repeatedly until convergence; initial positions attracted to same mode share basin/cluster (with mode-merging rule). No preset number of clusters in basic form; bandwidth h controls scale, small h often many fine modes, large h merges. Kernel/feature scale changes behaviour. Mean shift seeks density modes, k-means seeks squared-distance centres; k-NN predicts using labelled neighbours.
+
+\Topic{3. Bag-of-Visual-Words (BoVW/BoW)}
+Training descriptors (SIFT or sampled patches) \(\to\) k-means vocabulary \(\{\mu_k\}_{k=1}^K\) \(\to\) nearest-word quantization \(\to\) K-bin image histogram \(\to\) normalize \(\to\) classifier/retrieval similarity. Hard count \(h_k=\sum_j\mathbf1\{\argmin_l\norm{d_j-\mu_l}=k\}\); L1 \(h/\sum h\), L2 \(h/\norm h\). K sets representation dimension, not descriptor count/image size.
+
+\key{Trade-offs:} loses layout and quantization detail, vocabulary ambiguity/repeated texture; spatial grids can retain coarse layout if explicitly used. Dense sampling = regular coverage; interest points = salient repeatable features. Which wins depends on distinctiveness/coverage/cost/dataset, not a universal database-size law. Fit codebook and preprocessing on train only; validate K/normalization/classifier, keep test untouched.
+
+\Topic{4. k-NN, linear models and SVM}
+\key{k-NN}: supervised, store labelled training vectors, find k nearest, majority/weighted vote with explicit tie rule. \(d_1=\sum_j|x_j-y_j|\), \(d_2=\sqrt{\sum_j(x_j-y_j)^2}\); squared L2 gives same nearest ranking. Feature scaling matters. k=1 sensitive to noise/overfit; larger k smoother, may underfit. Naive query \(O(ND)\) distance work; little fitting but large prediction/storage cost. Validate k/metric, do not tune on test.
+
+\key{Linear scores:} \(s=Wx+b\), \(W\in\R^{C\times D}\); predict \(\argmax_c s_c\). Pairwise class boundaries are hyperplanes in chosen feature space. One-vs-rest trains C binary classifiers; nonlinear features can yield nonlinear raw-pixel boundaries.
+
+\key{SVM = Support Vector Machine:} maximize margin with norm regularization; binary y=\(\pm1\), hinge \(\max(0,1-y(w\trans x+b))\). Soft-margin objective \(\tfrac12\norm w^2+C\sum_i\max(0,1-y_is_i)\). Larger C prioritizes violations/fit, smaller C stronger relative regularization; margin boundaries \(s=\pm1\), width \(2/\norm w\). Support vectors have nonzero dual weights; can lie on/inside margin or be misclassified. Kernel trick computes implicit-feature inner products (e.g. nonlinear boundary) without explicit mapping.
+
+\key{Splits}: train fits parameters; validation chooses hyperparameters/architecture/early stopping; final test estimates selected pipeline. Cross-validation rotates training/validation folds, not repeated test tuning. Standardization, vocabularies and augmentation must not leak held-out information. Parameters are learned weights; hyperparameters are selected settings (K,k,rate,etc.).
+
+\Topic{Vector quantization and classifier calculations}
+\begin{lstlisting}
+# X: N x D features; centres: K x D
+dist2 = ((X[:,None,:]-centres[None,:,:])**2).sum(-1)
+labels = dist2.argmin(axis=1)
+new = centres.copy()
+for k in range(len(centres)):
+    if np.any(labels == k):
+        new[k] = X[labels == k].mean(axis=0)
+# Here empty clusters keep old centre (chosen policy)
+hist = np.bincount(labels, minlength=len(centres))
+\end{lstlisting}
+Same nearest-centre assignment forms hard visual words; a codebook learned once on training descriptors is reused, not re-fit per test image. Histogram (2,0,1) has L1-normalized (2/3,0,1/3), L2-normalized \((2,0,1)/\sqrt5\). Normalization scale changes similarities even though argmax bin remains.
+
+\key{k-NN example:} ordered neighbour labels A,B,B: k=1 predicts A, k=3 predicts B by unweighted majority. Inverse-distance weighting could give a different answer; handle zero distance/ties explicitly. Euclidean distance to \((0,0)\) from (3,4) is5; L1 is7. Distances in different feature units should be scaled from training statistics.
+
+\key{Margin example:} w=(3,4) has norm5, hard-margin width .4 under \(s=\pm1\) normalization. Large raw scores alone do not imply a larger geometric margin; weight norm also matters.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{5. Classification metrics and confusion matrices}
+For chosen positive class: TP actual+/pred+; FP actual-/pred+; FN actual+/pred-; TN actual-/pred-. With confusion rows actual and columns predicted, \(TP_c=C_{cc}\), \(FN_c=\sum_jC_{cj}-TP_c\), \(FP_c=\sum_iC_{ic}-TP_c\); TN = total minus others. Check orientation before sums.
+\eq{\mathrm{Acc}=\frac{TP+TN}{TP+TN+FP+FN},}
+\eq{P=\frac{TP}{TP+FP},\quad R=\frac{TP}{TP+FN}.}
+\eq{F_1=\frac{2PR}{P+R}=\frac{2TP}{2TP+FP+FN}.}
+Recall = sensitivity/TPR; specificity = \(TN/(TN+FP)\), FPR = \(FP/(FP+TN)\). Accuracy can look high with zero minority recall. F1 is harmonic, not arithmetic mean; one weak P/R hurts. Define zero-denominator rule; do not silently claim 0 or 1. Percent vs fraction changes factor 100.
+
+\key{Averages:} macro = equal mean of class-specific metrics; weighted macro weights by specified supports; micro = pool TP/FP/FN then compute. Complete single-label multiclass micro P/R/F1 = accuracy. Macro F1 \(\ne\) F1 of macro P,R in general. Top-k accuracy = true label among k highest scores; top-5 is not five predictions scored independently.
+
+\key{Threshold trade-off:} fixed score ordering, lower cutoff gives more predictions and recall cannot decrease; precision need not be monotonic. Precision--recall curve varies cutoff/rank. Class imbalance affects precision and makes accuracy less useful; score calibration is different from ranking quality.
+
+\Topic{6. Retrieval, AP and mAP}
+\key{Ranking:} first K results, T relevant, G total relevant database items: \(P@K=T/K, R@K=T/G\). Reranking an unchanged top-K set cannot alter P@K/R@K, but can improve P at smaller ranks or AP. A relevant item not retrieved contributes no achieved recall.
+
+\key{Raw ranking AP:} relevance \(r_k\in\{0,1\}\), cumulative \(t_k=\sum_{j\le k}r_j\); \(P_k=t_k/k, R_k=t_k/G\):
+\eq{AP_{raw}=\frac1G\sum_k r_k P_k.}
+Use specified total G; not automatically number of returned relevant results. Unreturned positives contribute 0. Example [TP,FP,TP], G=3 gives \((1+2/3)/3=5/9\), achieved recall 2/3. If all G retrieved, raw AP = average precision at relevant ranks. Sorting/ties must follow evaluation policy.
+
+\key{All-points interpolated AP:} precision envelope \(P_{env}(R)=\max_{\tilde R\ge R}P(\tilde R)\), then sum positive recall jumps \(\sum_i(R_i-R_{i-1})P_{env}(R_i)\); unreached recall contributes 0. Right-to-left cumulative max yields envelope. Can differ from raw AP. Older 11-point AP averages envelope at recalls 0,0.1,\ldots,1; COCO uses its own sampled-recall implementation. Never replace a stated rule with another.
+
+\key{mAP axis:} retrieval = mean query AP, \(Q^{-1}\sum_q AP_q\); detection = mean class AP under common matching/threshold conventions. mAP@0.5 uses IoU threshold .5. COCO-style average also spans IoU .50:.05:.95 (10 thresholds), with specific recall sampling. Mean of raw box precisions is not mAP.
+\begin{lstlisting}
+tp = np.asarray(tp, dtype=float) # score order
+t = tp.cumsum()
+p = t / np.arange(1, len(tp)+1)
+r = t / G
+ap_raw = np.sum(p*tp) / G
+env = np.maximum.accumulate(p[::-1])[::-1]
+ap_interp = np.sum(np.diff(np.r_[0,r])*env)
+\end{lstlisting}
+Here each TP increments recall by 1/G; G>0 and specified missing-positive convention required. Classes/queries with G=0 need the evaluator's separate rule.
+
+\Topic{7. Boxes, IoU and detection evaluation}
+Continuous corner box \([x_1,y_1,x_2,y_2]\), width \(x_2-x_1\), height \(y_2-y_1\), nonnegative valid dimensions. Centre box \((c_x,c_y,w,h)\) has corners \((c_x\pm w/2,c_y\pm h/2)\). Do not add 1 unless inclusive integer-pixel convention stated.
+\eq{w_I=\max(0,\min(x_{2A},x_{2B})-\max(x_{1A},x_{1B})),}
+\eq{h_I=\max(0,\min(y_{2A},y_{2B})-\max(y_{1A},y_{1B})),}
+\eq{IoU=\frac{w_Ih_I}{A_A+A_B-w_Ih_I}.}
+Jaccard index; 0 disjoint, 1 identical positive-area regions; IoU can apply to masks. IoU unaffected by common translation/uniform scale of both regions, unlike raw unnormalized coordinate squared error. Degenerate zero-union needs stated rule.
+
+\key{AP matching:} per class, sort detections descending score; match qualifying overlap to an \emph{unmatched} GT under stated assignment rule; one GT can be claimed once. TP correct class plus sufficient IoU; wrong class/low IoU/duplicate = FP. Unmatched GT = FN. Duplicate overlapping an already claimed object does not become another TP unless validly assigned to another GT. NMS is prediction postprocessing, not GT evaluation matching.
+
+\key{Thresholds differ:} confidence cutoff selects candidates; NMS IoU threshold removes redundant predictions; evaluation IoU threshold decides correctness. These are not the same setting. Early FP lowers some precision but does not force AP=0. For fixed predictions a tighter GT IoU criterion cannot create a previously invalid match, but score/assignment details still matter.
+
+\key{Segmentation scores:} pixel accuracy dominated by large classes/background; per-class IoU \(TP/(TP+FP+FN)\), mean IoU = average class IoU. Dice/F1 \(2TP/(2TP+FP+FN)=2IoU/(1+IoU)\) for same binary counts. Instance evaluation also needs mask-level one-to-one matching.
+
+\key{Metric example:} TP=6, FP=2, FN=4, TN=8 (N=20): P=.75, R=.60, F1=2/3, accuracy=.70. Positive-region IoU=6/12=.50, Dice=12/18=2/3. Adding 80 TN raises accuracy to .94 but leaves P,R,F1,IoU unchanged--background abundance can hide poor positive performance.
+
+\key{AP variants differ:} [FP,TP,TP], G=2: raw AP=\((1/2+2/3)/2=7/12\); all-points envelope AP=2/3. Raising precision at later recall can increase earlier envelope values, not raw rank precision.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{8. Activations, losses and backpropagation}
+\key{Neuron:} affine preactivation \(z=w\trans x+b\), nonlinear output a=\(\phi(z)\). MLP = Multi-Layer Perceptron (FC layers + nonlinearities). Without nonlinearities, composed affine layers remain one affine map; depth alone does not add nonlinear expressive power.
+
+\key{Activations:} ReLU \(\max(0,z)\), derivative 1 if z>0, 0 if z<0 (often 0 at z=0). Leaky ReLU \(\max(z,\alpha z)\), \(0<\alpha<1\), negative derivative \(\alpha\). Sigmoid \(\sigma=1/(1+e^{-z})\), derivative \(\sigma(1-\sigma)\); tanh derivative \(1-\tanh^2z\). Sigmoid/tanh saturate at large \(|z|\), weakening gradients.
+
+\key{Softmax:} \(p_c=e^{z_c}/\sum_je^{z_j}\); subtract max z for stable exponentials. Nonnegative sum-1 outputs are not guaranteed calibrated probabilities. Softmax is shift-invariant to common logit offset, not common scaling; argmax logits = argmax probabilities.
+
+\key{Losses:} multiclass CE \(\ell=-\log p_y=-z_y+\log\sum_j e^{z_j}\); gradient logits \(p-\mathrm{onehot}(y)\). Binary CE \(-y\log p-(1-y)\log(1-p)\); sigmoid-logit derivative p-y. Linear regression identity output, \(\mathrm{MSE}=N^{-1}\sum(\hat y-y)^2\), derivative \(2(\hat y-y)/N\). Sum vs mean conventions change gradient scale. PyTorch \texttt{CrossEntropyLoss}: logits + integer labels; \texttt{NLLLoss}: \emph{log probabilities} + integer labels. Don't apply softmax twice.
+
+\key{Chain rule:} \(\partial\ell/\partial x=(\partial z/\partial x)\trans(\partial\ell/\partial z)\). Affine batch row notation \(Z=XW\trans+b\): \(\nabla_W\ell=\delta\trans X\), \(\nabla_X\ell=\delta W\), \(\nabla_b\ell=\sum_{batch}\delta\). Multiply by activation derivative at each layer. Shared variables sum all path contributions (CNN details page 6).
+
+\Topic{9. Optimization, rate and initialization (Lab5)}
+\key{GD/SGD:} \(\theta\leftarrow\theta-\eta\nabla\ell\); full batch uses all data; stochastic/minibatch estimates gradient with noise. Momentum convention \(v_t=\beta v_{t-1}+g_t\), \(\theta_t=\theta_{t-1}-\eta v_t\) (some include \(1-\beta\); follow definition). Epoch = one pass through train; step = one update. Shuffling reduces order effects; batch size influences noise/work, not trainable weight count.
+
+\key{Adam = Adaptive Moment Estimation} (Kingma/Ba):
+\eq{m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\quad
+ v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2,}
+\eq{\hat m_t=m_t/(1-\beta_1^t),\quad \hat v_t=v_t/(1-\beta_2^t),}
+\eq{\theta_t=\theta_{t-1}-\eta\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}.}
+Elementwise moments, common base learning rate still matters. Large \(\eta\): overshoot/oscillation/divergence; tiny: slow progress. Optimizer ranking is task-dependent; Adam is not universally better than SGD. Compare validation and equal/declared training budgets.
+
+\key{Initialization:} randomize interchangeable hidden weight vectors to break symmetry; identical/zero vectors can learn identically. Zero biases with random weights are fine. All-zero ReLU weights can block useful branch gradients, but some output biases can still update. Xavier/Glorot variance \(\approx2/(fan_{in}+fan_{out})\); uniform bound \(\sqrt{6/(fan_{in}+fan_{out})}\). Kaiming/He ReLU variance \(\approx2/fan_{in}\) (normal std its square root); convolution fan-in = \(K_hK_wC_{in}\), not image area.
+
+\key{Gradient problems:} products of small derivatives \(\to\) vanishing; large \(\to\) exploding/unstable. Help: suitable initialization/normalization, non-saturating activations, residual paths; gradient clipping limits large gradients, not restore vanished ones. Dying ReLU = preactivation stays nonpositive; appropriate rate/init, leaky ReLU/normalization can help; residuals do not guarantee unit revival.
+
+\Topic{10. Generalization, modes and diagnostic code}
+Underfit: poor train and validation (capacity or optimization/constraints). Overfit: strong train, worse held-out, increasing gap. Deeper model with higher \emph{train} error can be optimization difficulty (degradation), not overfit. More depth is not automatically better. Mitigate overfit by augmentation, weight regularization, dropout, early stopping, more representative data/reduced capacity; validate, no guarantees.
+
+\key{Augmentation:} label-preserving transforms or correctly updated boxes/masks; not arbitrary rotations/colour changes for every task. Dropout randomly drops activations during train; ordinary eval disables it with defined scaling. BatchNorm has different train/eval statistics. \texttt{model.eval()} does not disable autograd; \texttt{no\_grad()} does not set eval mode or freeze weights. Freezing = no parameter updates (\texttt{requires\_grad=False}/optimizer selection).
+\begin{lstlisting}
+model.train()
+for x,y in train_loader:
+    optimizer.zero_grad()  # gradients, not weights
+    logits = model(x)
+    loss = criterion(logits,y)
+    loss.backward()       # accumulates derivatives
+    optimizer.step()      # updates parameters
+model.eval()
+with torch.no_grad():
+    logits = model(x)
+    pred = logits.argmax(dim=1)
+\end{lstlisting}
+Total accuracy = total correct/total examples, not unweighted mean batch accuracy with unequal final batch. Per-channel input standardization \((x-\mu)/\sigma\) differs from min-max \((x-\min)/(\max-\min)\); use pretrained statistics and valid nonzero denominators. Grad-CAM inspects class-related spatial influence, not complete causal explanation (page 6).
+
+\key{Stable softmax/CE from logits}, one sample and class index y:
+\begin{lstlisting}
+a = logits - np.max(logits)
+prob = np.exp(a) / np.exp(a).sum()
+ce = -a[y] + np.log(np.exp(a).sum())
+dz = prob.copy()
+dz[y] -= 1             # gradient of CE wrt logits
+\end{lstlisting}
+For logits (0,0), p=(.5,.5), CE=\(\log2\), gradient=(-.5,.5) if y=0. Confident correct logits reduce CE; confident incorrect increase it. Dataset mean loss should be sample-weighted too. Batches n=4 accuracy1 and n=1 accuracy0 give unweighted .5, actual4/5=.8.
+
+\key{L2 penalty:} adding \(\lambda\norm\theta^2/2\) adds gradient \(\lambda\theta\); plain SGD update \(\theta\leftarrow(1-\eta\lambda)\theta-\eta g\). Adaptive-optimizer decoupled weight decay is not automatically identical to this penalty. Frozen weights can coexist with changing BN running statistics in train mode; decide mode as well as parameter updates.
+\end{sheetcol}\EndSheet
+
+% ======================== SIDE 6 ========================
+\Sheet{CNNs, DETECTION AND ARCHITECTURES}{Layer arithmetic \(\cdot\) backprop \(\cdot\) R-CNN/RPN/YOLO \(\cdot\) ResNet \(\cdot\) segmentation}
+\begin{sheetcol}
+\Topic{1. CNN mechanics: shapes, parameters and work}
+\key{CNN = Convolutional Neural Network}: local receptive fields, shared kernels at spatial positions, many output-channel feature maps. Standard ``convolution'' forward is cross-correlation:
+\eq{Y_{o,y,x}=b_o+\sum_{c,a,b}W_{o,c,a,b}
+ X_{c,sy+a-p,sx+b-p}.}
+Each output filter spans all \(C_{in}\) channels; sum channels before activation. Weights shape \((C_{out},C_{in},K_h,K_w)\) in PyTorch; activations \((N,C,H,W)\), common NumPy HWC differs. Channel count = number of filters, not spatial kernel size/depth in z-space.
+
+\key{Output size per axis:} kernel K, stride S, left/right padding \(P_l,P_r\), dilation D, effective kernel \(K_{eff}=D(K-1)+1\):
+\eq{N_{out}=\left\lfloor\frac{N+P_l+P_r-K_{eff}}S\right\rfloor+1.}
+No dilation, symmetric P: \(\lfloor(N+2P-K)/S\rfloor+1\). At stride 1 odd K, P=\((K-1)/2\) preserves size. ``Same'' at larger stride commonly targets \(\lceil N/S\rceil\) and may need asymmetric padding; inspect definition. Stride changes outputs/compute, \emph{not} shared parameters. Activation volume = batch\(\times H_oW_oC_o\), different from parameter count.
+
+\key{Counts including bias:} dense conv \(C_o(K_hK_wC_i+1)\); FC \(D_o(D_i+1)\); 1\(\times\)1 \(C_o(C_i+1)\); biases one/output channel or FC unit, not one/output pixel. Pool/ReLU/flatten/add/concat have 0 ordinary learned parameters. BatchNorm affine has \(2C\) (gamma/beta); running means/variances are state, not trained parameters. Omit +bias only if absent. The supplied textbook caption incorrectly repeats \(C_i\); correct kernel product includes \(C_o\).
+
+\key{Compute:} dense conv MACs \(H_oW_oC_oK_hK_wC_i\) per image, excluding biases/nonlinearities. Multiply+add counted separately \(\approx2\) FLOPs/MAC. Use \emph{output} positions, not input unless size-preserving. Larger stride reduces MACs but same weights; batch multiplies work. Compare like counts (weights vs params vs activations vs MACs).
+
+\key{FC equivalence:} whole \(H\!\times\!W\!\times\!C\) input to D outputs = conv kernel H\(\times\)W, \(C_{out}=D\), no padding, one output position. Shared FC on nonoverlapping K\(\times\)K patches = K\(\times\)K conv stride K. Reusing one FC across patches does not multiply weight count by number of patches. A locally connected unshared layer does multiply distinct per-position weights.
+
+\key{BatchNorm:} per-channel normalize using training batch/spatial statistics, learned \(\gamma,\beta\):
+\eq{y=\gamma\frac{x-\mu_B}{\sqrt{\sigma_B^2+\epsilon}}+\beta.}
+Ordinary eval uses stored statistics, not current test batch. Instance/layer/group norm use different within-sample entry groups; check tensor axes. BN has \(2C\) trainable affine params; running stats are buffers. Normalization can improve training stability, not guarantee no exploding/vanishing values.
+
+\key{1\(\times\)1/bottleneck:} mixes channels at each pixel, no direct spatial mixing; not identity/parameter-free. Reduce channels before expensive 3\(\times\)3 then expand. Two stride-1 3\(\times\)3 layers cover 5\(\times\)5, three cover 7\(\times\)7; at constant C no bias, 18\(C^2\) vs 25\(C^2\), 27\(C^2\) vs 49\(C^2\), plus intermediate nonlinearities; changing channels can alter savings.
+
+\key{3D conv:} kernel \((K_t,K_h,K_w)\), weights \((C_o,C_i,K_t,K_h,K_w)\); params \(C_o(K_tK_hK_wC_i+1)\). Frames T are a temporal axis, not \(C_i=T\) unless explicitly packed as channels. Output shape per axis same formula; MACs \(T_oH_oW_oC_oK_tK_hK_wC_i\). Framewise 2D alone does not mix time. (2+1)D spatial then temporal weights \(K_hK_wC_iC_m+K_tC_mC_o\), plus biases; not always fewer without specifying \(C_m\).
+
+\Topic{2. Pooling, receptive fields and equivariance}
+Max/average pooling operates per channel; no shared learned kernel. Max nonlinear, average fixed linear; both can downsample. Global average pool outputs one mean/channel, no params. Pooling gives limited local robustness, not automatic exact translation invariance. Stride/borders break arbitrary shift equivariance. Convolution shifts output with input (equivariance); invariant output would remain unchanged. Weight sharing improves cost/generalization but may not suit every fixed-position task.
+
+\key{Receptive-field recurrence:} input \(r=1,j=1\); each layer \(r\leftarrow r+(K_{eff}-1)j\), \(j\leftarrow Sj\), in order. j = input-grid jump between outputs. Padding changes location/border coverage, not nominal support size. For L stride-1 K-wide layers \(r=1+L(K-1)\). Pooling contributes its own K,S. Theoretical support \(\ne\) measured effective influence.
+
+\key{Arithmetic example:} 3\(\times\)3 stride1 \(r=3,j=1\); 2\(\times\)2 pool stride2 \(r=4,j=2\); 3\(\times\)3 stride1 \(r=8,j=2\). Don't just add K-1 after strides. A 32\(\times\)32\(\times\)3 input, 5\(\times\)5 conv with 8 filters, P=0,S=1 gives 28\(\times\)28\(\times\)8, weights 600, params 608, MACs \(28^2\cdot8\cdot75=470400\); S=3 gives 10\(\times\)10\(\times\)8, same 608 params.
+
+\Topic{3. Shared-kernel backpropagation}
+Let upstream \(\delta=\partial\ell/\partial Y\); for correlation forward,
+\eq{\frac{\partial\ell}{\partial W_{o,c,a,b}}
+ =\sum_{n,y,x}\delta_{n,o,y,x}X_{n,c,sy+a-p,sx+b-p}.}
+Bias gradient sums \(\delta\) across batch/positions. Input gradient accumulates \(\delta W\) from \emph{every} window containing that input; overlapping patches add, not overwrite. ReLU gradient gates by forward preactivation sign. Max-pool sends gradient to chosen forward maxima (tie rule), average-pool distributes it evenly; repeated influence sums. Check stride/padding/kernel orientation before manually computing input gradient.
+
+\key{Tiny example:} \(X=\smat{0&-1&3\\2&.5&1}\), \(W=\smat{0&1\\1&.5}\), stride1, padding0, bias b=0 gives Y=(1.25,4). For \(\delta=(1,1)\):
+\eq{\nabla_X\ell=\smat{0&1&1\\1&1.5&.5},\quad
+ \nabla_W\ell=\smat{-1&2\\2.5&1.5},\quad \nabla_b\ell=2.}
+
+\key{Layer declarations} (framework syntax to interpret, not required runtime):
+\begin{lstlisting}
+conv = nn.Conv2d(3, 8, kernel_size=5, stride=1)
+fc = nn.Linear(28*28*8, 10) # 62730 params
+flat = features.flatten(start_dim=1) # retain batch
+\end{lstlisting}
+Flatten all nonbatch axes, not just channels; retain sample axis.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{4. Detection: sliding windows and proposals}
+Dense classifier over position/scale/aspect ratio/orientation gives many overlapping candidates. Per axis window count \(\lfloor(N+2P-K)/S\rfloor+1\); total locations = rows\(\times\)cols; multiply by scales/aspects/orientations and classes only if asking scalar class scores/separate class evaluations. One multiclass window \(\ne\) C distinct boxes. Runtime = candidates\(\times\)time/candidate\(\times\)images; units seconds\(\to\)hours divide 3600.
+
+\key{Selective Search:} class-agnostic external heuristic proposals: oversegment, hierarchically merge neighbouring regions using colour/texture/size/fill similarities; use varied initial segmentations/features/scales to generate diverse boxes. Fewer promising candidates than exhaustive windows, not guaranteed complete recall or learned object classifier.
+
+\key{Greedy hard NMS:} sort scores; keep highest remaining; suppress lower-score candidates whose IoU \(>\tau\) (or stated \(\ge\)); repeat. Usually per class. Discarded boxes never suppress others later: A suppressing B and B overlapping C does not imply A suppresses C. Only IoU to \emph{kept} boxes matters. Confidence threshold first/also is different. High crowd overlap can suppress genuine separate instances; NMS doesn't guarantee one box/true object.
+
+\Topic{5. R-CNN family, RoI pooling and RPN}
+\key{R-CNN (Regions with CNN features)}: external Selective Search proposals \(\to\) crop/warp each raw region \(\to\) separate CNN computation \(\to\) class SVM and box regression. Overlapping crops repeat expensive conv work; multistage training/caching. \key{Fast R-CNN}: one shared whole-image conv map \(\to\) each external proposal's RoI pooling \(\to\) FC class/background and box-regression heads; joint task loss, but external proposal bottleneck remains. \key{Faster R-CNN}: shared backbone + learned RPN proposals \(\to\) second-stage RoI head. ``Two-stage'' does not mean every crop gets a separate raw-image backbone.
+
+\key{RoI pooling = Region of Interest pooling:} map proposal to feature map; partition into fixed \(H_r\!\times\!W_r\) bins, pool each/channel; fixed-size \(H_rW_rC\) output from variable region. Quantization may affect alignment; Mask R-CNN adds a mask branch, with more accurate region alignment in common versions (no advanced implementation required).
+
+\key{RPN = Region Proposal Network:} sliding learned predictor on shared map, A anchors/location with scales/aspects. Predict objectness and 4 box offsets per anchor; score-filter/NMS proposals, then second-stage classification/refinement. Objectness = object vs background, not final C-way class. With two-logit objectness: 2A cls +4A reg channels; with scalar sigmoid: A+4A. At \(H_fW_f\) positions, \(H_fW_fA\) anchors; formula depends on stated representation.
+
+\key{Anchor-relative regression} (common convention):
+\eq{t_x=(x-x_a)/w_a,\quad t_y=(y-y_a)/h_a,}
+\eq{t_w=\log(w/w_a),\quad t_h=\log(h/h_a).}
+Decode \(x=x_a+w_at_x,y=y_a+h_at_y,w=w_ae^{t_w},h=h_ae^{t_h}\). Anchor reference shape differs from predicted box; anchors don't increase trainable backbone parameters unless head channels/weights change. Match labels/positive thresholds are detector-specific, not universal IoU settings.
+
+\key{Combined head loss:} classification + weighted box regression for designated positives (e.g. smooth L1). \(\mathrm{smoothL1}(r)=r^2/2\) if \(|r|<1\), else \(|r|-1/2\) in one convention. Ignore/background examples may contribute classification without positive regression.
+
+\Topic{6. One-stage detectors, SSD and YOLO versions}
+\key{One-stage:} directly predict dense class/box outputs from image features, no proposal-then-RoI classification stage. Both one-/two-stage can share a backbone; speed/accuracy depends on design/settings, not an absolute law. \key{SSD = Single Shot MultiBox Detector}: default boxes at multiple feature-map resolutions/scales/aspect ratios for different object sizes.
+
+\key{Original YOLO v1 = You Only Look Once:} S\(\times\)S grid, B boxes/cell, one shared C-class vector/cell:
+\eq{\text{output}=S\times S\times(5B+C),\quad
+ \#boxes=S^2B.}
+Object assigned to cell containing its centre; responsible predictor chosen by overlap in training. Each box: x,y,w,h,confidence; confidence \(=\Pr(object)\,IoU\); class score \(=\Pr(class\mid object)\Pr(object)IoU\). Confidence is \emph{predicted}; no GT is provided at inference. Use v1 cell/image-normalized coordinates, not later anchor equations. Example S=7,B=2,C=20 \(\Rightarrow7\!\times\!7\!\times\!30=1470\) scalars, 98 boxes. Close same-cell objects challenge v1.
+
+\key{Do not generalize v1 equations:} later per-anchor variants may have \(B(5+C)\) channels/cell, different objectness/IoU targets and decoding. Read version and channel convention before counting; both box count and scalar count are different quantities. Filter class scores then NMS under stated policy.
+
+\key{Backbone/neck/head:} backbone extracts features (e.g. VGG, ResNet); neck combines features/scales (FPN, etc.); head outputs classes/boxes/objectness. FPN = Feature Pyramid Network: top-down upsampled coarse semantics + lateral fine-spatial features, multiscale predictions; not just an image pyramid.
+
+\key{YOLOv4 reading:} bag of freebies = training-only improvements with no inference cost (augmentation, loss/training changes); bag of specials = small-cost architectural/postprocessing improvements. Coordinate MSE is scale-sensitive; IoU loss uses relative overlap. Plain \(1-IoU\) can have poor/zero gradient for disjoint boxes; GIoU adds enclosure, DIoU centre distance, CIoU also aspect consistency. Detailed newer detector implementation not required.
+
+\key{NMS example with actual geometry:} A=(0,0,4,2), B=(1,0,5,2), C=(2,0,6,2), scores3,2,1. IoU(A,B)=IoU(B,C)=.6; IoU(A,C)=1/3. At suppression threshold .5, keep A, discard B, keep C. Discarded B cannot suppress C. If treating all overlaps transitively, answer would be wrong.
+
+\key{RPN/head counts:} 20\(\times\)20 feature map, 9 anchors/location gives3600 candidates. With two objectness logits and four offsets/anchor, heads have18 and36 channels. 1\(\times\)1 heads on256 input channels use \((256+1)(18+36)=13878\) params including biases, separate from shared backbone/sliding conv. Five foreground classes typically need6 class/background logits in a two-stage head; class-specific vs class-agnostic box-regression widths depend on stated design.
+\end{sheetcol}\Sep
+\begin{sheetcol}
+\Topic{7. Architectural patterns}
+\key{LeNet}: early backprop-trained conv digit/character recognition, Yann LeCun. \key{AlexNet}: 2012 ImageNet breakthrough, Alex Krizhevsky/Ilya Sutskever/Geoffrey Hinton; GPU training, ReLU/deeper CNN. \key{VGG}: Simonyan/Zisserman (Visual Geometry Group), stacks of 3\(\times\)3 convs + pooling, often increasing channels; VGG16/19 counts learned layers in named architectures. Small stacked kernels enlarge receptive field with extra nonlinearities and often fewer weights than single large kernels for suitable channels.
+
+\Topic{8. ResNet: addition, shortcuts and bottlenecks}
+\key{Residual block:} \(y=x+F(x)\) before optional final activation. Learns residual, can make F=0 for identity \emph{preactivation}. If final ReLU, output is ReLU(x), not identity on arbitrary negative x. Direct addition requires matching spatial/channel shape; use projection/downsampling \(y=P(x)+F(x)\) when changing resolution/channels.
+
+\key{Why:} deep plain networks can have higher train error from optimization difficulty; residual direct paths ease identity-like mapping and gradient propagation, not automatically eliminate overfit or every gradient problem. \(\partial y/\partial x=I+\partial F/\partial x\) before activation; skip has no learned parameters if literal identity, projection does.
+
+\key{Basic block:} commonly two 3\(\times\)3 convs; \key{bottleneck}: 1\(\times\)1 reduce \(C_i\to C_b\), 3\(\times\)3 \(C_b\to C_b\), 1\(\times\)1 expand \(C_b\to C_o\). Weight count \(C_iC_b+9C_b^2+C_bC_o\), plus present biases/BN/projection. Shape-changing 1\(\times\)1 shortcut weights \(C_iC_o\) (stride can downsample). Sum branches does not concatenate/increase channels. ResNet authors: Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.
+
+\Topic{9. Encoder--decoder, segmentation and autoencoders}
+\key{Encoder}: compress/downsample spatial representations, grow context. \key{Decoder}: upsample/reconstruct dense output; low spatial resolution alone loses fine boundaries. \key{FCN = Fully Convolutional Network}: spatial output from convolutional layers rather than one fixed-size classifier head; supports dense prediction within architecture constraints.
+
+\key{Upsampling:} nearest/bilinear fixed interpolation has no trainable parameters. Transposed convolution is learned transpose of convolution's linear matrix (before bias), not mathematical inverse. Output per axis (common convention): \((N-1)S-2P+D(K-1)+P_{out}+1\). ``Output padding'' chooses output shape, not adding learned samples. Uneven overlap can cause checkerboard artifacts; resizing+conv is an alternative.
+
+\key{SegNet}: store encoder max-pool indices, unpool into those positions, then refine. Unpooling does not restore lost nonmax information. \key{U-Net}: corresponding encoder high-resolution features concatenate with upsampled decoder features at matched spatial scales. Channels \(C_1+C_2\) (not C); ResNet adds same-shape tensors and retains C. Crop/resize/shape alignment can be necessary before concat.
+
+\key{Semantic output}: C logits/pixel, per-pixel softmax/CE (or binary sigmoid/BCE); ignore/weight labels as specified. Box classifier is not a segmentation mask. \key{Mask R-CNN}: instance mask branch alongside class/box; separate masks distinguish overlapping same-class objects. \key{Panoptic}: unify thing instances and stuff semantic regions.
+
+\key{Autoencoder}: encoder \(x\to z\), decoder \(z\to\hat x\), train to reconstruct input (MSE/BCE etc.); no separate semantic labels required. Latent bottleneck restricts representation, not guarantee semantic or perfect reconstruction; over-capacity can simply learn copying. Self-supervised rendering/consistency uses observations as targets instead of manual labels for every output; assumptions/visibility still matter.
+
+\Topic{10. Transfer learning, Grad-CAM and course names}
+\key{Transfer:} reuse pretrained features/weights (often ImageNet 1000 classes); replace head for new class meanings/count. Freeze backbone/train new head for limited similar-domain data, fine-tune selected/all layers for more data/domain shift, usually choose suitable lower rate. Validate; no guarantee frozen/random/fine-tuned ordering. Match expected RGB/BGR, scale, mean/std and size; freezing and eval/no-grad are distinct (page 5).
+
+\key{Grad-CAM}: selected conv activations \(A^k\), class score \(s_c\), pooled gradients \(\alpha_k^c=(1/HW)\sum_{i,j}\partial s_c/\partial A^k_{ij}\); heatmap \(\relu(\sum_k\alpha_k^c A^k)\), upsample for display. Helps inspect shortcuts/error attention; coarse localization, not guaranteed causal explanation/precise object mask. Do not disable gradients before computing class-gradient visualization.
+
+\key{Name/term reminders:} photometric stereo--Robert Woodham; Lambert--cosine diffuse law; Phong--ambient/diffuse/specular; Canny--John Canny (1986); Harris/Stephens--corner (1988); Shi/Tomasi--minimum eigenvalue; Lucas/Kanade--local flow (1981); Horn/Schunck--global smooth flow; Lowe--SIFT/ratio; Fischler/Bolles--RANSAC (1981); McCulloch/Pitts--1943 artificial neuron; Rosenblatt--perceptron; Girshick--R-/Fast R-CNN; Ren et al.--Faster R-CNN; Redmon et al.--original YOLO (2016); Glorot/Bengio--Xavier; He--Kaiming/ResNet; Kingma/Ba--Adam.
+
+\key{Exam-use checks:} read convention, units, shapes, padding, threshold strictness, AP variant and detector version first; compute float/full precision, round final value only; exact counts stay integers. This is a course-aligned reference, not an exhaustive guarantee/prediction. Guest Lecture 13 and optional-only advanced implementations are excluded. All 12 main decks, Seminars 1--5 and Labs 0--5 inform these six sides.
+
+\key{Transfer/head arithmetic:} 512 input features to 7 new classes needs \(7(512+1)=3591\) head params with bias; old 1000-class head had513000. Replacing head doesn't change backbone features' channel count. A fully frozen backbone + this head has3591 trainable params (unless other trainable modules are retained), although total stored model params are much larger.
+
+\key{Skip shapes:} 64-channel encoder +128-channel decoder concatenation gives192 channels; direct addition is invalid without shape adaptation. A subsequent 1\(\times\)1 conv to32 channels has \(32(192+1)=6176\) params with bias, not192+32. Upsampling changes spatial resolution, not automatically number of channels/classes.
+\end{sheetcol}\EndSheet
+\end{document}

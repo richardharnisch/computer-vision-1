@@ -4,6 +4,8 @@
 
 ## Start here
 
+**[Six-page A4 cheat sheet](cheat-sheet/cv1-cheat-sheet.pdf)** · [LaTeX source](cheat-sheet/cv1-cheat-sheet.tex) · [Page map, printing and rebuild instructions](cheat-sheet/README.md). Print at 100%, double-sided, on three A4 sheets. It covers all 24 topic groups with dense formulas, definitions, method steps, code recipes and worked examples.
+
 **PDF versions (compiled with LaTeX):**
 
 | Exam | Questions | Separate solutions |
