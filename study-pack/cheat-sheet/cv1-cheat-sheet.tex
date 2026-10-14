@@ -60,9 +60,10 @@
   \vspace{-1pt}\hrule height 0.35pt\vspace{2pt}\noindent
   \hbox to\textwidth\bgroup\ignorespaces}
 \newcommand{\EndSheet}{\unskip\egroup\par}
-\newenvironment{sheetcol}{\stepcounter{sheetcolumn}
+% Keep unchanged columns at their print-tested size; reduce only expanded ones.
+\newenvironment{sheetcol}[1][7.0]{\stepcounter{sheetcolumn}
   \begin{lrbox}{\columnbox}\begin{minipage}[t]{\colwidth}\vspace{0pt}
-  \fontsize{7.0}{7.6}\selectfont}
+  \fontsize{#1}{\dimexpr#1pt+0.6pt\relax}\selectfont}
   {\end{minipage}\end{lrbox}
   \typeout{CV1COL|\thesheet|\thesheetcolumn|\the\dimexpr\ht\columnbox+\dp\columnbox\relax}
   \usebox{\columnbox}\ignorespacesafterend}
@@ -72,7 +73,7 @@
 
 % ======================== SIDE 1 ========================
 \Sheet{IMAGE FORMATION}{Camera \(\cdot\) colour \(\cdot\) reflectance \(\cdot\) photometric stereo}
-\begin{sheetcol}
+\begin{sheetcol}[6.85]
 \Topic{1. Coordinates, pinhole and calibration}
 \key{Conventions throughout:} column vectors; image arrays \(I[y,x]\), x right/y down unless stated; world-to-camera \(X_c=RX_w+t\); virtual image plane in front; visible \(Z_c>0\). A question's convention takes priority. \(\sim\) means equal up to nonzero scale; \(\odot\) is elementwise multiplication.
 
@@ -100,6 +101,14 @@ Points use R and t; directions/normals use only R: \(n_c=Rn_w\). Solve \(Kd=\til
  R_y=\smat{c&0&s\\0&1&0\\-s&0&c}.}
 \eq{R_z=\smat{c&-s&0\\s&c&0\\0&0&1}.}
 Camera rotation vs point rotation can require a transpose. y-down changes apparent rotation direction. Rotate then translate: \(TR\); translate then rotate: \(RT\) (rotate the translation too). In 3D, \(R_1R_2\ne R_2R_1\) in general.
+
+\key{Basic trigonometric values} (angles in degrees):
+\eq{\begin{array}{c|ccccc}
+\theta&0^\circ&30^\circ&45^\circ&60^\circ&90^\circ\\
+\sin\theta&0&1/2&\sqrt2/2&\sqrt3/2&1\\
+\cos\theta&1&\sqrt3/2&\sqrt2/2&1/2&0
+\end{array}}
+\(\sqrt2/2\simeq.7071,\sqrt3/2\simeq.8660\). NumPy uses radians: \(\theta_{rad}=\theta_{deg}\pi/180\), e.g. \texttt{np.sin(np.deg2rad(30))=.5}.
 
 \key{Crop/resize:} crop top-left \((x_0,y_0)\), then resize \((a_x,a_y)\):
 \eq{K'=\smat{a_x&0&-a_xx_0\\0&a_y&-a_yy_0\\0&0&1}K.}
@@ -254,22 +263,32 @@ An upward normal \((-2,1,2)/3\) gives p=1,q=-1/2; moving 4 x-units and 2 y-units
 
 % ======================== SIDE 2 ========================
 \Sheet{IMAGE PROCESSING}{Point operators \(\cdot\) morphology \(\cdot\) filtering \(\cdot\) Fourier \(\cdot\) NumPy}
-\begin{sheetcol}
+\begin{sheetcol}[6.45]
 \Topic{1. Histograms, point operations and thresholding}
 \key{Histogram:} \(h(r)=\#\{I=r\}\); normalized \(p(r)=h(r)/N\), \(\sum p=1\); CDF \(F(r)=\sum_{j\le r}p(j)\), nondecreasing, ends at 1. Counts reveal intensity distribution, not layout, edges or connectivity; multiple images share h. Too few bins merge distinctions, too many give sparse/noisy estimates. Separate RGB histograms lose cross-channel association; joint histograms preserve association, still not spatial layout.
 
 \key{Point operator:} \(s=T(r)\), output depends only on input at same pixel (mapping may depend on global statistics). Linear contrast stretch \(s=c+(r-a)(d-c)/(b-a)\), \(b>a\); clip if specified. \(s=\alpha r+\beta\): \(\alpha\) contrast, \(\beta\) brightness. Negative for levels \(0\ldots L-1\): \(s=L-1-r\). Gamma \(s=cr^\gamma\), normalized \(0<r<1\): \(\gamma<1\) brightens, \(\gamma>1\) darkens. Some systems define inverse gamma; read the formula.
 
-\key{Histogram equalization:} intensity lookup through scaled CDF. Common versions:
-\eq{s(r)=\operatorname{round}[(L-1)F(r)]\quad\text{or}}
+\key{Histogram equalization: hand procedure (S1 Q5c--f).}
+\key{1. Count:} for b-bit image, \(L=2^b\); list every level \(k=0,\ldots,L-1\), including zero-count bins. \(h_k=\#\{I=k\}\), \(N=\sum_kh_k\) (or H\(\times\)W).
+\key{2. Normalize:} \(p_k=h_k/N\).
+\key{3. Cumulate:} \(F_k=\sum_{j=0}^kp_j\); inclusive running sum, last value1.
+\key{4. Map:} multiply by \(L-1\), not L or255 for a 3-bit image. Seminar uses nearest integer, \emph{no CDF-min subtraction}:
+\eq{T(k)=\operatorname{round}[(L-1)F_k].}
+\key{5. Merge counts:} \(h'_s=\sum_{k:T(k)=s}h_k\); add all old counts mapping to s, don't overwrite them. Draw output histogram with x=\(0\ldots L-1\), y=\(h'_s\); \(\sum h'=N\).
+\key{6. Back-project:} replace each original pixel k by T(k): \(J[y,x]=T(I[y,x])\). Positions stay fixed; histogram alone cannot recover them. Compute exact cumulative counts before final rounding.
+
+\key{Other convention}, only if stated:
 \eq{s(r)=\operatorname{round}\!\left[\frac{(L-1)(F(r)-F_{\min})}{1-F_{\min}}\right].}
-F\(_{\min}\): first positive CDF; constant image needs a fallback in second rule. Use stated floor/round and number of levels. Output bin count is sum of counts for every input level mapped there. Cannot split identical input levels, so not necessarily flat/uniform. Map pixels back with the lookup table. Equalize an intensity channel to reduce colour distortion; independent R/G/B mappings can change ratios/hue. Global equalization can amplify noise or neglect local contrast.
+F\(_{\min}\)=first positive CDF; constant image needs a fallback. Floor versus round changes output; \texttt{np.rint} uses ties-to-even. Identical input values cannot split, so a discrete equalized histogram need not be flat; global enhancement can amplify noise/neglect local contrast.
 \begin{lstlisting}
 h = np.bincount(I.ravel(), minlength=L)
 cdf = h.cumsum() / h.sum()
 lut = np.rint((L-1)*cdf).astype(int)
 J = lut[I]  # I must contain integer levels
+h_new = np.bincount(lut, weights=h, minlength=L)
 \end{lstlisting}
+\key{S1 Q5f RGB:} RGB\(\to\)HSV; equalize only V; keep H,S; recombine H,S,V' and convert back to RGB. Retains HSV hue/saturation under ideal conversion (rounding/gamut can affect results). Independent R/G/B equalization changes channel ratios and can change hue.
 \key{Threshold:} \(B[y,x]=1\) if \(I[y,x]\ge T\) (or specified strict rule); binarization discards graded appearance. Lighting/shadows can alter B; component count is not automatically object count.
 
 \Topic{2. Connected components and morphology}
@@ -292,7 +311,15 @@ Opening removes small foreground/protrusions/bridges; closing fills small backgr
 \key{Measurements:} area \(A=\sum B\); centroid \((\bar x,\bar y)=(\sum xB/A,\sum yB/A)\); physical area = pixel count\(\times\)pixel area. Inner boundary \(B-(B\ominus K)\); outer \((B\oplus K)-B\); morphological gradient \((B\oplus K)-(B\ominus K)\). Threshold \(\to\) opening/separation \(\to\) labelling can count objects, but may destroy genuine small ones.
 
 \Topic{Discrete calculations and morphology code}
-\key{Equalization example:} 4 levels, h=(2,1,1,0), N=4; CDF=(.5,.75,1,1). With \(s=\lfloor3F\rfloor\), lookup=(1,2,3,3), output h'=(0,2,1,1). Levels mapping to same output combine counts; don't substitute a 256-level scale or subtract \(F_{min}\) unless asked. \texttt{np.rint} uses ties-to-even, which can differ from half-up rounding.
+\key{S1 Q5c worked table:} L=8, N=4400, nearest integer:
+\eq{\begin{array}{c|rrrrrrrr}
+k&0&1&2&3&4&5&6&7\\
+h_k&900&800&700&600&500&400&300&200\\
+7F_k&1.43&2.70&3.82&4.77&5.57&6.20&6.68&7.00\\
+T(k)&1&3&4&5&6&6&7&7
+\end{array}}
+\(h'=(0,900,0,800,700,600,900,500)\): output6 merges \(500+400\); output7 merges \(300+200\).
+\key{Q5d--e patch:} count \(h=(16,19,14,7,6,2,0,0)\), N=64; \(T=(2,4,5,6,7,7,7,7)\), \(h'=(0,0,16,0,19,14,7,8)\). First row \((1,1,1,3,3,4,4,1)\to(4,4,4,6,6,7,7,4)\); apply lookup to all other pixels likewise.
 
 \key{Symmetric element, zero-padding, odd K:} reduce only active mask positions; full sliding windows below give one output/input pixel.
 \begin{lstlisting}
@@ -306,7 +333,7 @@ eroded = np.all(W[..., K.astype(bool)], axis=-1)
 \end{lstlisting}
 For all-ones 5\(\times\)5 B and 3\(\times\)3 all-active K: zero-padded erosion keeps 9 pixels; dilation within frame keeps 25. Opening restores 25, while cropped zero-padded closing leaves 9--border handling can defeat ideal extensivity. In 3\(\times\)3 identity foreground, 4-connectivity gives 3 components, 8 gives 1; area=3, centroid=(1,1) in zero-based x,y.
 \end{sheetcol}\Sep
-\begin{sheetcol}
+\begin{sheetcol}[6.54]
 \Topic{3. Spatial filtering and noise (Lab2)}
 \key{Linear:} \(H(aI+bJ)=aH(I)+bH(J)\). Fixed unbiased weighted sums are linear; fixed nonzero bias makes an affine map. Median/max/thresholding are nonlinear. Shift invariance means identical translated neighbourhood rules (boundaries can break it).
 \eq{(I*K)[y,x]=\sum_{a,b}K[a,b]I[y-a,x-b],}
@@ -327,10 +354,17 @@ Variances add, not sigmas. Extra blur to target scale: \(\sigma_{add}=\sqrt{\sig
 \key{Median:} middle sorted neighbourhood value (specified even-sample convention), robust to sparse salt-and-pepper outliers, nonlinear, may remove thin structures. Mean/Gaussian can reduce random additive noise but spread impulse outliers and blur transitions. No filter is universally best; noise type/scale and signal detail matter.
 
 \Topic{4. Derivatives, gradients and scale}
-For centred correlation, \(I_x\simeq[I(x+1)-I(x-1)]/2\); omit factor only if stated. \(I_y\) similarly down rows. Sobel x = \(\smat{-1&0&1\\-2&0&2\\-1&0&1}=\smat{1\\2\\1}[-1,0,1]\); smoothing perpendicular to derivative direction. Opposite sign appears in sources. Laplacian discrete example \(\smat{0&1&0\\1&-4&1\\0&1&0}\), sum 0; second derivatives also amplify noise.
+\key{Gradient filters:} central difference correlation \(D_x=[-1,0,1]/2\), \(D_y=D_x\trans\), so \(G_x[y,x]\simeq(I[y,x+1]-I[y,x-1])/2\), \(G_y[y,x]\simeq(I[y+1,x]-I[y-1,x])/2\).
+\key{S3 Q2a uses} \(F_x=[1,0,-1],F_y=F_x\trans\), no factor1/2, correlated with the patch. Thus \(G_x=I_{left}-I_{right},G_y=I_{up}-I_{down}\). It uses the interior 3\(\times\)3 centres of the 5\(\times\)5 patch; don't introduce padded-border votes. Opposite derivative sign leaves magnitude/unsigned HOG unchanged, but rotates signed direction by180\(^{\circ}\).
+\key{Standard choices:} Sobel smooths perpendicular to derivative; Prewitt uses equal perpendicular weights:
+\eq{S_x=\smat{-1&0&1\\-2&0&2\\-1&0&1},\quad
+P_x=\smat{-1&0&1\\-1&0&1\\-1&0&1},\quad S_y=S_x\trans,\ P_y=P_x\trans.}
+Sobel separable \(S_x=[1,2,1]\trans[-1,0,1]\); Prewitt \([1,1,1]\trans[-1,0,1]\). Gaussian derivatives \(I*G_x,I*G_y\) smooth and differentiate. Keep kernel sign, scale, padding and correlation/convolution conventions consistent.
+\key{Gradient magnitude} = Euclidean length of the per-pixel derivative vector, measures intensity-change strength independent of its direction. First square each derivative, add \emph{at that pixel}, then square-root (not sum across the image):
 \eq{\nabla I=(I_x,I_y),\quad m=\sqrt{I_x^2+I_y^2},\quad
  \theta=\operatorname{atan2}(I_y,I_x).}
-Gradient points toward maximum intensity increase and is normal to edge tangent. Large x derivative often indicates a vertical edge. Smooth before differentiation; derivative kernels sum 0 to remove constants (away from boundary artifacts).
+Compute \texttt{np.sqrt(Gx**2+Gy**2)} or \texttt{np.hypot(Gx,Gy)} in float. (3,4) gives m=5; (-3,-4) also5. \(m^2\) is squared magnitude, not magnitude. Laplacian \(\smat{0&1&0\\1&-4&1\\0&1&0}\) is a \emph{second}-derivative filter, not the gradient vector.
+The true/default-sign gradient points toward maximum intensity increase, normal to edge tangent; S3's opposite-sign filter reverses that vector. Large x derivative often indicates a vertical edge. Smooth before differentiating; derivative kernels sum0 to remove constants away from boundaries.
 \eq{\partial_x(I*G)=I*(\partial_xG),\quad
  g'_\sigma=-\frac{x}{\sigma^2}g_\sigma,}
 \eq{g''_\sigma=\left(\frac{x^2}{\sigma^4}-\frac1{\sigma^2}\right)g_\sigma,\quad
@@ -358,7 +392,7 @@ Jconv = np.einsum('yxab,ab->yx', W, G[::-1,::-1])
 
 Independent equal-variance noise: averaging n samples divides variance by n, standard deviation by \(\sqrt n\); not true for correlated noise.
 \end{sheetcol}\Sep
-\begin{sheetcol}
+\begin{sheetcol}[6.75]
 \Topic{5. Fourier analysis: complex numbers to filtering}
 \key{Meaning:} weighted spatial sinusoids/complex exponentials; magnitude = amount, phase = spatial placement. Low frequency: slow broad variation; high: fine detail/edges (also noise). DC = constant component. Complex coefficients are needed even for real images: encode cosine and sine/phase jointly.
 \eq{e^{\ii\theta}=\cos\theta+\ii\sin\theta,\quad
@@ -379,6 +413,8 @@ Independent equal-variance noise: averaging n samples divides variance by n, sta
 \key{Boundary/padding:} finite DFT multiplication yields \emph{circular} convolution (periodic extension). For full linear convolution lengths N,M, pad to at least \(N+M-1\); 2D pad to \(H+K_h-1,W+K_w-1\). Place kernel origin consistently (centred kernels need correct shift before FFT). Zero-padding does not add missing measurements.
 
 \key{Frequency filters:} multiply F by transfer H then inverse transform. Low-pass keeps central low frequencies; high-pass removes DC/slow trends; band-pass selects a range. Ideal sharp cutoff can ring; Gaussian smoother cutoff reduces this. Derivatives multiply continuous spectra by \(\ii\omega_x\) or \(\ii\omega_y\); discrete differences have their own transfer function. Parseval for this DFT: \(\sum_n|f[n]|^2=(1/N)\sum_k|F[k]|^2\).
+
+\key{Examples: low-pass} Gaussian \(G_\sigma\) or box \(\tfrac19\smat{1&1&1\\1&1&1\\1&1&1}\), keeps DC/slow structure, blurs detail. \key{High-pass} Laplacian \(\smat{0&1&0\\1&-4&1\\0&1&0}\), removes constants/emphasizes rapid changes. \key{Band-pass} Difference of Gaussians \(G_{\sigma_1}-G_{\sigma_2}\), \(\sigma_2>\sigma_1\): cancels DC, passes intermediate scales, suppresses very fine noise. Gabor is another oriented frequency-selective example.
 
 \key{Sampling:} Nyquist limit = half sampling rate; spatial frequencies above it alias into lower ones. Low-pass before decimation; factor a downsample reduces admissible original-grid frequency to \(1/(2a)\) cycles/pixel. Resizing without appropriate antialiasing can create moir\'e. FFT is fast DFT evaluation, typically \(O(N\log N)\), not a different transform.
 \begin{lstlisting}
@@ -420,7 +456,7 @@ Jsame = J[ry:ry+I.shape[0], rx:rx+I.shape[1]]
 
 % ======================== SIDE 3 ========================
 \Sheet{FEATURES, FITTING AND MOTION}{Edges \(\cdot\) corners \(\cdot\) SIFT \(\cdot\) RANSAC \(\cdot\) optical flow \(\cdot\) tracking}
-\begin{sheetcol}
+\begin{sheetcol}[6.6]
 \Topic{1. Edges and Canny}
 \key{Edge:} rapid local intensity change, from material, illumination/shadow, surface orientation or depth discontinuity; not necessarily an object boundary. Texture/noise generate edges; missing/fragmented responses do not automatically form complete curves. Edge tangent is perpendicular to \(\nabla I\). Derivative scale selects level of detail.
 
@@ -447,35 +483,48 @@ Both small = flat/unobservable; one large/one small = edge (ambiguous tangent); 
 \key{Scale selection:} Gaussian scale space \(L(x,y,\sigma)=G_\sigma*I\); scale-normalized LoG \(\sigma^2\nabla^2L\) peaks at a characteristic structure size. Extremum over location \emph{and} scale allows corresponding detections after resizing. Small structures can disappear at large scales.
 
 \Topic{3. Histogram of Oriented Gradients (Seminar 3)}
-Compute \(I_x,I_y\), \(m=\sqrt{I_x^2+I_y^2}\), \(\theta=\operatorname{atan2}(I_y,I_x)\). Signed orientation 0--360; unsigned \(\theta\bmod180^\circ\) merges opposite gradients. A 9-bin unsigned hard histogram often uses 20-degree bins; use stated bin edges/centres and interpolation.
-\eq{h_j=\sum_{p\in\mathrm{cell}}m_p\,\mathbf1\{\theta_p\in B_j\}.}
-Unweighted version counts instead of summing m. Zero gradients have no magnitude vote; placeholder angle is meaningless. Modern HOG often aggregates cells, concatenates blocks, normalizes. Seminar's \emph{raw} histogram doubles if image intensity doubles; normalized nonzero histogram can remove common gain. Constant additive offset disappears under derivatives away from padding/clipping.
+\key{Build/write descriptor:} (1) compute \(G_x,G_y\) with consistent filters (page2); (2) magnitude \(m_p=\sqrt{G_{xp}^2+G_{yp}^2}\); (3) unsigned \(\theta_p=(\operatorname{atan2}(G_{yp},G_{xp})180/\pi)\bmod180^\circ\); (4) assign each angle to specified bin; (5) write vector in increasing bin order, including all zeros. For 9 hard bins of width20\(^{\circ}\), \(B_j=[20j,20(j+1))\), j=0..8, so45\(^{\circ}\) goes to entry j=2 (third). Signed gradients instead span360\(^{\circ}\).
+\eq{h_j^{count}=\sum_p\mathbf1\{\theta_p\in B_j\},\quad
+h_j^{mag}=\sum_p m_p\mathbf1\{\theta_p\in B_j\}.}
+Unweighted: add1 per pixel. Weighted: add its magnitude. \(\sum h^{count}\)=number of counted pixels, \(\sum h^{mag}=\sum m_p\). Write \(h=[h_0,h_1,\ldots,h_8]\); multi-cell descriptor concatenates cell vectors in stated spatial order. These are \emph{raw} histograms; normalize only if requested. Real HOG often interpolates votes and normalizes blocks.
 
 \key{Rotation/sign:} basic HOG is not rotation invariant: orientation/spatial bins change; SIFT uses orientation alignment. Flipping both derivative signs preserves m and unsigned orientations but rotates signed angles by \(180^\circ\). Edge tangent vs gradient normal differs by \(90^\circ\).
 \begin{lstlisting}
 mag = np.hypot(Ix, Iy)
 ang = np.degrees(np.arctan2(Iy, Ix)) % 180
-h, _ = np.histogram(ang, bins=np.arange(0,181,20),
-                    weights=mag)
+bins = np.arange(0,181,20)
+h_count, _ = np.histogram(ang, bins)
+h, _ = np.histogram(ang, bins, weights=mag)
 M = np.array([[np.sum(Ix*Ix), np.sum(Ix*Iy)],
               [np.sum(Ix*Iy), np.sum(Iy*Iy)]])
 lam = np.linalg.eigvalsh(M) # ascending
 \end{lstlisting}
 \key{Corner calculation:} \(M=\smat{16&0\\0&4}\) gives eigenvalues 16,4, trace20, det64; k=.04 gives Harris \(64-.04(400)=48\), Shi--Tomasi=4. Edge \(M=\smat{25&0\\0&0}\) gives Harris=-25, ST=0 despite strong trace. M uses squared derivatives, so opposite gradient vectors add evidence rather than cancelling.
 
-\key{HOG example:} gradients (3,4) and (-3,-4) both have magnitude5; signed angles \(53.13^\circ,233.13^\circ\), unsigned both \(53.13^\circ\). Hard 20-degree bins place total10 in [40,60); zero-gradient neighbours contribute0. Count-only histogram gives2. Normalized histogram differs from this raw vote sum.
+\key{S3 Q2d example:} the interior patch has
+\eq{G_x=G_y=\smat{0&0&1\\0&1&1\\1&1&0},\quad
+m=\smat{0&0&\sqrt2\\0&\sqrt2&\sqrt2\\\sqrt2&\sqrt2&0}.}
+Five pixels: angle45\(^{\circ}\), magnitude\(\sqrt2\); four flat pixels: m=0. Seminar assigns their undefined angle a0\(^{\circ}\) placeholder and counts them in unweighted bin0:
+\eq{h^{count}=[4,0,5,0,0,0,0,0,0],}
+\eq{h^{mag}=[0,0,5\sqrt2,0,0,0,0,0,0]\simeq[0,0,7.071,0,0,0,0,0,0].}
+If flat pixels are excluded, count bin0 is0 instead4; state this policy. Their weighted vote is always0. Under \(I'=aI+b\), a>0, raw magnitudes/votes scale a; interior derivatives remove b. Positive gain leaves unweighted counts unchanged. Normalization can remove common gain; ordinary HOG still lacks rotation invariance.
 
 \key{Canny chain:} for low=3, high=8 and adjacent NMS responses 9--5--4--2--6, the 5 and 4 survive through the strong9, the 2 is rejected, and the isolated6 cannot link across2. Hysteresis must run on the thinned response map, not restore a suppressed nonmaximum.
 
 \key{Invariance requires} corresponding detected locations/scales, not merely normalized descriptor values; fixed-size patches are not automatically scale invariant.
 \end{sheetcol}\Sep
-\begin{sheetcol}
+\begin{sheetcol}[6.5]
 \Topic{4. SIFT and local matching (Lab4)}
 \key{Detect vs describe:} detector chooses repeatable locations/scale/orientation; descriptor encodes local appearance to compare. Repeatability is not distinctiveness. Local descriptors allow matches from visible parts under occlusion; geometry/consensus still needed.
 
-\key{SIFT = Scale-Invariant Feature Transform} (David Lowe): (1) Gaussian scale-space pyramid/octaves; DoG \(D=L(k\sigma)-L(\sigma)\); (2) find extrema against 26 neighbours (8 same scale + 9 above + 9 below); (3) localize/refine, reject low contrast/edge-like unstable responses; (4) assign dominant gradient orientation; (5) sample scale-/orientation-aligned gradient histograms, normalize.
+\key{SIFT = Scale-Invariant Feature Transform} (David Lowe).
+\key{S3 Q3a: locate features.} Gaussian scale space \(L(x,y,\sigma)=G_\sigma*I\), multiple scales/octave, downsample by2 between octaves. DoG \(D=L(k\sigma)-L(\sigma)\) approximates scale-normalized LoG \((k-1)\sigma^2\nabla^2L\), detecting blobs. Search \emph{spatial/scale extrema}: greater/smaller than all26 neighbours (8 same scale,9 each adjacent scale). Refine \((x,y,\sigma)\); reject low contrast and unstable edge responses.
 
-\key{Descriptor:} standard 16\(\times\)16 patch, 4\(\times\)4 cells, 8 orientation bins/cell = 128 values; magnitude plus spatial Gaussian weighting, usually interpolation among spatial/orientation bins. Express positions/angles relative to keypoint scale and dominant orientation. L2-normalize, clip strong components (standard 0.2), renormalize. Gradients suppress constant offsets, normalization reduces positive gain; not exact invariance to arbitrary perspective, deformation, shadows/clipping. Multiple dominant orientations can yield multiple descriptors.
+\key{Q3b: invariance. (i) Illumination:} interior \(I'=aI+b\), a>0 gives \(D'=aD\): b cancels, gain preserves ideal extremum locations. Gradients remove b; descriptor normalization removes a. \key{(ii) Scale:} select characteristic \(\sigma\) across scales, sample support proportional to \(\sigma\); resizing shifts the corresponding scale, not a fixed pixel window. \key{(iii) Rotation:} Gaussian/magnitude-weighted local orientation histogram (standard36 bins); dominant peak \(\alpha\) defines patch-coordinate/gradient alignment. Strong secondary peaks can produce additional oriented keypoints.
+
+\key{Q3c:128 numbers.} Aligned 16\(\times\)16 window \(\to\)4\(\times\)4 cells (4\(\times\)4 samples each),8 gradient-orientation bins/cell over360\(^{\circ}\) (45-degree spacing), \emph{not} raw pixels. Gaussian-weighted magnitude votes split between neighbouring orientation/spatial bins. Concatenate16 cell histograms, e.g. row-major:
+\eq{d=[h_{00,0},\ldots,h_{00,7},h_{01,0},\ldots,h_{33,7}]\in\R^{128}.}
+\key{Each consecutive group of8} = one subregion's magnitude-weighted orientation histogram. A60\(^{\circ}\) vote splits \(2m/3\) to45\(^{\circ}\), \(m/3\) to90\(^{\circ}\), before other weights. Relative angle \((\theta-\alpha)\bmod360^\circ\) distinguishes opposite gradients. L2-normalize, clip entries (standard.2), renormalize. Contrast cutoffs, clipping, nonuniform lighting, large projective/deformation changes limit exact invariance.
 
 \key{Matching:} nearest descriptor distance under metric (often L2 for SIFT); brute force n query by m database descriptors of D dimensions costs \(O(nmD)\). Nearest absolute distance alone does not show distinctiveness in repeated texture. Ratio test with nearest \(d_1\), second-nearest \(d_2>0\): keep if \(d_1/d_2<\tau\). Near 1 = ambiguous. \(\tau\) is a chosen threshold, not guaranteed correctness. If squared distances \(D_i=d_i^2\), compare \(D_1/D_2<\tau^2\), not \(\tau\). Mutual nearest/cross-check tests a different consistency rule.
 
@@ -562,7 +611,7 @@ If patch equations are \(2u=4\) and \(3v=-3\), LK gives (2,-1). Replacing the se
 
 % ======================== SIDE 4 ========================
 \Sheet{GEOMETRY AND 3D VISION}{Global transforms \(\cdot\) stitching \(\cdot\) epipolar geometry \(\cdot\) stereo \(\cdot\) SfM}
-\begin{sheetcol}
+\begin{sheetcol}[6.7]
 \Topic{1. Global 2D transforms and invariants}
 One mapping across image, unlike independent per-pixel flow. With column homogeneous coordinates \(\tilde x'\sim H\tilde x\):
 \eq{T=\smat{1&0&t_x\\0&1&t_y\\0&0&1},\quad
@@ -597,7 +646,12 @@ uv = q[:2] / q[2]
 
 \key{One H exists} for one scene plane (between suitable ideal cameras), or pure rotation about same optical centre: \(H=K_2R_{21}K_1\inv\). Translation through nonplanar scene gives depth-dependent parallax; one H cannot align all depths. Undistort first; camera-centre rotation differs from rotating about some external pivot.
 
-\key{Stitching:} detect/describe (e.g. SIFT), match/ratio test, affine/H RANSAC, refit, compute warped corner bounds, choose canvas translation, inverse warp and blend. Source-to-canvas \(T_{canvas}H\); account for negative minima. Keep coverage mask: actual black intensity is not missing data.
+\key{Image-stitching steps (S4 Q1b):} combine overlapping images into one aligned panorama; same optical centre implies rotation homography.
+\key{1. Detect/describe:} repeatable corners/blobs plus local appearance vectors; examples \emph{SIFT, ORB} (Harris detects corners but still needs a descriptor).
+\key{2. Match:} compare descriptors across images, reject ambiguous correspondences; examples \emph{brute-force L2 + Lowe ratio} for SIFT, \emph{Hamming-distance matching} for binary ORB (cosine is another declared similarity).
+\key{3. Estimate alignment:} fit H between corresponding coordinates, reject outliers, refit on all inliers; examples \emph{DLT, RANSAC}. Minimum4 generic pairs. Lab4's \emph{affine LS + RANSAC} is a simpler6-DoF model; use H for general same-centre stitching, \(H=K_2R_{21}K_1\inv\).
+\key{4. Planar map/warp:} transform image corners to choose common canvas, translate negative bounds, resample each view into it; examples \emph{backward mapping + bilinear} or \emph{nearest-neighbour} interpolation. Source-to-canvas \(T_{canvas}H\); keep coverage masks (real black pixels \(\ne\) missing data).
+\key{5. Blend:} combine aligned overlap and copy singly covered pixels; examples \emph{feathering/alpha blending} (normalized spatial ramp weights), \emph{multiband/pyramid blending} (blend across scales to soften seams).
 
 \key{Blending:} \(I=(w_1I_1+w_2I_2)/(w_1+w_2)\) where covered, or \(\alpha I_1+(1-\alpha)I_2\). Distance/ramp weights soften seams; exposure compensation can reduce brightness mismatch. Misalignment/parallax/moving objects still produce ghosting; blending cannot repair geometry. Outside overlap copy valid source rather than average with zero fill.
 
@@ -931,9 +985,12 @@ flat = features.flatten(start_dim=1) # retain batch
 \end{lstlisting}
 Flatten all nonbatch axes, not just channels; retain sample axis.
 \end{sheetcol}\Sep
-\begin{sheetcol}
+\begin{sheetcol}[6.7]
 \Topic{4. Detection: sliding windows and proposals}
-Dense classifier over position/scale/aspect ratio/orientation gives many overlapping candidates. Per axis window count \(\lfloor(N+2P-K)/S\rfloor+1\); total locations = rows\(\times\)cols; multiply by scales/aspects/orientations and classes only if asking scalar class scores/separate class evaluations. One multiclass window \(\ne\) C distinct boxes. Runtime = candidates\(\times\)time/candidate\(\times\)images; units seconds\(\to\)hours divide 3600.
+Dense classifier over position/scale/aspect ratio/orientation gives many overlapping candidates. Per axis window count \(\lfloor(N+2P-K)/S\rfloor+1\); total locations = rows\(\times\)cols. \key{S4 Q4c box-evaluation formula:}
+\eq{N_{eval}=N_{locations}\,N_{aspect\ ratios}\,N_{scales}\,N_{classes}.}
+9 locations\(\times\)3 aspect ratios\(\times\)4 scales\(\times\)5 classes = \key{540 class--box evaluations}, but only108 distinct candidate boxes. Multiply by orientations too if varied; one multiclass window \(\ne\) C distinct boxes. Runtime = candidates\(\times\)time/candidate\(\times\)images; seconds\(\to\)hours divide3600.
+\key{Make sliding windows faster (S4 Q5c):} larger \emph{stride} skips positions (roughly \(S^2\) fewer in2D, exact floor counts above); \emph{segmentation/region proposals} focus on likely object regions instead of all background windows, e.g. Selective Search. Lower search cost can reduce recall or localization precision; segmentation itself also costs computation. Shared whole-image CNN features avoid repeatedly computing overlapping crop features.
 
 \key{Selective Search:} class-agnostic external heuristic proposals: oversegment, hierarchically merge neighbouring regions using colour/texture/size/fill similarities; use varied initial segmentations/features/scales to generate diverse boxes. Fewer promising candidates than exhaustive windows, not guaranteed complete recall or learned object classifier.
 

@@ -2,7 +2,7 @@
 
 **[Printable PDF](cv1-cheat-sheet.pdf) · [Standalone LaTeX source](cv1-cheat-sheet.tex)**
 
-Exactly **six portrait A4 pages**, for three double-sided sheets. Three columns per page, 7-point body text, 6.25-point code, compact native LaTeX equations and matrices, and nominal 5 mm margins. No cover or bibliography consumes a permitted side.
+Exactly **six portrait A4 pages**, for three double-sided sheets. Three columns per page, **6.45–7-point body text** (only expanded columns are smaller), 6.25-point code, compact native LaTeX equations and matrices, and nominal 5 mm margins. No cover or bibliography consumes a permitted side.
 
 ## Print
 
@@ -10,7 +10,15 @@ Exactly **six portrait A4 pages**, for three double-sided sheets. Three columns 
 - Use duplex printing, **flip on the long edge**. Page pairs are 1–2, 3–4 and 5–6.
 - Do not use multiple pages per side or booklet mode. Automatic “Fit” can make the text smaller.
 - Use a high-quality setting. Check one printed side before printing all three sheets. Some punctuation extends less than 0.5 mm into the nominal margins; the printer must support at least a 4.5 mm printable margin.
-- The rendered pages were checked, but **physical print legibility and your printer's printable area were not tested**.
+- The original 7-point version printed successfully, according to your report. The revised, smaller columns were checked in rendered images but **were not physically test-printed here**. Check one revised side before printing the full set.
+
+## 14 October revision — requested additions
+
+- **Side 1:** exact sine/cosine values for 0°, 30°, 45°, 60° and 90°, plus degree/radian conversion.
+- **Side 2:** histogram equalization in six explicit steps; S1 Q5c's complete count/mapping table; Q5d–e's histogram, lookup, merged counts and first-row pixel remapping; Q5f's HSV/V-channel procedure. Named low/high/band-pass examples, the gradient-magnitude definition and calculation, and central-difference/Sobel/Prewitt/Gaussian-derivative choices are explicit.
+- **Side 3:** raw weighted and unweighted HoG formulas, ordered vectors and code; the actual S3 Q2d vectors, including its flat-pixel counting convention. SIFT is organized around **S3 Q3a–c**: feature location/scale, illumination/scale/rotation mechanisms, and the 16 groups of eight descriptor values, with vote interpolation and normalization.
+- **Side 4:** numbered stitching steps with descriptions and example algorithms: detect/describe, match, estimate alignment, warp to a common canvas, blend.
+- **Side 6:** S4 Q4c's explicit locations × aspect ratios × scales × classes formula and **540 evaluations / 108 candidate boxes**. Larger stride and segmentation/proposals reduce sliding-window search, with their cost/recall trade-offs stated.
 
 ## Page map
 
@@ -55,7 +63,9 @@ uv run --no-project study-pack/cheat-sheet/build.py
 
 Requires pdfLaTeX, `latexmk`, `pdftotext`, and the standard LaTeX packages named in the source, including `newtxtext`, `newtxmath`, `microtype` and `listings`. `uv` manages the NumPy dependency used for checks. The `.tex` itself is standalone and does not require Python to compile.
 
-The build executes the **23 NumPy listings on dedicated synthetic inputs**, syntax-checks the **two PyTorch listings without running them**, independently checks worked arithmetic and finite-difference CNN gradients, then compiles and checks the actual PDF. It requires six A4 pages, all 18 columns within the height budget, at least 96% column-height use, the expected topic markers, text inside a 4.5 mm safety boundary, and no overflow or missing-glyph warnings. It copies the PDF here only after the checks pass. Logs stay under `/tmp/opencode/`.
+The build executes the **23 NumPy listings on dedicated synthetic inputs**, syntax-checks the **two PyTorch listings without running them**, independently checks worked arithmetic and finite-difference CNN gradients, then compiles and checks the actual PDF. It also recomputes the requested seminar examples: both equalization histograms and the 8×8 patch, gradient kernels/magnitudes, weighted/unweighted HoG, SIFT normalization/vote arithmetic, trigonometric values, box evaluations and stride counts. These are software/arithmetic checks, not execution of a full SIFT implementation or physical experiments.
+
+It requires six A4 pages, all 18 columns within the height budget, at least 96% column-height use, the expected topic markers (including the requested additions), text inside a 4.5 mm safety boundary, and no overflow or missing-glyph warnings. It copies the PDF here only after the checks pass. Logs stay under `/tmp/opencode/`.
 
 For calculation checks alone:
 
@@ -63,4 +73,4 @@ For calculation checks alone:
 uv run --no-project study-pack/cheat-sheet/verify_math.py
 ```
 
-Current column-height use is **97.1–99.9%, averaging 98.8%**. This measures occupied vertical layout, not black-ink coverage. All six final pages were checked visually from rendered images. Automated checks cannot prove every conceptual statement or replace a physical print check; PDF text extraction is not a proof of correct mathematical rendering.
+Current column-height use is **97.1–99.9%, averaging 99.2%**. This measures occupied vertical layout, not black-ink coverage. All six final pages were checked visually from rendered images. Automated checks cannot prove every conceptual statement or replace a physical print check; PDF text extraction is not a proof of correct mathematical rendering.

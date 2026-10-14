@@ -110,7 +110,8 @@ def verify():
     # 8--10: round/floor distinction, boundary-sensitive morphology, filtering.
     env = run(8, I=np.array([[0, 0], [1, 2]]), L=4)
     close(env["cdf"], [.5, .75, 1, 1])
-    close(env["lut"], [2, 2, 3, 3])  # rint, not the prose example's floor
+    close(env["lut"], [2, 2, 3, 3])  # rint and floor are distinct conventions
+    close(env["h_new"], [0, 0, 3, 1])
     close(np.floor(3*env["cdf"]), [1, 2, 3, 3])
     close(np.bincount(np.array([1, 1, 2, 3]), minlength=4), [0, 2, 1, 1])
     element = np.ones((3, 3), dtype=bool)
@@ -148,6 +149,7 @@ def verify():
     env = run(14, Ix=np.array([[3., -3.], [0., 0.]]),
               Iy=np.array([[4., -4.], [0., 0.]]))
     close(env["h"], [0, 0, 10, 0, 0, 0, 0, 0, 0])
+    close(env["h_count"], [2, 0, 2, 0, 0, 0, 0, 0, 0])
     close(env["lam"], [0, 50])
     close(np.degrees(np.arctan2(4, 3)), 53.13010235415598)
 
@@ -256,7 +258,104 @@ def verify():
     close([tp/(tp+fp), tp/(tp+fn), 2*tp/(2*tp+fp+fn), (tp+tn)/20], [.75, .6, 2/3, .7])
     close((tp+tn+80)/100, .94)
     close([tp/(tp+fp+fn), 2*tp/(2*tp+fp+fn)], [.5, 2/3])
-    print("Verified 23 NumPy listings, 2 syntax-only PyTorch listings, and worked arithmetic.")
+
+    # Requested revision: S1 Q5c--f, with the seminar's stated rounding rule.
+    histogram = np.array([900, 800, 700, 600, 500, 400, 300, 200])
+    env = run(8, I=np.repeat(np.arange(8), histogram), L=8)
+    assert histogram.sum() == 4400
+    close(7*env["cdf"], [1.431818181818, 2.704545454545, 3.818181818182,
+                         4.772727272727, 5.568181818182, 6.204545454545,
+                         6.681818181818, 7])
+    close(env["lut"], [1, 3, 4, 5, 6, 6, 7, 7])
+    close(env["h_new"], [0, 900, 0, 800, 700, 600, 900, 500])
+    patch = np.array([
+        [1, 1, 1, 3, 3, 4, 4, 1], [4, 0, 0, 5, 1, 2, 0, 1],
+        [0, 1, 3, 1, 2, 0, 2, 0], [3, 1, 2, 2, 2, 1, 1, 2],
+        [1, 4, 2, 2, 2, 3, 5, 3], [0, 2, 1, 0, 2, 1, 3, 0],
+        [0, 2, 1, 1, 0, 0, 4, 1], [0, 4, 0, 0, 0, 2, 1, 1],
+    ])
+    env = run(8, I=patch, L=8)
+    close(env["h"], [16, 19, 14, 7, 6, 2, 0, 0])
+    close(env["lut"], [2, 4, 5, 6, 7, 7, 7, 7])
+    close(env["h_new"], [0, 0, 16, 0, 19, 14, 7, 8])
+    close(env["J"][0], [4, 4, 4, 6, 6, 7, 7, 4])
+    assert env["h_new"].sum() == patch.size
+
+    # S3 Q2a--d: independent correlation differences at the nine interior pixels.
+    patch = np.array([[1, 1, 1, 1, 1], [1, 1, 1, 1, 0], [1, 1, 1, 0, 0],
+                      [1, 1, 0, 0, 0], [1, 0, 0, 0, 0]], dtype=float)
+    gx, gy = np.zeros((3, 3)), np.zeros((3, 3))
+    for y, x in np.ndindex(3, 3):
+        gx[y, x] = patch[y+1, x] - patch[y+1, x+2]
+        gy[y, x] = patch[y, x+1] - patch[y+2, x+1]
+    close(gx, [[0, 0, 1], [0, 1, 1], [1, 1, 0]])
+    close(gy, gx)
+    env = run(14, Ix=gx, Iy=gy)
+    close(env["mag"], np.sqrt(2)*gx)
+    close(env["h_count"], [4, 0, 5, 0, 0, 0, 0, 0, 0])
+    close(env["h"], [0, 0, 5*np.sqrt(2), 0, 0, 0, 0, 0, 0])
+    count_valid = np.histogram(env["ang"][env["mag"] > 0], env["bins"])[0]
+    close(count_valid, [0, 0, 5, 0, 0, 0, 0, 0, 0])
+    close(run(14, Ix=-gx, Iy=-gy)["h"], env["h"])
+    close(run(14, Ix=2*gx, Iy=2*gy)["h"], 2*env["h"])
+    close(run(14, Ix=2*gx, Iy=2*gy)["h_count"], env["h_count"])
+
+    # Standard gradient kernels and low/high/band-pass examples.
+    y, x = np.indices((5, 5))
+    ramp = x + 2*y
+    windows = sliding_window_view(ramp, (3, 3))
+    sobel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    prewitt = np.array([[-1, 0, 1]]*3)
+    close(np.einsum("yxab,ab->yx", windows, sobel), np.full((3, 3), 8))
+    close(np.einsum("yxab,ab->yx", windows, sobel.T), np.full((3, 3), 16))
+    close(np.einsum("yxab,ab->yx", windows, prewitt), np.full((3, 3), 6))
+    close(np.einsum("yxab,ab->yx", windows, prewitt.T), np.full((3, 3), 12))
+    low = np.ones((3, 3))/9
+    high = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
+    close(low.sum(), 1)
+    close(high.sum(), 0)
+    omega = np.array([0., 1., 100.])
+    band = np.exp(-omega**2/2) - np.exp(-4*omega**2/2)  # sigma1=1, sigma2=2
+    close(band[[0, 2]], [0, 0])
+    assert band[1] > 0
+
+    # S3 Q3: arithmetic behind illumination invariance and descriptor votes.
+    def gaussian(sigma):
+        grid = np.arange(-2, 3, dtype=float)
+        g = np.exp(-grid**2/(2*sigma**2))
+        g /= g.sum()
+        return np.outer(g, g)
+
+    y, x = np.indices((15, 15))
+    blob = np.exp(-((x-7)**2+(y-7)**2)/(2*1.1**2))
+    dog = gaussian(1.3)-gaussian(.9)
+    response = np.einsum("yxab,ab->yx", sliding_window_view(blob, (5, 5)), dog)
+    transformed = np.einsum("yxab,ab->yx", sliding_window_view(3*blob+5, (5, 5)), dog)
+    close(transformed, 3*response)
+    assert np.argmin(transformed) == np.argmin(response)
+    raw = np.r_[1000., np.ones(127)]
+
+    def descriptor_normalization(vector):
+        vector = vector/np.linalg.norm(vector)
+        vector = np.minimum(vector, .2)
+        return vector/np.linalg.norm(vector)
+
+    close(descriptor_normalization(raw), descriptor_normalization(3*raw))
+    assert 4*4*8 == 128
+    fraction = (60-45)/(90-45)
+    close([6*(1-fraction), 6*fraction], [4, 2])
+    close((150-90) % 360, 60)
+
+    # Exact trig table, S4 Q4c class--box counts, and stride speed-up counts.
+    angles = np.deg2rad([0, 30, 45, 60, 90])
+    close(np.sin(angles), [0, .5, np.sqrt(2)/2, np.sqrt(3)/2, 1])
+    close(np.cos(angles), [1, np.sqrt(3)/2, np.sqrt(2)/2, .5, 0])
+    assert 9*3*4 == 108 and 9*3*4*5 == 540
+    assert ((28-14)//2+1)**2*5 == 320
+    assert ((28+2*2-14)//2+1)**2*5 == 500
+    assert ((28-14)//2+1)**2 < ((28-14)//1+1)**2
+    print("Verified 23 NumPy listings, 2 syntax-only PyTorch listings, worked arithmetic, "
+          "and the requested seminar examples.")
 
 
 if __name__ == "__main__":

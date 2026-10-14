@@ -20,12 +20,15 @@ SOURCE = HERE / "cv1-cheat-sheet.tex"
 OUTPUT = HERE / "cv1-cheat-sheet.pdf"
 NS = {"h": "http://www.w3.org/1999/xhtml"}
 PAGE_MARKERS = [
-    ["Coordinates", "Colour spaces", "Calibrated photometric"],
-    ["Histograms", "Spatial filtering", "Fourier analysis", "NumPy shape"],
-    ["Canny", "SIFT", "RANSAC", "Lucas", "tracking"],
-    ["homographies", "epipolar", "disparity", "Structure from Motion"],
+    ["Coordinates", "Colour spaces", "Calibrated photometric", "trigonometric"],
+    ["Histograms", "Spatial filtering", "Fourier analysis", "NumPy shape", "Q5c",
+     "low-pass", "High-pass", "Band-pass", "Gradient magnitude", "Sobel", "Prewitt"],
+    ["Canny", "SIFT", "RANSAC", "Lucas", "tracking", "Q2d", "Q3a", "Q3b", "Q3c"],
+    ["homographies", "epipolar", "disparity", "Structure from Motion", "stitching steps",
+     "Detect/describe", "Estimate alignment", "feathering"],
     ["k-means", "Visual-Words", "precision", "AP", "Adam"],
-    ["CNN", "RPN", "YOLO", "ResNet", "U-Net", "Grad-CAM"],
+    ["CNN", "RPN", "YOLO", "ResNet", "U-Net", "Grad-CAM", "Q4c", "540", "stride",
+     "segmentation/region proposals"],
 ]
 
 
