@@ -83,6 +83,26 @@ def verify():
     env = run(4, albedo=image, shading=np.array([[[.2], [.8]]]))
     close(env["recolored"], [[[0, 0, 0], [.8, 0, 0]]])
 
+    # Section 6: explicit intensity factors, cosine clamp and light-row strengths.
+    section = text.split(r"\Topic{6. Calibrated photometric stereo (Lab1)}", 1)[1]
+    section = section.split(r"\Topic{7.", 1)[0]
+    assert r"I_j=\rho J_j\max(0,n\trans\ell_j)" in section
+    assert r"L_j=J_j\ell_j\trans" in section
+    directions = np.array([[0., 0., 1.], [math.sqrt(3)/2, 0., .5],
+                           [0., 1., 0.], [0., 0., -1.]])
+    strengths = np.array([100., 100., 80., 40.])
+    intensities = []
+    for strength, direction, expected in zip(strengths, directions, [50., 25., 0., 0.]):
+        env = run(3, I=image, a=[1, 0, 0], b=[0, 1, 0],
+                  rho=.5, J=strength, light=direction)
+        close(env["Id"], expected)
+        intensities.append(env["Id"])
+    light_rows = strengths[:, None] * directions
+    g_pixel = np.array([0., 0., .5])
+    close(light_rows[:3] @ g_pixel, intensities[:3])
+    close(np.linalg.lstsq(light_rows[:3], intensities[:3], rcond=None)[0], g_pixel)
+    assert light_rows[-1] @ g_pixel < 0  # back-facing clamp is not a linear equation
+
     # 5--7: lights-as-rows, intensity row weighting and integrable height.
     lights = np.array([[0, 0, 1], [.8, 0, .6], [0, .8, .6],
                        [-.8, 0, .6], [0, -.8, .6]])

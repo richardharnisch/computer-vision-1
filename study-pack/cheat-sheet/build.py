@@ -20,7 +20,8 @@ SOURCE = HERE / "cv1-cheat-sheet.tex"
 OUTPUT = HERE / "cv1-cheat-sheet.pdf"
 NS = {"h": "http://www.w3.org/1999/xhtml"}
 PAGE_MARKERS = [
-    ["Coordinates", "Colour spaces", "Calibrated photometric", "trigonometric"],
+    ["Coordinates", "Colour spaces", "Calibrated photometric", "trigonometric",
+     "Pixel-intensity components", "Lighting:", "Geometry:", "Material:"],
     ["Histograms", "Spatial filtering", "Fourier analysis", "NumPy shape", "Q5c",
      "low-pass", "High-pass", "Band-pass", "Gradient magnitude", "Sobel", "Prewitt"],
     ["Canny", "SIFT", "RANSAC", "Lucas", "tracking", "Q2d", "Q3a", "Q3b", "Q3c"],

@@ -6,6 +6,8 @@
 
 **[Six-page A4 cheat sheet](cheat-sheet/cv1-cheat-sheet.pdf)** · [LaTeX source](cheat-sheet/cv1-cheat-sheet.tex) · [Page map, printing and rebuild instructions](cheat-sheet/README.md). Print at 100%, double-sided, on three A4 sheets. It covers all 24 topic groups with dense formulas, definitions, method steps, code recipes and worked examples.
 
+**[Condensed master lab: Night Shift](master-lab/master-lab.ipynb)** · [Setup and coverage](master-lab/README.md). Work through Labs 1–5 as one recycling-line inspection project: 16 coding checkpoints, generated data, CPU-only training and separate solutions.
+
 **PDF versions (compiled with LaTeX):**
 
 | Exam | Questions | Separate solutions |

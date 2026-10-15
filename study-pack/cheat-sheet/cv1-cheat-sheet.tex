@@ -195,7 +195,7 @@ Grey-World means (4,2,2) give target 8/3 and gains (2/3,4/3,4/3), corrected mean
 
 \key{Light models:} distant directional strength constant; point-light irradiance additionally decreases with squared distance and direction changes across object. A calibrated single L row per image assumes its direction/strength applies across the modeled surface; nearby-light effects need a different model. Lambertian is view-independent, not independent of light or normal.
 \end{sheetcol}\Sep
-\begin{sheetcol}
+\begin{sheetcol}[6.4]
 \Topic{5. Intrinsic images and shape from shading}
 
 \key{Intrinsic image model:} \(I=A\odot S\), material/albedo A times shading S; possible extra specular layer \(I=A\odot S+H\). Recolour A inside object mask, leave S fixed, multiply (not divide) to reconstruct. Match [0,1] vs [0,255] units: normalized multiplicative layers avoid an unwanted extra factor 255. Synthetic rendering can expose exact layers; synthetic performance is not proof on real scenes.
@@ -208,7 +208,18 @@ recolored = A * shading # compatible shapes
 \key{Shape from shading:} single-view intensity mixes light, material and orientation. Usual assumptions: diffuse constant albedo, known distant light, orthographic camera; still needs boundary/prior/integrability constraints. One intensity constrains n to a cone, not a unique direction. Texture/material changes must not be mistaken for shape.
 
 \Topic{6. Calibrated photometric stereo (Lab1)}
-\key{Setup:} fixed object and camera, multiple lighting directions. Unlike geometric stereo (different viewpoints), it recovers local normals/albedo first, then height by integration. For m lights stacked as rows \(L\in\R^{m\times3}\), observations \(i\in\R^m\), \(g=\rho n\):
+\key{Setup:} fixed object and camera, different calibrated lights. Unlike geometric stereo (different viewpoints), recover normals/albedo first, then integrate for height.
+
+\key{Pixel-intensity components: lighting, geometry, material.}
+\key{Lighting:} known strength \(J_j\) and unit direction \(\ell_j\) \emph{from surface toward light j}.
+\key{Geometry:} unknown unit surface normal n, perpendicular to local surface; sets its orientation to light.
+\key{Material:} unknown diffuse albedo \(\rho\), the reflectance factor (per colour channel), not measured brightness.
+\eq{I_j=\rho J_j\max(0,n\trans\ell_j),\quad n\trans\ell_j=\cos\theta_j.}
+Face-on \(\theta=0^\circ\): strongest; \(90^\circ\): zero; negative dot product: clamp to0. Example \(\rho=.5,J=100,\theta=60^\circ\Rightarrow I=25\).
+
+\key{Assumptions:} n and \(\rho\) fixed across images; Lambertian material, linear camera response, calibrated exposure/gain. Cast shadows, highlights and interreflection violate this model; glossy reflectance needs view direction/BRDF (section4).
+
+\key{Linear system (valid unshadowed data):} stack rows \(L_j=J_j\ell_j\trans\) in \(L\in\R^{m\times3}\); observed \(i=(I_1,\ldots,I_m)\trans\); unknown \(g=\rho n\):
 \eq{i=Lg,\quad \hat g=\argmin_g\norm{Lg-i}_2^2=L^+i.}
 Full column rank: \(\hat g=(L\trans L)\inv L\trans i\); use stable least squares, not explicit inversion. At least 3 linearly independent valid lights; \(\operatorname{rank}L=3\). Three images alone are insufficient. Repeating dependent lights cannot reveal nullspace components. More independent measurements can reduce noise and reveal residual errors, not remove systematic model error.
 

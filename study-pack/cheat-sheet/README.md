@@ -2,7 +2,7 @@
 
 **[Printable PDF](cv1-cheat-sheet.pdf) · [Standalone LaTeX source](cv1-cheat-sheet.tex)**
 
-Exactly **six portrait A4 pages**, for three double-sided sheets. Three columns per page, **6.45–7-point body text** (only expanded columns are smaller), 6.25-point code, compact native LaTeX equations and matrices, and nominal 5 mm margins. No cover or bibliography consumes a permitted side.
+Exactly **six portrait A4 pages**, for three double-sided sheets. Three columns per page, **6.4–7-point body text** (only expanded columns are smaller), 6.25-point code, compact native LaTeX equations and matrices, and nominal 5 mm margins. No cover or bibliography consumes a permitted side.
 
 ## Print
 
@@ -21,6 +21,8 @@ Exactly **six portrait A4 pages**, for three double-sided sheets. Three columns 
 - **Side 6:** S4 Q4c's explicit locations × aspect ratios × scales × classes formula and **540 evaluations / 108 candidate boxes**. Larger stride and segmentation/proposals reduce sliding-window search, with their cost/recall trade-offs stated.
 
 ## Page map
+
+**15 October update — side 1, section 6:** the photometric-stereo intensity model now explicitly defines light strength/direction, surface normal and albedo, including which quantities are known or estimated. It states the Lambertian equation, cosine/clamping behaviour, a numerical example, model assumptions, and how light strength enters each row of L. Only side 1's third column is reduced to 6.4-point body text; its existing material is retained.
 
 | Side | Contents |
 |---|---|
@@ -63,7 +65,7 @@ uv run --no-project study-pack/cheat-sheet/build.py
 
 Requires pdfLaTeX, `latexmk`, `pdftotext`, and the standard LaTeX packages named in the source, including `newtxtext`, `newtxmath`, `microtype` and `listings`. `uv` manages the NumPy dependency used for checks. The `.tex` itself is standalone and does not require Python to compile.
 
-The build executes the **23 NumPy listings on dedicated synthetic inputs**, syntax-checks the **two PyTorch listings without running them**, independently checks worked arithmetic and finite-difference CNN gradients, then compiles and checks the actual PDF. It also recomputes the requested seminar examples: both equalization histograms and the 8×8 patch, gradient kernels/magnitudes, weighted/unweighted HoG, SIFT normalization/vote arithmetic, trigonometric values, box evaluations and stride counts. These are software/arithmetic checks, not execution of a full SIFT implementation or physical experiments.
+The build executes the **23 NumPy listings on dedicated synthetic inputs**, syntax-checks the **two PyTorch listings without running them**, independently checks worked arithmetic and finite-difference CNN gradients, then compiles and checks the actual PDF. It also recomputes the requested seminar examples: both equalization histograms and the 8×8 patch, gradient kernels/magnitudes, weighted/unweighted HoG, SIFT normalization/vote arithmetic, trigonometric values, box evaluations and stride counts. Photometric-stereo checks cover the explicit intensity equation, face-on/angled/tangent/back-facing light, and strength-weighted light rows. These are software/arithmetic checks, not execution of a full SIFT implementation or physical experiments.
 
 It requires six A4 pages, all 18 columns within the height budget, at least 96% column-height use, the expected topic markers (including the requested additions), text inside a 4.5 mm safety boundary, and no overflow or missing-glyph warnings. It copies the PDF here only after the checks pass. Logs stay under `/tmp/opencode/`.
 
@@ -73,4 +75,4 @@ For calculation checks alone:
 uv run --no-project study-pack/cheat-sheet/verify_math.py
 ```
 
-Current column-height use is **97.1–99.9%, averaging 99.2%**. This measures occupied vertical layout, not black-ink coverage. All six final pages were checked visually from rendered images. Automated checks cannot prove every conceptual statement or replace a physical print check; PDF text extraction is not a proof of correct mathematical rendering.
+Current column-height use is **97.1–100.0%, averaging 99.2%**. This measures occupied vertical layout, not black-ink coverage. All six pages were checked visually from rendered images; the updated side 1 was checked again after the photometric-stereo addition. Automated checks cannot prove every conceptual statement or replace a physical print check; PDF text extraction is not a proof of correct mathematical rendering.
