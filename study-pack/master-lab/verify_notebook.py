@@ -74,6 +74,13 @@ def main():
         if cell.cell_type == "code":
             ast.parse(cell.source)
     assert "import solutions" not in "\n".join(c.source for c in delivered.cells)
+    for index, cell in enumerate(delivered.cells):
+        if "exercise_id" in cell.metadata:
+            explanation = delivered.cells[index-1]
+            assert explanation.cell_type == "markdown"
+            assert "#### Your implementation" in explanation.source
+            assert "**Translate to" in explanation.source or "**Implement the sequence" in explanation.source
+            assert explanation.source.count("$$") >= 2 and explanation.source.count("$$") % 2 == 0
 
     html, _ = HTMLExporter().from_notebook_node(delivered)
     (root / "learner-render.html").write_text(html)

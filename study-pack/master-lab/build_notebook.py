@@ -9,6 +9,7 @@ from pathlib import Path
 import textwrap
 
 import nbformat as nbf
+from instructional_notes import NOTES
 
 HERE = Path(__file__).resolve().parent
 
@@ -30,7 +31,8 @@ def make_notebook():
         cells.append(nbf.v4.new_code_cell(source, metadata=metadata))
 
     def exercise(key, text, stub, check):
-        md(text)
+        heading, body = textwrap.dedent(text).strip().split("\n", 1)
+        md(heading + "\n\n" + NOTES[key] + "\n\n#### Your implementation\n\n" + body.strip())
         code(stub, exercise_id=key, tags=["exercise", f"checkpoint-{key}"])
         code(check, tags=["check", f"checkpoint-{key}"])
 

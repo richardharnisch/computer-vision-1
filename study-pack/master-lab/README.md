@@ -9,7 +9,11 @@ and inspect its attention.
 **One notebook, five stations, 16 coding checkpoints.** The learner notebook has 68 cells, compared
 with 537 cells across the supplied Labs 1–4 and the three Lab5 tutorial/assignment notebooks.
 The reduction removes setup, repetitions and large experiment grids, not just explanatory text.
-Suggested active time is about **2½–3½ hours**, depending on fluency; timings are estimates.
+Allow extra reading time if these topics are new; the original **2½–3½ hour** estimate assumes familiarity.
+
+Each checkpoint now includes a teaching section before the implementation contract: context and
+assumptions, TeX equations with explained symbols, array/tensor shapes, and the steps that connect
+the mathematics to NumPy/PyTorch. The coding tasks, checks and separate solutions are unchanged.
 
 ## Start
 
@@ -97,7 +101,8 @@ uv run --project study-pack/master-lab python study-pack/master-lab/build_notebo
 uv run --project study-pack/master-lab python study-pack/master-lab/verify_notebook.py
 ```
 
-`build_notebook.py` is the text/stub authoring source; `mission_support.py` contains fixtures, checks and
+`build_notebook.py` is the notebook/stub authoring source; `instructional_notes.py` contains the expanded
+teaching sections. `mission_support.py` contains fixtures, checks and
 experiment drivers, and `solutions.py` contains separate authored answers. The delivered `.ipynb` is the
 actual learner artifact. The generator **refuses to overwrite changed notebook text/code**; choose a new
 `--output` path if you want a fresh template. Do not regenerate your working copy.
